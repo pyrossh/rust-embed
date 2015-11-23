@@ -1,0 +1,7 @@
+[package]
+name = "rust-embed"
+version = "0.1.0"
+authors = ["Peter John <pyros2097@gmail.com>"]
+
+[dependencies]
+hyper = "*"
