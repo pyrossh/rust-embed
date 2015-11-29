@@ -15,7 +15,7 @@ Generates rust code to embed resource files into your library or executable
     output_file    string is output filename.
 
   example:
-    rust-embed ./src/public ./src/assets.rs
+    rust-embed src/public src/assets.rs
 ```
 
 You can use this to embed your css, js and images into a single executable.
@@ -53,11 +53,11 @@ asset::get(name: str)
 // This will return the data for the specified resource name or will throw an // error if it cannot be found.
 ```
 
-## Exampale
+## Examples
 A simple http server which serves its resources directly.
 
 To compile the assets for the examples,
-`rust-embed ./examples/public/ ./exmaples/assets.rs`
+`rust-embed examples/public/ examples/assets.rs`
 
 To run the examples,
 `cargo run --example http`
@@ -71,14 +71,17 @@ use hyper::net::Fresh;
 
 mod assets;
 
-fn hello(_: Request, res: Response<Fresh>) {
+fn handle_index(_: Request, res: Response<Fresh>) {
     res.send(&assets::index_html).unwrap();
+    // or
+    // res.send(assets::get("examples/public/index.html").unwrap()).unwrap();
 }
 
 fn main() {
   println!("Server running on 127.0.0.1:3000");
-  Server::http("127.0.0.1:3000").unwrap().handle(hello);
+  Server::http("127.0.0.1:3000").unwrap().handle(handle_index).unwrap();
 }
 ```
 
-
+Go Rusketeers!
+The power is yours!
