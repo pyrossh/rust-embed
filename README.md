@@ -1,6 +1,9 @@
 ## Rust Embed
 Generates rust code to embed resource files into your rust executable
 
+# TODO
+  rewrite this to use compiler plugins and macro so that we can use that instead
+
 ```bash
 ./rust-embed
 
