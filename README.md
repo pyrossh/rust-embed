@@ -50,7 +50,7 @@ You can directly access your files as constants from the assets module or
 you can use this function to serve all files stored in your assets folder which might be useful for webservers.
 
 ```rust
-assets:index_html // direct access
+assets::index_html // direct access
 
 assets::get(name: str)  
 // This will return the data for the specified resource name or will throw an error if it cannot be found.
