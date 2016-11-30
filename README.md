@@ -24,6 +24,13 @@ This is similar to [go-bindata](https://github.com/jteeuwen/go-bindata).
 
 This is similar to [pony-embed](https://github.com/pyros2097/pony-embed).
 
+Note:
+ 
+This is not the same as std macros,
+`include_bytes!`
+`include_str!`
+these are macros which generate code at compile time whereas rust-embed generates code when the command is run. And rust-embed works only on folders.
+
 ## Installation
 
 ```
