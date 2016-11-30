@@ -1,14 +1,11 @@
 ## Rust Embed
 Generates rust code to embed resource files into your rust executable
 
-# TODO
-  rewrite this to use compiler plugins and macro so that we can use that instead
-
 ```bash
 ./rust-embed
 
 rust-embed v0.1.0
-Generates rust code to embed resource files into your library or executable
+Generates rust code to embed resource files/folders at compile time into your library or executable
 
   Usage:
     rust-embed input_folder output_file
@@ -29,31 +26,16 @@ This is similar to [pony-embed](https://github.com/pyros2097/pony-embed).
 
 ## Installation
 
-> **Note:** this method currently requires you to be running cargo 0.6.0 or
-> newer.
-
 ```
-cargo install --git https://github.com/pyros2097/rust-embed
+cargo install rust-embed
 ```
-
-or if you're using [`multirust`](https://github.com/brson/multirust)
-
-```
-multirust run nightly cargo install --git https://github.com/pyros2097/rust-embed
-```
-
 
 ## Documentation
-First make sure you've got Rust **1.4.0** or greater available.
-
-You can directly access your files as constants from the assets module or
-you can use this function to serve all files stored in your assets folder which might be useful for webservers.
+It exposes a function to serve all files stored in your assets folder which is useful for webservers. So now you can statically compile all your assets i.e. your /static/ or /public/ folders into the rust executable and serve them. So now you don't need to package your assets with your executable.
 
 ```rust
-assets:index_html // direct access
-
-assets::get(name: str)  
-// This will return the data for the specified resource name or will throw an error if it cannot be found.
+assets::get(path: str)  
+// This will return the data for the file specified by the file path or will throw an error if it cannot be found.
 ```
 
 ## Examples
@@ -88,3 +70,6 @@ fn main() {
 
 Go Rusketeers!
 The power is yours!
+
+# TODO
+  rewrite this to use compiler plugins and macro so that we can use that instead
