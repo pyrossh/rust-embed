@@ -22,7 +22,7 @@ fn recursive_read(pp: &mut Vec<u8>, buffer: &mut Vec<u8>, filepath: &Path) {
                 file.read_to_end(&mut text).unwrap_or_else(|e| {
                     panic!("couldn't read file {}: {}", e, filepath.display());
                 });;
-                let asset_name = path.file_name().unwrap().to_str().unwrap().replace(".", "_").replace("/", "_").replace("-", "_");
+                let asset_name = path.to_str().unwrap().replace(".", "_").replace("/", "_").replace("-", "_");
                 write!(pp, "{}", "    \"");
                 write!(pp, "{}", path.display());
                 write!(pp, "{}", "\"");
