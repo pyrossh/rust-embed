@@ -1,3 +1,4 @@
+#![allow(unused_must_use)]
 use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
@@ -21,14 +22,14 @@ fn recursive_read(pp: &mut Vec<u8>, buffer: &mut Vec<u8>, filepath: &Path) {
                 file.read_to_end(&mut text).unwrap_or_else(|e| {
                     panic!("couldn't read file {}: {}", e, filepath.display());
                 });;
-                let asset_name = path.to_str().unwrap().replace(".", "_").replace("/", "_");
+                let asset_name = path.to_str().unwrap().replace(".", "_").replace("/", "_").replace("-", "_");
                 write!(pp, "{}", "    \"");
                 write!(pp, "{}", path.display());
                 write!(pp, "{}", "\"");
                 write!(pp, "{}", " => Result::Ok(&");
                 write!(pp, "{}", asset_name);
                 write!(pp, "{}", "),\n");
-                write!(buffer, "{}", "#[allow(non_upper_case_globals)]\npub static ");
+                write!(buffer, "{}", "pub static ");
                 write!(buffer, "{}", asset_name);
                 write!(buffer, "{}", ": [u8; ");
                 write!(buffer, "{}", &text.len().to_string());
@@ -66,6 +67,8 @@ fn main() {
     let ref input_folder = args[1];
     let ref output_file = args[2];
     let mut output_buffer: Vec<u8> = vec![];
+    write!(output_buffer, "{}\n", "#![allow(dead_code)]");
+    write!(output_buffer, "{}\n", "#![allow(non_upper_case_globals)]");
     let mut pp: Vec<u8> = vec![];
     write!(pp, "{}", "\npub fn get(name: &str) -> Result<&[u8], &str> {\n  match name {\n");
     recursive_read(&mut pp, &mut output_buffer, Path::new(input_folder));
