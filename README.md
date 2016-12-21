@@ -67,7 +67,7 @@ use hyper::net::Fresh;
 mod assets;
 
 fn handle_index(_: Request, res: Response<Fresh>) {
-    res.send(&assets::index_html).unwrap();
+    res.send(&assets::examples_public_index_html).unwrap();
     // or
     // res.send(assets::get("examples/public/index.html").unwrap()).unwrap();
 }
