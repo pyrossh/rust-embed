@@ -41,8 +41,11 @@ cargo install rust-embed
 It exposes a function to serve all files stored in your assets folder which is useful for webservers. So now you can statically compile all your assets i.e. your /static/ or /public/ folders into the rust executable and serve them. So now you don't need to package your assets with your executable.
 
 ```rust
-assets::get(path: str)  
-// This will return the data for the file specified by the file path or will throw an error if it cannot be found.
+assets::get(path: str) -> Result<&[u8], &str>
+// This will return the data for the file specified by the file path or an error if it cannot be found.
+
+assets::list() -> Vec<&'static str>
+// This will return the list of all files which were included
 ```
 
 ## Examples
