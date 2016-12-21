@@ -11,7 +11,7 @@ fn handle_index(req: Request, res: Response) {
         AbsolutePath(ref path) => {
             println!("GET {:?}", &path);
             if &path[..] == "/" {
-                res.send(&assets::index_html).unwrap();
+                res.send(&assets::examples_public_index_html).unwrap();
             } else {
                 res.send(assets::get(&path[1..path.len()]).unwrap()).unwrap();
             }
