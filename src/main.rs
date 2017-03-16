@@ -57,7 +57,7 @@ fn recursive_read(list: &mut Vec<u8>, pp: &mut Vec<u8>, buffer: &mut Vec<u8>, fi
 
 fn print_usage() {
     print!("
-rust-embed v0.1.0
+rust-embed v0.2.0
 Generates rust code to embed resource files into your library or executable
 
   Usage:
