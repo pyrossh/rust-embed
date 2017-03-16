@@ -6,7 +6,7 @@ readme = "README.md"
 documentation = "https://docs.rs/rust-embed"
 repository = "https://github.com/pyros2097/rust-embed"
 license = "MIT"
-keywords = ["http", "hyper", "rocket", "static", "web", "server"]
+keywords = ["http", "rocket", "static", "web", "server"]
 categories = ["web-programming::http-server"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 
