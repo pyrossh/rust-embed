@@ -1,7 +1,14 @@
 [package]
 name = "rust-embed"
-version = "0.1.0"
-authors = ["Peter John <pyros2097@gmail.com>"]
+version = "0.2.0"
+description = "Generates rust code to embed resource files into your rust executable"
+readme = "README.md"
+documentation = "https://docs.rs/rust-embed"
+repository = "https://github.com/pyros2097/rust-embed"
+license = "MIT"
+keywords = ["http", "hyper", "rocket", "static", "web", "server"]
+categories = ["web-programming::http-server"]
+authors = ["pyros2097 <pyros2097@gmail.com>"]
 
-[dependencies]
+[dev-dependencies]
 hyper = "*"
