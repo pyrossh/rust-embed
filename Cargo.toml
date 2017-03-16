@@ -11,4 +11,4 @@ categories = ["web-programming::http-server"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 
 [dev-dependencies]
-hyper = "*"
+hyper = "0.6.16"
