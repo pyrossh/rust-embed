@@ -88,6 +88,7 @@ fn main() {
 
     write!(output_buffer, "#![allow(dead_code)]");
     write!(output_buffer, "#![allow(non_upper_case_globals)]");
+    write!(output_buffer, "#![allow(unknown_lints)]");
     write!(output_buffer, "#![allow(clippy)]\n");
     write!(list, "{}", "\npub fn list() -> Vec<&'static str> {\n  vec![\n");
     write!(pp, "{}", "\npub fn get(name: &str) -> Result<&[u8], &str> {\n  match name {\n");
