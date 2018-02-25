@@ -82,4 +82,11 @@ Go Rusketeers!
 The power is yours!
 
 # TODO
-  rewrite this to use compiler plugins and macro so that we can use that instead
+Nice. People are still using this. I guess I will need to dig into implementing this in macro so that it automatically embeds these files in release mode and just loads the file on demand in debug mode.
+something like this maybe,
+```rust
+get_asset =  !embed("src/public")
+fn handle_index(req: Request, res: Response<Fresh>) { 
+  res.send(get_asset(req.url.path).unwrap()).unwrap();
+}
+```
