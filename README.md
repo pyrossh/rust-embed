@@ -20,7 +20,7 @@ Generates rust code to embed resource files/folders at compile time into your li
 
 You can use this to embed your css, js and images into a single executable.
 
-This is similar to [go-bindata](https://github.com/jteeuwen/go-bindata).
+This is similar to [go-embed](https://github.com/pyros2097/go-embed).
 
 This is similar to [pony-embed](https://github.com/pyros2097/pony-embed).
 
