@@ -87,7 +87,9 @@ fn main() {
     let mut list: Vec<u8> = vec![];
 
     write!(output_buffer, "#![allow(dead_code)]");
-    write!(output_buffer, "#![allow(non_upper_case_globals)]\n");
+    write!(output_buffer, "#![allow(non_upper_case_globals)]");
+    write!(output_buffer, "#![allow(unknown_lints)]");
+    write!(output_buffer, "#![allow(clippy)]\n");
     write!(list, "{}", "\npub fn list() -> Vec<&'static str> {\n  vec![\n");
     write!(pp, "{}", "\npub fn get(name: &str) -> Result<&[u8], &str> {\n  match name {\n");
     recursive_read(&mut list, &mut pp, &mut output_buffer, Path::new(input_folder));
