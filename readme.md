@@ -27,12 +27,23 @@ It exposes a function to serve all files stored in your assets folder which is u
 system so that it doesn't take to much time to compile;]
 
 ```rust
-asset(path: String) -> Option<String>
+asset(path: String) -> Option<Vec<u8>>
+
+let asset = embed!("examples/public".to_owned());
+match asset("/index.html".to_owned()) {
+    None => assert!(false, "index.html should exist"),
+    _ => assert!(true),
+}
 ```
 
 ## Examples
 To run the examples,
 `cargo run --example hyper`
+
+## Testing
+debug: `cargo test --lib -- --nocapture`
+
+release: `cargo test --lib --release -- --nocapture`
 
 Go Rusketeers!
 The power is yours!
