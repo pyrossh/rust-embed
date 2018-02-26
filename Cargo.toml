@@ -1,14 +1,15 @@
 [package]
 name = "rust-embed"
-version = "0.2.0"
-description = "Generates rust code to embed resource files into your rust executable"
-readme = "README.md"
+version = "0.3.0"
+description = "Rust Marco which loads files into the rust binary at compile time during release and loads the file from the fs during dev"
+readme = "readme.md"
 documentation = "https://docs.rs/rust-embed"
 repository = "https://github.com/pyros2097/rust-embed"
 license = "MIT"
-keywords = ["http", "rocket", "static", "web", "server"]
+keywords = ["http", "hyper", "actix-web", "rocket", "static", "web", "server"]
 categories = ["web-programming::http-server"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 
-[dev-dependencies]
-hyper = "0.6.16"
+[dependencies]
+log = "0.4"
+walkdir = "2.1.4"
