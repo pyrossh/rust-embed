@@ -1,4 +1,4 @@
-## Rust Embed
+## Rust Embed [![crates.io](http://meritbadge.herokuapp.com/rust-embed)](https://crates.io/crates/rust-embed)
 Rust Marco which loads files into the rust binary at compile time during release and loads the file from the fs during dev.
 
 You can use this to embed your css, js and images into a single executable.
