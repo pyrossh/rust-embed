@@ -28,11 +28,17 @@ system so that it doesn't take to much time to compile;]
 
 ```rust
 asset(path: String) -> Option<Vec<u8>>
+```
 
-let asset = embed!("examples/public".to_owned());
-match asset("/index.html".to_owned()) {
-    None => assert!(false, "index.html should exist"),
-    _ => assert!(true),
+## Usage
+```rust
+#[macro_use]
+extern crate rust_embed;
+
+fn main() {
+  let asset = embed!("examples/public".to_owned());
+  let index_html = asset("/index.html".to_owned()).unwrap();
+  println!("{}", index_html);
 }
 ```
 
@@ -41,9 +47,9 @@ To run the examples,
 `cargo run --example hyper`
 
 ## Testing
-debug: `cargo test --lib -- --nocapture`
+debug: `cargo test --lib
 
-release: `cargo test --lib --release -- --nocapture`
+release: `cargo test --lib --release
 
 Go Rusketeers!
 The power is yours!
