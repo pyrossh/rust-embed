@@ -18,5 +18,5 @@ matrix:
 script:
   - |
     cargo clean
-    cargo test --lib -- --nocapture
-    cargo test --lib --release -- --nocapture
+    cargo test --lib
+    cargo test --lib --release
