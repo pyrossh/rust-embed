@@ -1,6 +1,6 @@
 [package]
 name = "rust-embed"
-version = "0.3.0"
+version = "0.3.1"
 description = "Rust Marco which loads files into the rust binary at compile time during release and loads the file from the fs during dev"
 readme = "readme.md"
 documentation = "https://docs.rs/rust-embed"
@@ -10,6 +10,13 @@ keywords = ["http", "rocket", "static", "web", "server"]
 categories = ["web-programming::http-server"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 
+[lib]
+name = "rust-embed"
+plugin = true
+
 [dependencies]
 log = "0.4"
 walkdir = "2.1.4"
+
+[dev-dependencies]
+actix-web = "0.3.3"
