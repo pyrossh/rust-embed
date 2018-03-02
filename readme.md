@@ -23,7 +23,7 @@ rust-embed="0.3.0"
 ```
 
 ## Documentation
-It exposes a function to serve all files stored in your assets folder which is useful for webservers. So now you can statically compile all your assets i.e. your /static/ or /public/ folders into the rust executable and serve them during release and in development it will load the file from the file
+The `embed!` macro takes a folder path and returns a function which allows you to get the file by passing the file path within the folder. So now you can statically compile all your assets i.e. your /static/ or /public/ folders into the rust executable and serve them during release and in development it will load the file from the file
 system so that it doesn't take to much time to compile;]
 
 ```rust
@@ -34,6 +34,8 @@ asset(path: String) -> Option<Vec<u8>>
 ```rust
 #[macro_use]
 extern crate rust_embed;
+
+use rust_embed::*;
 
 fn main() {
   let asset = embed!("examples/public".to_owned());
