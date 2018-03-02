@@ -1,0 +1,22 @@
+language: rust
+sudo: false
+dist: trusty
+
+cache:
+  cargo: true
+
+matrix:
+  include:
+    - rust: 1.21.0
+    - rust: stable
+    - rust: beta
+    - rust: nightly
+  allow_failures:
+    - rust: nightly
+    - rust: beta
+
+script:
+  - |
+    cargo clean
+    cargo test --lib
+    cargo test --lib --release

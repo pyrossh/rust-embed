@@ -1,4 +1,4 @@
-## Rust Embed
+## Rust Embed [![Build Status](https://travis-ci.org/pyros2097/rust-embed.svg?branch=master)](https://travis-ci.org/pyros2097/rust-embed) [![crates.io](http://meritbadge.herokuapp.com/rust-embed)](https://crates.io/crates/rust-embed)
 Rust Marco which loads files into the rust binary at compile time during release and loads the file from the fs during dev.
 
 You can use this to embed your css, js and images into a single executable.
@@ -28,11 +28,17 @@ system so that it doesn't take to much time to compile;]
 
 ```rust
 asset(path: String) -> Option<Vec<u8>>
+```
 
-let asset = embed!("examples/public".to_owned());
-match asset("/index.html".to_owned()) {
-    None => assert!(false, "index.html should exist"),
-    _ => assert!(true),
+## Usage
+```rust
+#[macro_use]
+extern crate rust_embed;
+
+fn main() {
+  let asset = embed!("examples/public".to_owned());
+  let index_html = asset("/index.html".to_owned()).unwrap();
+  println!("{}", index_html);
 }
 ```
 
@@ -41,9 +47,9 @@ To run the examples,
 `cargo run --example hyper`
 
 ## Testing
-debug: `cargo test --lib -- --nocapture`
+debug: `cargo test --lib
 
-release: `cargo test --lib --release -- --nocapture`
+release: `cargo test --lib --release
 
 Go Rusketeers!
 The power is yours!
