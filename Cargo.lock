@@ -683,7 +683,7 @@ dependencies = [
 
 [[package]]
 name = "rust-embed"
-version = "0.3.0"
+version = "0.3.2"
 dependencies = [
  "actix-web 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
