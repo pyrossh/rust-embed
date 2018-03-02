@@ -1,6 +1,3 @@
-#![crate_type = "dylib"]
-#![feature(plugin_registrar)]
-
 #[macro_use]
 extern crate log;
 extern crate walkdir;
@@ -68,20 +65,6 @@ fn generate_assets<'a>(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>
 #[macro_export]
 macro_rules! embed {
     ($x:expr) => ( ::generate_assets($x) )
-}
-
-macro_rules! register_macros {
-    ($reg:expr, $($n:expr => $f:ident),+) => (
-        $($reg.register_macro($n, macros::$f);)+
-    )
-}
-
-/// Compiler hook for Rust to register plugins.
-#[plugin_registrar]
-pub fn plugin_registrar(reg: &mut Registry) {
-    register_macros!(reg,
-        "embed" => embed
-    );
 }
 
 #[cfg(test)]
