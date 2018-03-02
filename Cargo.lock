@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "rust-embed"
-version = "0.3.4"
+version = "0.3.5"
 dependencies = [
  "log 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "walkdir 2.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
