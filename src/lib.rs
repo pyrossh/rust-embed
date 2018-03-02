@@ -3,7 +3,7 @@ extern crate log;
 extern crate walkdir;
 
 #[cfg(debug_assertions)]
-pub fn generate_assets(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>> {
+fn generate_assets(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>> {
     use std::fs::File;
     use std::path::Path;
     use std::io::Read;
@@ -32,7 +32,7 @@ pub fn generate_assets(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>
 }
 
 #[cfg(not(debug_assertions))]
-pub fn generate_assets<'a>(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>> {
+fn generate_assets<'a>(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>> {
     use std::fs::File;
     use std::io::Read;
     use std::path::Path;
