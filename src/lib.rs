@@ -80,7 +80,7 @@ macro_rules! register_macros {
 #[plugin_registrar]
 pub fn plugin_registrar(reg: &mut Registry) {
     register_macros!(reg,
-        "embeb" => embed,
+        "embed" => embed
     );
 }
 
