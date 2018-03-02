@@ -7,16 +7,16 @@ fn generate_assets(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>> {
     use std::fs::File;
     use std::path::Path;
     use std::io::Read;
-    info!("rust-embed: loading folder -> {}", parent_path);
+    info!("loading folder -> {}", parent_path);
     Box::new(move |file_path| {
         let name = &format!("{}{}", parent_path, file_path);
         let path = &Path::new(name);
         let key = String::from(path.to_str().expect("Path does not have a string representation"));
-        info!("rust-embed: asset from file -> {}", key);
+        info!("asset from file -> {}", key);
         let mut file = match File::open(path) {
             Ok(mut file) => file,
             Err(e) => {
-                error!("rust-embed: could not open file -> {} {}", key, e);
+                error!("could not open file -> {} {}", key, e);
                 return None
             }
         };
@@ -24,7 +24,7 @@ fn generate_assets(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>> {
         match file.read_to_end(&mut data) {
             Ok(_) => Some(data),
             Err(e) =>  {
-                error!("rust-embed: could not open file -> {} {}", key, e);
+                error!("could not open file -> {} {}", key, e);
                 return None
             }
         }
@@ -39,18 +39,18 @@ fn generate_assets<'a>(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>
     use walkdir::WalkDir;
     use std::collections::HashMap;
 
-    info!("rust-embed: loading folder -> {}", parent_path);
+    info!("loading folder -> {}", parent_path);
     let mut map = HashMap::new();
     for entry in WalkDir::new(parent_path.clone()).into_iter().filter_map(|e| e.ok()).filter(|e| e.file_type().is_file()) {
-        info!("rust-embed: asset from file -> {}", entry.path().display());
+        info!("asset from file -> {}", entry.path().display());
         let base = &parent_path.clone();
         let key = String::from(entry.path().to_str().expect("Path does not have a string representation")).replace(base, "");
         let mut file = File::open(&Path::new(&entry.path())).unwrap_or_else(|e| {
-            panic!("rust-embed: could not open file -> {} {}", key, e);
+            panic!("could not open file -> {} {}", key, e);
         });
         let mut data: Vec<u8> = Vec::new();
         file.read_to_end(&mut data).unwrap_or_else(|e| {
-            panic!("rust-embed: could not read file -> {} {}", key, e);
+            panic!("could not read file -> {} {}", key, e);
         });
         map.insert(key, data);
     }
