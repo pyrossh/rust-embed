@@ -5,6 +5,7 @@ extern crate rocket_contrib;
 extern crate rust_embed;
 
 use std::path::PathBuf;
+use std::ffi::OsStr;
 use std::io::Cursor;
 use rocket::response;
 use rocket::http::{ContentType, Status};
@@ -28,13 +29,13 @@ fn index<'r>() -> response::Result<'r> {
 fn dist<'r>(file: PathBuf) -> response::Result<'r> {
   let filename = file.display().to_string();
   let asset = embed!("examples/public/".to_owned());
-  // let ext = Path::new(&filename).extension().and_then(OsStr::to_str).expect("Could not get file extension");
-  // let content_type = ContentType::from_extension(ext).expect("Could not get file content type");
+  let ext = file.as_path().extension().and_then(OsStr::to_str).expect("Could not get file extension");
+  let content_type = ContentType::from_extension(ext).expect("Could not get file content type");
   asset(filename.clone()).map_or_else(
     || Err(Status::NotFound),
     |d| {
       response::Response::build()
-        .header(ContentType::HTML)
+        .header(content_type)
         .sized_body(Cursor::new(d))
         .ok()
     },
