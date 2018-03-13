@@ -13,7 +13,7 @@ This is not the same as std macros,
 `include_bytes!`
 `include_str!`
 these are macros which generate code at compile time for only files.
-`embed!("examples/public")` accepts folders and returns a function to get the contents using the file path
+`embed!("examples/public/")` accepts folders and returns a function to get the contents using the file path
 
 ## Installation
 
@@ -36,8 +36,8 @@ asset(path: String) -> Option<Vec<u8>>
 extern crate rust_embed;
 
 fn main() {
-  let asset = embed!("examples/public".to_owned());
-  let index_html = asset("/index.html".to_owned()).unwrap();
+  let asset = embed!("examples/public/".to_owned());
+  let index_html = asset("index.html".to_owned()).unwrap();
   println!("{}", index_html);
 }
 ```
