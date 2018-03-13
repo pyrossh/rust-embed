@@ -9,12 +9,12 @@ use std::ffi::OsStr;
 use std::io::Cursor;
 use rocket::response;
 use rocket::http::{ContentType, Status};
+use rocket::State;
 use rust_embed::*;
 
 #[get("/")]
-fn index<'r>() -> response::Result<'r> {
-  let asset = embed!("examples/public".to_owned());
-  asset("/index.html".to_owned()).map_or_else(
+fn index<'r>(asset: State<Asset>) -> response::Result<'r> {
+  asset("index.html".to_owned()).map_or_else(
     || Err(Status::NotFound),
     |d| {
       response::Response::build()
@@ -26,9 +26,8 @@ fn index<'r>() -> response::Result<'r> {
 }
 
 #[get("/dist/<file..>")]
-fn dist<'r>(file: PathBuf) -> response::Result<'r> {
+fn dist<'r>(asset: State<Asset>, file: PathBuf) -> response::Result<'r> {
   let filename = file.display().to_string();
-  let asset = embed!("examples/public/".to_owned());
   let ext = file.as_path().extension().and_then(OsStr::to_str).expect("Could not get file extension");
   let content_type = ContentType::from_extension(ext).expect("Could not get file content type");
   asset(filename.clone()).map_or_else(
@@ -43,5 +42,8 @@ fn dist<'r>(file: PathBuf) -> response::Result<'r> {
 }
 
 fn main() {
-  rocket::ignite().mount("/", routes![index, dist]).launch();
+  let asset = embed!("examples/public/".to_owned());
+  rocket::ignite()
+  .manage(asset)
+  .mount("/", routes![index, dist]).launch();
 }

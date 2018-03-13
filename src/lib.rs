@@ -2,8 +2,10 @@
 extern crate log;
 extern crate walkdir;
 
+pub type Asset = Box<Fn(String) -> Option<Vec<u8>> + std::marker::Sync + std::marker::Send>;
+
 #[cfg(debug_assertions)]
-pub fn generate_assets(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>> {
+pub fn generate_assets(parent_path: String) -> Asset {
     use std::fs::File;
     use std::path::Path;
     use std::io::Read;
@@ -32,7 +34,7 @@ pub fn generate_assets(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>
 }
 
 #[cfg(not(debug_assertions))]
-pub fn generate_assets<'a>(parent_path: String) -> Box<Fn(String) -> Option<Vec<u8>>> {
+pub fn generate_assets<'a>(parent_path: String) -> Asset {
     use std::fs::File;
     use std::io::Read;
     use std::path::Path;
@@ -72,16 +74,16 @@ mod tests {
     #[test]
     #[cfg(debug_assertions)]
     fn dev() {
-        let asset = embed!("examples/public".to_owned());
-        match asset("/index.html".to_owned()) {
+        let asset = embed!("examples/public/".to_owned());
+        match asset("index.html".to_owned()) {
             None => assert!(false, "index.html should exist"),
             _ => assert!(true),
         }
-        match asset("/gg.html".to_owned()) {
+        match asset("gg.html".to_owned()) {
             Some(_) => assert!(false, "gg.html should not exist"),
             _ => assert!(true),
         }
-        match asset("/images/llama.png".to_owned()) {
+        match asset("images/llama.png".to_owned()) {
             None => assert!(false, "llama.png should exist"),
             _ => assert!(true),
         }
@@ -90,16 +92,16 @@ mod tests {
     #[test]
     #[cfg(not(debug_assertions))]
     fn prod() {
-        let asset = embed!("examples/public".to_owned());
-        match asset("/index.html".to_owned()) {
+        let asset = embed!("examples/public/".to_owned());
+        match asset("index.html".to_owned()) {
             None => assert!(false, "index.html should exist"),
             _ => assert!(true),
         }
-        match asset("/gg.html".to_owned()) {
+        match asset("gg.html".to_owned()) {
             Some(_) => assert!(false, "gg.html should not exist"),
             _ => assert!(true),
         }
-        match asset("/images/llama.png".to_owned()) {
+        match asset("images/llama.png".to_owned()) {
             None => assert!(false, "llama.png should exist"),
             _ => assert!(true),
         }
