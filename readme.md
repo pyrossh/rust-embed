@@ -46,8 +46,11 @@ fn main() {
 
 ## Examples
 To run the example in dev mode where it reads from the fs,
+
 `cargo run --example rocket`
+
 To run the example in release mode where it read from binary,
+
 `cargo run --release --example rocket`
 ## Testing
 debug: `cargo test --lib`
