@@ -19,7 +19,7 @@ these are macros which generate code at compile time for only files.
 
 ```
 [dependencies]
-rust-embed="0.3.0"
+rust-embed="0.5.0"
 ```
 
 ## Documentation
@@ -49,7 +49,7 @@ To run the example in dev mode where it reads from the fs,
 
 `cargo run --example rocket`
 
-To run the example in release mode where it read from binary,
+To run the example in release mode where it reads from binary,
 
 `cargo run --release --example rocket`
 ## Testing
