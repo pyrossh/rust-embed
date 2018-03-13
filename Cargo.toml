@@ -16,3 +16,8 @@ plugin = true
 [dependencies]
 log = "0.4"
 walkdir = "2.1.4"
+
+[dev-dependencies]
+rocket = "0.3.6"
+rocket_codegen = "0.3.6"
+rocket_contrib = "0.3.6"

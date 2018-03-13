@@ -44,7 +44,7 @@ fn main() {
 
 ## Examples
 To run the examples,
-`cargo run --example hyper`
+`cargo run --example rocket`
 
 ## Testing
 debug: `cargo test --lib
