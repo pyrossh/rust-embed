@@ -66,7 +66,7 @@ pub fn generate_assets<'a>(parent_path: String) -> Asset {
 
 #[macro_export]
 macro_rules! embed {
-    ($x:expr) => ( ::generate_assets($x) )
+    ($x:expr) => ( $crate::generate_assets($x) )
 }
 
 #[cfg(test)]
