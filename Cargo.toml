@@ -19,3 +19,10 @@ rocket = "0.3.6"
 rocket_codegen = "0.3.6"
 rocket_contrib = "0.3.6"
 rouille = "2.1.0"
+
+[badges]
+appveyor = { repository = "pyros2097/rust-embed" }
+travis-ci = { repository = "pyros2097/rust-embed" }
+is-it-maintained-issue-resolution = { repository = "pyros2097/rust-embed" }
+is-it-maintained-open-issues = { repository = "pyros2097/rust-embed" }
+maintenance = { status = "passively-maintained" }
