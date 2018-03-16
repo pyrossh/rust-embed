@@ -701,7 +701,7 @@ dependencies = [
 
 [[package]]
 name = "rust-embed"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "log 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rocket 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",

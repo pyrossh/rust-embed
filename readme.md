@@ -19,7 +19,7 @@ these are macros which generate code at compile time for only files.
 
 ```
 [dependencies]
-rust-embed="0.5.1"
+rust-embed="0.5.2"
 ```
 
 ## Documentation
