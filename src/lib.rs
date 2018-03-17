@@ -57,6 +57,7 @@ pub fn generate_assets<'a>(parent_path: String) -> Asset {
         map.insert(key, data);
     }
     Box::new(move |file_path| {
+        info!("asset from cache -> {}", file_path);
         match map.get(&file_path) {
             Some(s) => Some(s.to_vec()),
             None => None,
