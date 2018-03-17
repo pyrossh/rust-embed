@@ -19,6 +19,7 @@ rocket = "0.3.6"
 rocket_codegen = "0.3.6"
 rocket_contrib = "0.3.6"
 rouille = "2.1.0"
+fern = "0.5"
 
 [badges]
 appveyor = { repository = "pyros2097/rust-embed" }
