@@ -1,7 +1,7 @@
 [package]
 name = "rust-embed"
-version = "0.5.2"
-description = "Rust Marco which loads files into the rust binary at compile time during release and loads the file from the fs during dev"
+version = "1.0.0"
+description = "Rust Custom Derive Macro which loads files into the rust binary at compile time during release and loads the file from the fs during dev"
 readme = "readme.md"
 documentation = "https://docs.rs/rust-embed"
 repository = "https://github.com/pyros2097/rust-embed"
@@ -10,7 +10,12 @@ keywords = ["http", "rocket", "static", "web", "server"]
 categories = ["web-programming::http-server"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 
+[lib]
+proc-macro = true
+
 [dependencies]
+syn = "0.11"
+quote = "0.3"
 log = "0.4"
 walkdir = "2.1.4"
 
