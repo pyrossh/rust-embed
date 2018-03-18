@@ -91,7 +91,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 }
 
 fn help() {
-  panic!("#[derive(RustEmbed)] should contain one attribute like this #[golem(\"examples/public/\")]");
+  panic!("#[derive(RustEmbed)] should contain one attribute like this #[folder(\"examples/public/\")]");
 }
 
 fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
@@ -132,6 +132,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
       panic!("#[derive(RustEmbed)] attribute value must be a string literal");
     }
   };
+  info!("folder: {}", folder_path);
   generate_assets(ident, folder_path)
 }
 
