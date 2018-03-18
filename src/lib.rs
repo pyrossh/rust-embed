@@ -1,4 +1,6 @@
 #![recursion_limit = "1024"]
+#[macro_use]
+extern crate log;
 extern crate proc_macro;
 #[macro_use]
 extern crate quote;
@@ -45,21 +47,19 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 }
 
 #[cfg(not(debug_assertions))]
-pub fn generate_assets(folder_path: String) -> Asset {
+fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   use std::fs::File;
   use std::io::Read;
   use std::path::Path;
   use walkdir::WalkDir;
-  use std::collections::HashMap;
-  info!("loading folder -> {}", parent_path);
-  let mut map = HashMap::new();
-  for entry in WalkDir::new(parent_path.clone())
+  let mut values = Vec::<Tokens>::new();
+  for entry in WalkDir::new(folder_path.clone())
     .into_iter()
     .filter_map(|e| e.ok())
     .filter(|e| e.file_type().is_file())
   {
-    info!("asset from file -> {}", entry.path().display());
-    let base = &parent_path.clone();
+    info!("file: {}", entry.path().display());
+    let base = &folder_path.clone();
     let key = String::from(
       entry
         .path()
@@ -73,20 +73,16 @@ pub fn generate_assets(folder_path: String) -> Asset {
     file.read_to_end(&mut data).unwrap_or_else(|e| {
       panic!("could not read file -> {} {}", key, e);
     });
-    map.insert(key, data);
+    let value = quote!{
+      #key => Some(vec!#data),
+    };
+    values.push(value);
   }
-  Box::new(move |file_path| {
-    info!("asset from cache -> {}", file_path);
-    match map.get(&file_path) {
-      Some(s) => Some(s.to_vec()),
-      None => None,
-    }
-  });
   quote!{
       impl #ident {
           pub fn get(file_path: &str) -> Option<Vec<u8>> {
               match file_path {
-                  "index.html" => Some(vec![]),
+                  #(#values)*
                   _ => None,
               }
           }
@@ -95,9 +91,7 @@ pub fn generate_assets(folder_path: String) -> Asset {
 }
 
 fn help() {
-  panic!(
-    "#[derive(RustEmbed)] should contain one attribute like this #[golem(\"examples/public/\")]"
-  );
+  panic!("#[derive(RustEmbed)] should contain one attribute like this #[golem(\"examples/public/\")]");
 }
 
 fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
