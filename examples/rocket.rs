@@ -1,22 +1,26 @@
-#![feature(test, plugin, decl_macro)]
+#![feature(test, plugin, decl_macro, attr_literals)]
 #![plugin(rocket_codegen)]
+extern crate fern;
+#[macro_use]
+extern crate log;
 extern crate rocket;
 extern crate rocket_contrib;
+#[macro_use]
 extern crate rust_embed;
-extern crate fern;
-extern crate log;
 
 use std::path::PathBuf;
 use std::ffi::OsStr;
 use std::io::Cursor;
 use rocket::response;
 use rocket::http::{ContentType, Status};
-use rocket::State;
-use rust_embed::*;
+
+#[derive(RustEmbed)]
+#[folder("examples/public/")]
+struct Asset;
 
 #[get("/")]
-fn index<'r>(asset: State<Asset>) -> response::Result<'r> {
-  asset("index.html".to_owned()).map_or_else(
+fn index<'r>() -> response::Result<'r> {
+  Asset::get("index.html").map_or_else(
     || Err(Status::NotFound),
     |d| {
       response::Response::build()
@@ -28,7 +32,7 @@ fn index<'r>(asset: State<Asset>) -> response::Result<'r> {
 }
 
 #[get("/dist/<file..>")]
-fn dist<'r>(asset: State<Asset>, file: PathBuf) -> response::Result<'r> {
+fn dist<'r>(file: PathBuf) -> response::Result<'r> {
   let filename = file.display().to_string();
   let ext = file
     .as_path()
@@ -36,7 +40,7 @@ fn dist<'r>(asset: State<Asset>, file: PathBuf) -> response::Result<'r> {
     .and_then(OsStr::to_str)
     .expect("Could not get file extension");
   let content_type = ContentType::from_extension(ext).expect("Could not get file content type");
-  asset(filename.clone()).map_or_else(
+  Asset::get(&filename.clone()).map_or_else(
     || Err(Status::NotFound),
     |d| {
       response::Response::build()
@@ -61,9 +65,5 @@ fn main() {
     .chain(std::io::stdout())
     .apply()
     .expect("Could not initialize logger");
-  let asset = embed!("examples/public/".to_owned());
-  rocket::ignite()
-    .manage(asset)
-    .mount("/", routes![index, dist])
-    .launch();
+  rocket::ignite().mount("/", routes![index, dist]).launch();
 }

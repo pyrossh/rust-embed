@@ -1,0 +1,82 @@
+{
+  "editor.tabSize": 2,
+  "editor.fontSize": 15,
+  "editor.wordWrapColumn": 160,
+  "editor.minimap.enabled": false,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/__pycache__": true,
+    "**/target": true,
+    "**/dist": true,
+    "**/.expo": true,
+    "**/.cache": true,
+    "**/.cache-loader": true,
+  },
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/__pycache__": true,
+    "**/target": true,
+    "**/dist": true,
+    "**/.expo": true,
+    "**/.cache": true,
+    "**/.cache-loader": true,
+  },
+  "files.watcherExclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git/objects/**": true,
+    "**/node_modules/**": true,
+    "**/__pycache__": true,
+    "**/target": true,
+    "**/.expo": true,
+    "**/.cache": true,
+    "**/.cache-loader": true,
+  },
+  "workbench.editor.showTabs": false,
+  "explorer.openEditors.visible": 0,
+  "gitProjectManager.baseProjectsFolders": [
+    "~/Code",
+  ],
+  "gitProjectManager.openInNewWindow": true,
+  "window.zoomLevel": 0,
+  "window.menuBarVisibility": "toggle",
+  "workbench.iconTheme": "vscode-icons",
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "workbench.startupEditor": "newUntitledFile",
+  "gitlens.advanced.messages": {
+    "suppressCommitHasNoPreviousCommitWarning": false,
+    "suppressCommitNotFoundWarning": false,
+    "suppressFileNotUnderSourceControlWarning": false,
+    "suppressGitVersionWarning": false,
+    "suppressLineUncommittedWarning": false,
+    "suppressNoRepositoryWarning": false,
+    "suppressResultsExplorerNotice": true,
+    "suppressUpdateNotice": true,
+    "suppressWelcomeNotice": false
+  },
+  "workbench.colorTheme": "Dracula Soft",
+  "git.autofetch": true,
+  "gitlens.keymap": "alternate",
+  "sqltools.format": {
+    "indentSize": 2
+  },
+  "sqltools.connections": [
+    {
+      "name": "Postgres",
+      "server": "localhost",
+      "dialect": "PostgreSQL",
+      "port": 5432,
+      "database": "postgres",
+      "username": "postgres",
+      "askForPassword": false,
+      "password": "postgres",
+      "connectionTimeout": 300
+    }
+  ]
+}
