@@ -714,7 +714,7 @@ dependencies = [
 
 [[package]]
 name = "rust-embed"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "fern 0.5.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",

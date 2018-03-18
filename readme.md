@@ -11,7 +11,7 @@ This is similar to [pony-embed](https://github.com/pyros2097/pony-embed).
 
 ```
 [dependencies]
-rust-embed="1.0.0"
+rust-embed="1.1.0"
 ```
 
 ## Documentation
