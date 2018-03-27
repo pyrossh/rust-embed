@@ -1,8 +1,5 @@
 #![feature(test, plugin, decl_macro, attr_literals)]
 #![plugin(rocket_codegen)]
-extern crate fern;
-#[macro_use]
-extern crate log;
 extern crate rocket;
 extern crate rocket_contrib;
 #[macro_use]
@@ -52,18 +49,5 @@ fn dist<'r>(file: PathBuf) -> response::Result<'r> {
 }
 
 fn main() {
-  fern::Dispatch::new()
-    .format(move |out, message, record| {
-      out.finish(format_args!(
-        "[{}][{}] {}",
-        record.target(),
-        record.level(),
-        message
-      ))
-    })
-    .level(log::LevelFilter::Info)
-    .chain(std::io::stdout())
-    .apply()
-    .expect("Could not initialize logger");
   rocket::ignite().mount("/", routes![index, dist]).launch();
 }
