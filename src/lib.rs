@@ -58,7 +58,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
     .filter_map(|e| e.ok())
     .filter(|e| e.file_type().is_file())
   {
-    info!("file: {}", entry.path().display());
+    println!("   \x1b[92mCompiling\x1b[0m {}", entry.path().display());
     let base = &folder_path.clone();
     let key = String::from(
       entry
