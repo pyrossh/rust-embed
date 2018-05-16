@@ -25,11 +25,11 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
               let name = &format!("{}{}", folder_path, file_path);
               let path = &Path::new(name);
               let key = String::from(path.to_str().expect("Path does not have a string representation"));
-              info!("file: {}", key);
+              println!("file: {}", key);
               let mut file = match File::open(path) {
                   Ok(mut file) => file,
                   Err(e) => {
-                      error!("file: {} {}", key, e);
+                      eprintln!("file: {} {}", key, e);
                       return None
                   }
               };
@@ -37,7 +37,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
               match file.read_to_end(&mut data) {
                   Ok(_) => Some(data),
                   Err(e) =>  {
-                      error!("file: {} {}", key, e);
+                      eprintln!("file: {} {}", key, e);
                       return None
                   }
               }
