@@ -15,12 +15,12 @@ use quote::Tokens;
 #[cfg(debug_assertions)]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   quote!{
-      use std::fs::File;
-      use std::io::Read;
-      use std::path::Path;
-
       impl #ident {
           pub fn get(file_path: &str) -> Option<Vec<u8>> {
+              use std::fs::File;
+              use std::io::Read;
+              use std::path::Path;
+
               let folder_path = #folder_path;
               let name = &format!("{}{}", folder_path, file_path);
               let path = &Path::new(name);
