@@ -4,11 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-Thanks to @Mcat12 for the changelog.
+Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
 ## [2.0.0] - 2018-05-26
 ### Changed
-- Reimplemented the macro for release to use include_bytes for perf sake. Thanks @lukad
+- Reimplemented the macro for release to use include_bytes for perf sake. Thanks to [lukad](https://github.com/lukad).
 
 ## [1.1.1] - 2018-03-19
 ### Changed
