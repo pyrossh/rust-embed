@@ -48,9 +48,6 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 
 #[cfg(not(debug_assertions))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
-  use std::fs::File;
-  use std::io::Read;
-  use std::path::Path;
   use walkdir::WalkDir;
   let mut values = Vec::<Tokens>::new();
   for entry in WalkDir::new(folder_path.clone())
@@ -60,21 +57,11 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   {
     println!("   \x1b[92mCompiling\x1b[0m {}", entry.path().display());
     let base = &folder_path.clone();
-    let key = String::from(
-      entry
-        .path()
-        .to_str()
-        .expect("Path does not have a string representation"),
-    ).replace(base, "");
-    let mut file = File::open(&Path::new(&entry.path())).unwrap_or_else(|e| {
-      panic!("could not open file -> {} {}", key, e);
-    });
-    let mut data: Vec<u8> = Vec::new();
-    file.read_to_end(&mut data).unwrap_or_else(|e| {
-      panic!("could not read file -> {} {}", key, e);
-    });
+    let key = String::from(entry.path().to_str().expect("Path does not have a string representation")).replace(base, "");
+    let canonical_path = std::fs::canonicalize(entry.path()).expect("Could not get canonical path");
+    let canonical_path_str = canonical_path.to_str();
     let value = quote!{
-      #key => Some(vec!#data),
+      #key => Some(include_bytes!(#canonical_path_str).to_vec()),
     };
     values.push(value);
   }
