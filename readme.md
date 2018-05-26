@@ -11,11 +11,11 @@ This is similar to [pony-embed](https://github.com/pyros2097/pony-embed).
 
 ```
 [dependencies]
-rust-embed="1.1.1"
+rust-embed="2.0.0"
 ```
 
 ## Documentation
-Declare a struct name it Asset or something and add an attribute `folder` to it which has the path to your static folder. 
+Declare a struct name it Asset or something and add an attribute `folder` to it which has the path to your static folder.
 ```rust
 #![feature(attr_literals)]
 
