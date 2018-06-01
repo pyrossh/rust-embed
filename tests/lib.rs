@@ -1,6 +1,3 @@
-#![feature(attr_literals)]
-#[macro_use]
-extern crate log;
 #[macro_use]
 extern crate rust_embed;
 
@@ -8,7 +5,7 @@ extern crate rust_embed;
 #[cfg(debug_assertions)]
 fn dev() {
   #[derive(RustEmbed)]
-  #[folder("examples/public/")]
+  #[folder = "examples/public/"]
   struct Asset;
 
   match Asset::get("index.html") {
@@ -29,7 +26,7 @@ fn dev() {
 #[cfg(not(debug_assertions))]
 fn prod() {
   #[derive(RustEmbed)]
-  #[folder("examples/public/")]
+  #[folder = "examples/public/"]
   struct Asset;
 
   match Asset::get("index.html") {
