@@ -13,23 +13,18 @@ rust-embed="2.0.0"
 ## Documentation
 Declare a struct name it Asset or something and add an attribute `folder` to it which has the path to your static folder.
 ```rust
-#![feature(attr_literals)]
-
 #[derive(RustEmbed)]
-#[folder("examples/public/")]
+#[folder = "examples/public/"]
 struct Asset;
 ```
 
 ## Usage
 ```rust
-#![feature(attr_literals)]
 #[macro_use]
 extern crate rust_embed;
-#[macro_use]
-extern crate log;
 
 #[derive(RustEmbed)]
-#[folder("examples/public/")]
+#[folder = "examples/public/"]
 struct Asset;
 
 fn main() {

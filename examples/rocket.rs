@@ -1,4 +1,4 @@
-#![feature(test, plugin, decl_macro, attr_literals)]
+#![feature(test, plugin, decl_macro)]
 #![plugin(rocket_codegen)]
 extern crate rocket;
 extern crate rocket_contrib;
@@ -12,7 +12,7 @@ use rocket::response;
 use rocket::http::{ContentType, Status};
 
 #[derive(RustEmbed)]
-#[folder("examples/public/")]
+#[folder = "examples/public/"]
 struct Asset;
 
 #[get("/")]
