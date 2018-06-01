@@ -16,7 +16,5 @@ script:
   - |
     cargo test --tests --lib
     cargo test --tests --lib --release
-    cargo clean
     cargo build --example basic
-    cargo clean
     cargo build --release --example basic
