@@ -14,7 +14,7 @@ matrix:
 
 script:
   - |
-    cargo test --tests --lib
-    cargo test --tests --lib --release
+    cargo test --lib
+    cargo test --lib --release
     cargo build --example basic
     cargo build --release --example basic
