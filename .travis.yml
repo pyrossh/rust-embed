@@ -1,20 +1,20 @@
 language: rust
 sudo: false
 dist: trusty
+rust:
+  - stable
+  - nightly
 
 cache:
   cargo: true
 
 matrix:
-  include:
-    - rust: nightly
+  allow_failures:
+   - rust: nightly
 
 script:
   - |
-    cargo clean
-    cargo test --tests --lib
-    cargo test --tests --lib --release
-    cargo clean
+    cargo test --lib
+    cargo test --lib --release
     cargo build --example basic
-    cargo clean
     cargo build --release --example basic

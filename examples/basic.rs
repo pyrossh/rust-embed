@@ -1,9 +1,8 @@
-#![feature(attr_literals)]
 #[macro_use]
 extern crate rust_embed;
 
 #[derive(RustEmbed)]
-#[folder("examples/public/")]
+#[folder = "examples/public/"]
 struct Asset;
 
 fn main() {

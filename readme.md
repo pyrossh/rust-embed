@@ -13,23 +13,18 @@ rust-embed="2.0.0"
 ## Documentation
 Declare a struct name it Asset or something and add an attribute `folder` to it which has the path to your static folder.
 ```rust
-#![feature(attr_literals)]
-
 #[derive(RustEmbed)]
-#[folder("examples/public/")]
+#[folder = "examples/public/"]
 struct Asset;
 ```
 
 ## Usage
 ```rust
-#![feature(attr_literals)]
 #[macro_use]
 extern crate rust_embed;
-#[macro_use]
-extern crate log;
 
 #[derive(RustEmbed)]
-#[folder("examples/public/")]
+#[folder = "examples/public/"]
 struct Asset;
 
 fn main() {
@@ -46,6 +41,11 @@ To run the example in dev mode where it reads from the fs,
 To run the example in release mode where it reads from binary,
 
 `cargo run --release --example basic`
+
+Note: To run the `rocket` example, add the `nightly` feature flag and run on a nightly build:
+
+`cargo +nightly run --example rocket --features nightly`
+
 ## Testing
 debug: `cargo test --tests --lib`
 

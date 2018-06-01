@@ -76,7 +76,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 }
 
 fn help() {
-  panic!("#[derive(RustEmbed)] should contain one attribute like this #[folder(\"examples/public/\")]");
+  panic!("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]");
 }
 
 fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
@@ -92,10 +92,10 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
     help();
   }
   let value = &ast.attrs[0].value;
-  let items = match value {
-    &MetaItem::List(ref attr_name, ref items) => {
+  let literal_value = match value {
+    &MetaItem::NameValue(ref attr_name, ref value) => {
       if attr_name == "folder" {
-        items
+        value
       } else {
         panic!("#[derive(RustEmbed)] attribute name must be folder");
       }
@@ -104,14 +104,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
       panic!("#[derive(RustEmbed)] attribute name must be folder");
     }
   };
-  let item = &items[0];
-  let lit = match item {
-    &NestedMetaItem::Literal(ref l) => l,
-    _ => {
-      panic!("Hello");
-    }
-  };
-  let folder_path = match lit {
+  let folder_path = match literal_value {
     &Lit::Str(ref val, _) => val.clone(),
     _ => {
       panic!("#[derive(RustEmbed)] attribute value must be a string literal");
