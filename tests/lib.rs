@@ -1,7 +1,5 @@
 #![feature(attr_literals)]
 #[macro_use]
-extern crate log;
-#[macro_use]
 extern crate rust_embed;
 
 #[test]
