@@ -41,6 +41,11 @@ To run the example in dev mode where it reads from the fs,
 To run the example in release mode where it reads from binary,
 
 `cargo run --release --example basic`
+
+Note: To run the `rocket` example, add the `nightly` feature flag and run on a nightly build:
+
+`cargo +nightly run --example rocket --features nightly`
+
 ## Testing
 debug: `cargo test --tests --lib`
 
