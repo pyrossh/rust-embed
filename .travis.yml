@@ -7,8 +7,9 @@ cache:
 
 matrix:
   include:
-    - rust: nightly
-    - rust: 1.26
+    - rust: stable
+    allow_failures:
+      - rust: nightly
 
 script:
   - |
