@@ -19,12 +19,16 @@ quote = "0.3"
 log = "0.4"
 walkdir = "2.1.4"
 
+rocket = { version = "0.3.6", optional = true }
+rocket_codegen = { version = "0.3.6", optional = true }
+rocket_contrib = { version = "0.3.6", optional = true }
+
 [dev-dependencies]
-rocket = "0.3.6"
-rocket_codegen = "0.3.6"
-rocket_contrib = "0.3.6"
 rouille = "2.1.0"
 fern = "0.5"
+
+[features]
+nightly = ["rocket", "rocket_codegen", "rocket_contrib"]
 
 [badges]
 appveyor = { repository = "pyros2097/rust-embed" }
