@@ -1,6 +1,4 @@
 #![recursion_limit = "1024"]
-#[macro_use]
-extern crate log;
 extern crate proc_macro;
 #[macro_use]
 extern crate quote;
@@ -112,7 +110,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
       panic!("#[derive(RustEmbed)] attribute value must be a string literal");
     }
   };
-  info!("folder: {}", folder_path);
+  println!("folder: {}", folder_path);
   generate_assets(ident, folder_path)
 }
 
