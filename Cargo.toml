@@ -18,15 +18,15 @@ syn = "0.11"
 quote = "0.3"
 walkdir = "2.1.4"
 
+actix-web = { version = "0.6", optional = true }
+
 rocket = { version = "0.3.6", optional = true }
 rocket_codegen = { version = "0.3.6", optional = true }
 rocket_contrib = { version = "0.3.6", optional = true }
 
-[dev-dependencies]
-actix-web = "0.6"
-
 [features]
 nightly = ["rocket", "rocket_codegen", "rocket_contrib"]
+actix = ["actix-web"]
 
 [badges]
 appveyor = { repository = "pyros2097/rust-embed" }
