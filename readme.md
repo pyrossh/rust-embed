@@ -13,7 +13,7 @@ You can use this to embed your css, js and images into a single executable which
 
 ```
 [dependencies]
-rust-embed="2.0.0"
+rust-embed="3.0.0"
 ```
 
 ## Documentation
