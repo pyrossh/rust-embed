@@ -13,10 +13,9 @@ matrix:
    - rust: nightly
 
 script:
-  - |
-    cargo test --test lib
-    cargo test --release --test lib
-    cargo build --example basic
-    cargo build --release --example basic
-    cargo build --example actix --features actix
-    cargo build --release --example actix --features actix
+  - cargo test --test lib
+  - cargo test --test lib --release
+  - cargo build --example basic
+  - cargo build --example basic --release 
+  - cargo build --example actix --features actix
+  - cargo build --example actix --features actix --release
