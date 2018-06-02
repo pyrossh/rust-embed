@@ -46,7 +46,7 @@ To run the example in dev mode where it reads from the fs,
 
 To run the example in release mode where it reads from binary,
 
-`cargo run --release --example basic`
+`cargo run --example basic --release`
 
 Note: To run the `actix-web` example:
 
@@ -59,7 +59,7 @@ Note: To run the `rocket` example, add the `nightly` feature flag and run on a n
 ## Testing
 debug: `cargo test --test lib`
 
-release: `cargo test --release --test lib`
+release: `cargo test --test lib --release`
 
 Go Rusketeers!
 The power is yours!
