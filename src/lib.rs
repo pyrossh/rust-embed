@@ -9,6 +9,7 @@ extern crate walkdir;
 use proc_macro::TokenStream;
 use syn::*;
 use quote::Tokens;
+use std::path::Path;
 
 #[cfg(debug_assertions)]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
@@ -105,6 +106,9 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
     _ => {
       panic!("#[derive(RustEmbed)] attribute value must be a string literal");
     }
+  };
+  if !Path::new(&folder_path).exists() {
+    panic!("#[derive(RustEmbed)] folder '{}' does not exist. cwd: '{}'", folder_path, std::env::current_dir().unwrap().to_str().unwrap());
   };
   generate_assets(ident, folder_path)
 }
