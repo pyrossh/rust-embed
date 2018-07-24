@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
+## [3.0.1] - 2018-07-24
+### Added
+- panic if the folder cannot be found
+
 ## [3.0.0] - 2018-06-01
 ### Changed
 - The derive attribute style so we don't need `attr_literals` and it can be used in stable rust now. Thanks to [Mcat12](https://github.com/Mcat12).
