@@ -23,17 +23,16 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
               let folder_path = #folder_path;
               let name = &format!("{}{}", folder_path, file_path);
               let path = &Path::new(name);
-              let key = String::from(path.to_str().expect("Path does not have a string representation"));
               let mut file = match File::open(path) {
                   Ok(mut file) => file,
-                  Err(e) => {
+                  Err(_e) => {
                       return None
                   }
               };
               let mut data: Vec<u8> = Vec::new();
               match file.read_to_end(&mut data) {
                   Ok(_) => Some(data),
-                  Err(e) =>  {
+                  Err(_e) =>  {
                       return None
                   }
               }
@@ -52,7 +51,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
     .filter(|e| e.file_type().is_file())
   {
     let base = &folder_path.clone();
-    let key = String::from(entry.path().to_str().expect("Path does not have a string representation")).replace(base, "");
+    let key = String::from(entry.path().strip_prefix(base).unwrap().to_str().expect("Path does not have a string representation"));
     let canonical_path = std::fs::canonicalize(entry.path()).expect("Could not get canonical path");
     let canonical_path_str = canonical_path.to_str();
     let value = quote!{
