@@ -11,7 +11,7 @@ use quote::Tokens;
 use std::path::Path;
 use syn::*;
 
-#[cfg(debug_assertions)]
+#[cfg(not(feature = "binary"))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   quote!{
       impl #ident {
@@ -41,7 +41,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   }
 }
 
-#[cfg(not(debug_assertions))]
+#[cfg(feature = "binary")]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   use walkdir::WalkDir;
   let mut values = Vec::<Tokens>::new();
