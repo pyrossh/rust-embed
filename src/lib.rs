@@ -51,8 +51,16 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
     .filter(|e| e.file_type().is_file())
   {
     let base = &folder_path.clone();
-    let key = String::from(entry.path().strip_prefix(base).unwrap().to_str().expect("Path does not have a string representation"));
+    let key = String::from(
+      entry
+        .path()
+        .strip_prefix(base)
+        .unwrap()
+        .to_str()
+        .expect("Path does not have a string representation"),
+    );
     let canonical_path = std::fs::canonicalize(entry.path()).expect("Could not get canonical path");
+    let key = if std::path::MAIN_SEPARATOR == '\\' { key.replace('\\', "/") } else { key };
     let canonical_path_str = canonical_path.to_str();
     let value = quote!{
       #key => Some(include_bytes!(#canonical_path_str).to_vec()),
