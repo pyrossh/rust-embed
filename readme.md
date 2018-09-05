@@ -1,4 +1,4 @@
-## Rust Embed [![Build Status](https://travis-ci.org/pyros2097/rust-embed.svg?branch=master)](https://travis-ci.org/pyros2097/rust-embed) [![crates.io](http://meritbadge.herokuapp.com/rust-embed)](https://crates.io/crates/rust-embed)
+## Rust Embed [![Build Status](https://travis-ci.org/pyros2097/rust-embed.svg?branch=master)](https://travis-ci.org/pyros2097/rust-embed) [![Build status](https://ci.appveyor.com/api/projects/status/jnr45fn1l1dop2a8/branch/master?svg=true)](https://ci.appveyor.com/project/pyros2097/rust-embed/branch/master) [![crates.io](http://meritbadge.herokuapp.com/rust-embed)](https://crates.io/crates/rust-embed)
 Rust Custom Derive Macro which loads files into the rust binary at compile time during release and loads the file from the fs during dev.
 
 You can use this to embed your css, js and images into a single executable which can be deployed to your servers. Also it makes it easy to build a very small docker image for you to deploy.
