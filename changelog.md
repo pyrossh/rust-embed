@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
+## [3.0.2] - 2018-09-05
+### Added
+- appveyor for testing on windows
+### Fixed
+- handle paths in windows correctly
+
 ## [3.0.1] - 2018-07-24
 ### Added
 - panic if the folder cannot be found
