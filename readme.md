@@ -17,11 +17,15 @@ rust-embed="3.0.0"
 ```
 
 ## Documentation
-Declare a struct name it Asset or something and add an attribute `folder` to it which has the path to your static folder.
+You need to add the custom derive macro RustEmbed to your struct with an attribute `folder` which is the path to your static folder.
 ```rust
 #[derive(RustEmbed)]
 #[folder = "examples/public/"]
 struct Asset;
+```
+This macro add a single static method `get` to your type. This method allows you to get your assets from the fs during dev and from the binary during release. It takes the file path as string and returns an an optional vector of u8.
+```rust
+pub fn get(file_path: &str) -> Option<Vec<u8>>
 ```
 
 ## Usage
