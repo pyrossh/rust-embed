@@ -23,7 +23,7 @@ You need to add the custom derive macro RustEmbed to your struct with an attribu
 #[folder = "examples/public/"]
 struct Asset;
 ```
-This macro add a single static method `get` to your type. This method allows you to get your assets from the fs during dev and from the binary during release. It takes the file path as string and returns an an optional vector of u8.
+This macro adds a single static method `get` to your type. This method allows you to get your assets from the fs during dev and from the binary during release. It takes the file path as string and returns an optional vector of u8.
 ```rust
 pub fn get(file_path: &str) -> Option<Vec<u8>>
 ```
