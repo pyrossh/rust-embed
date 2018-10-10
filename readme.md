@@ -13,7 +13,7 @@ You can use this to embed your css, js and images into a single executable which
 
 ```
 [dependencies]
-rust-embed="3.0.2"
+rust-embed="4.0.0"
 ```
 
 ## Documentation
@@ -23,9 +23,9 @@ You need to add the custom derive macro RustEmbed to your struct with an attribu
 #[folder = "examples/public/"]
 struct Asset;
 ```
-This macro adds a single static method `get` to your type. This method allows you to get your assets from the fs during dev and from the binary during release. It takes the file path as string and returns an optional vector of u8.
+This macro adds a single static method `get` to your type. This method allows you to get your assets from the fs during dev and from the binary during release. It takes the file path as string and returns an `Option` with the bytes.
 ```rust
-pub fn get(file_path: &str) -> Option<Vec<u8>>
+pub fn get(file_path: &str) -> Option<impl AsRef<[u8]>>
 ```
 
 ## Usage
@@ -39,7 +39,7 @@ struct Asset;
 
 fn main() {
   let index_html = Asset::get("index.html").unwrap();
-  println!("{:?}", std::str::from_utf8(&index_html));
+  println!("{:?}", std::str::from_utf8(index_html.as_ref()));
 }
 ```
 
