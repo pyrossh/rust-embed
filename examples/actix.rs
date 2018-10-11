@@ -3,8 +3,8 @@ extern crate actix_web;
 extern crate rust_embed;
 extern crate mime_guess;
 
-use actix_web::{App, HttpRequest, HttpResponse, server};
 use actix_web::http::Method;
+use actix_web::{server, App, Body, HttpRequest, HttpResponse};
 use mime_guess::guess_mime_type;
 
 #[derive(RustEmbed)]
@@ -13,11 +13,9 @@ struct Asset;
 
 fn handle_embedded_file(path: &str) -> HttpResponse {
   match Asset::get(path) {
-    Some(content) => {
-      HttpResponse::Ok()
-        .content_type(guess_mime_type(path).as_ref())
-        .body(content)
-    }
+    Some(content) => HttpResponse::Ok()
+      .content_type(guess_mime_type(path).as_ref())
+      .body(Body::from_slice(content.as_ref())),
     None => HttpResponse::NotFound().body("404 Not Found"),
   }
 }
@@ -32,13 +30,8 @@ fn dist(req: HttpRequest) -> HttpResponse {
 }
 
 fn main() {
-  server::new(|| {
-    App::new().route("/", Method::GET, index).route(
-      "/dist/{_:.*}",
-      Method::GET,
-      dist,
-    )
-  }).bind("127.0.0.1:8000")
+  server::new(|| App::new().route("/", Method::GET, index).route("/dist/{_:.*}", Method::GET, dist))
+    .bind("127.0.0.1:8000")
     .unwrap()
     .run();
 }

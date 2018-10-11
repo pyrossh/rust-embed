@@ -7,15 +7,15 @@ extern crate syn;
 extern crate walkdir;
 
 use proc_macro::TokenStream;
-use syn::*;
 use quote::Tokens;
 use std::path::Path;
+use syn::*;
 
 #[cfg(debug_assertions)]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   quote!{
       impl #ident {
-          pub fn get(file_path: &str) -> Option<Vec<u8>> {
+          pub fn get(file_path: &str) -> Option<impl AsRef<[u8]>> {
               use std::fs::File;
               use std::io::Read;
               use std::path::Path;
@@ -63,13 +63,13 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
     let key = if std::path::MAIN_SEPARATOR == '\\' { key.replace('\\', "/") } else { key };
     let canonical_path_str = canonical_path.to_str();
     let value = quote!{
-      #key => Some(include_bytes!(#canonical_path_str).to_vec()),
+      #key => Some(&include_bytes!(#canonical_path_str)[..]),
     };
     values.push(value);
   }
   quote!{
       impl #ident {
-          pub fn get(file_path: &str) -> Option<Vec<u8>> {
+          pub fn get(file_path: &str) -> Option<impl AsRef<[u8]>> {
               match file_path {
                   #(#values)*
                   _ => None,
@@ -115,7 +115,11 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
     }
   };
   if !Path::new(&folder_path).exists() {
-    panic!("#[derive(RustEmbed)] folder '{}' does not exist. cwd: '{}'", folder_path, std::env::current_dir().unwrap().to_str().unwrap());
+    panic!(
+      "#[derive(RustEmbed)] folder '{}' does not exist. cwd: '{}'",
+      folder_path,
+      std::env::current_dir().unwrap().to_str().unwrap()
+    );
   };
   generate_assets(ident, folder_path)
 }
