@@ -20,6 +20,13 @@ fn dev() {
     None => assert!(false, "llama.png should exist"),
     _ => assert!(true),
   }
+
+  let mut num_files = 0;
+  for file in Asset::iter() {
+    assert!(Asset::get(file.as_ref()).is_some());
+    num_files += 1;
+  }
+  assert_eq!(num_files, 6);
 }
 
 #[test]
@@ -41,4 +48,11 @@ fn prod() {
     None => assert!(false, "llama.png should exist"),
     _ => assert!(true),
   }
+
+  let mut num_files = 0;
+  for file in Asset::iter() {
+    assert!(Asset::get(file.as_ref()).is_some());
+    num_files += 1;
+  }
+  assert_eq!(num_files, 6);
 }

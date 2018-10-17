@@ -10,13 +10,9 @@ keywords = ["http", "rocket", "static", "web", "server"]
 categories = ["web-programming::http-server"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 
-[lib]
-proc-macro = true
-
 [dependencies]
-syn = "0.11"
-quote = "0.3"
 walkdir = "2.1.4"
+rust-embed-impl = { version = "4.0.0", path = "impl"}
 
 actix-web = { version = "0.7", optional = true }
 mime_guess = { version = "2.0.0-alpha.6", optional = true }
