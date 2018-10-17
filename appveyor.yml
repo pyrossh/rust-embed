@@ -107,6 +107,8 @@ install:
   - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
   - rustup-init -yv --default-toolchain %channel% --default-host %target%
   - set PATH=%PATH%;%USERPROFILE%\.cargo\bin
+  - rustup install nightly
+  - rustup component add rustfmt-preview --toolchain nightly
   - if defined MSYS_BITS set PATH=C:\msys64\mingw%MSYS_BITS%\bin;C:\msys64\usr\bin;%PATH%
   - rustc -vV
   - cargo -vV
@@ -121,6 +123,7 @@ build: false
 #directly or perform other testing commands. Rust will automatically be placed in the PATH
 # environment variable.
 test_script:
+  - cargo +nightly fmt --all -- --check
   - cargo test --test lib
   - cargo test --test lib --release
   - cargo build --example basic

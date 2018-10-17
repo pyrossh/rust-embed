@@ -6,4 +6,4 @@ fn_args_density = "Compressed"
 max_width = 160
 tab_spaces = 2
 indent_style = "Block"
-reorder_imported_names = true
+reorder_imports = true
