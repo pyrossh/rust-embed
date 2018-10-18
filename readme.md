@@ -23,10 +23,39 @@ You need to add the custom derive macro RustEmbed to your struct with an attribu
 #[folder = "examples/public/"]
 struct Asset;
 ```
-This macro adds a single static method `get` to your type. This method allows you to get your assets from the fs during dev and from the binary during release. It takes the file path as string and returns an `Option` with the bytes.
+
+
+The macro will generate the following code:
+
 ```rust
-pub fn get(file_path: &str) -> Option<impl AsRef<[u8]>>
+impl Asset {  
+  pub fn get(file_path: &str) -> Option<impl AsRef<[u8]>> {
+    ...    
+  }
+  
+  pub fn iter() -> impl Iterator<Item = impl AsRef<str>> {
+    ...
+  }
+}
 ```
+
+### `get(file_path: &str)`
+
+Given a relative path from the assets folder returns the bytes if found.
+
+If the feature "debug-embed" is enabled or the binary  compiled in release mode the bytes have been embeded in the binary and a `&'static [u8]` is returned.
+
+Otherwise the bytes are read from the file system on each call and a `Vec<u8>` is returned.
+
+
+### `iter()`
+    
+Iterates the files in this assets folder.
+
+If the feature "debug-embed" is enabled or the binary compiled in release mode a static array to the list of relative paths to the files is returned.
+
+Otherwise the files are listed from the file system on each call.
+
 
 ## Usage
 ```rust
