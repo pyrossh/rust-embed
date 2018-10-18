@@ -26,6 +26,7 @@ rocket_codegen = { version = "0.3.6", optional = true }
 rocket_contrib = { version = "0.3.6", optional = true }
 
 [features]
+debug-embed = []
 nightly = ["rocket", "rocket_codegen", "rocket_contrib"]
 actix = ["actix-web", "mime_guess"]
 
