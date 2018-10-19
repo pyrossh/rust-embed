@@ -15,6 +15,9 @@ mod utils;
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
+  use std::env::current_dir;
+  // resolve relative to current path
+  let folder_path = utils::path_to_str(current_dir().unwrap().join(folder_path));
   quote!{
       impl #ident {
           pub fn get(file_path: &str) -> Option<impl AsRef<[u8]>> {
@@ -22,10 +25,8 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
               use std::io::Read;
               use std::path::Path;
 
-              let folder_path = #folder_path;
-              let name = &format!("{}{}", folder_path, file_path);
-              let path = &Path::new(name);
-              let mut file = match File::open(path) {
+              let file_path = Path::new(#folder_path).join(file_path);
+              let mut file = match File::open(file_path) {
                   Ok(mut file) => file,
                   Err(_e) => {
                       return None
@@ -41,6 +42,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
           }
 
           pub fn iter() -> impl Iterator<Item = impl AsRef<str>> {
+              use std::path::Path;
               use rust_embed::utils::get_files;
               get_files(String::from(#folder_path)).map(|e| e.rel_path)
           }
