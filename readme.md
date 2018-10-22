@@ -13,11 +13,18 @@ You can use this to embed your css, js and images into a single executable which
 
 ```
 [dependencies]
-rust-embed="4.0.0"
+rust-embed="4.1.0"
 ```
 
 ## Documentation
+
 You need to add the custom derive macro RustEmbed to your struct with an attribute `folder` which is the path to your static folder.
+
+The path resolution works as follows:
+
+- In `debug` and when `debug-embed` feature is not enabled, the folder path is resolved relative to where the binary is run from.
+- In `release` or when `debug-embed` feature is enabled, the folder path is resolved relative to where `Cargo.toml` is.
+
 ```rust
 #[derive(RustEmbed)]
 #[folder = "examples/public/"]
@@ -43,7 +50,7 @@ impl Asset {
 
 Given a relative path from the assets folder returns the bytes if found.
 
-If the feature "debug-embed" is enabled or the binary  compiled in release mode the bytes have been embeded in the binary and a `&'static [u8]` is returned.
+If the feature `debug-embed` is enabled or the binary  compiled in release mode the bytes have been embeded in the binary and a `&'static [u8]` is returned.
 
 Otherwise the bytes are read from the file system on each call and a `Vec<u8>` is returned.
 
@@ -52,9 +59,15 @@ Otherwise the bytes are read from the file system on each call and a `Vec<u8>` i
     
 Iterates the files in this assets folder.
 
-If the feature "debug-embed" is enabled or the binary compiled in release mode a static array to the list of relative paths to the files is returned.
+If the feature `debug-embed` is enabled or the binary compiled in release mode a static array to the list of relative paths to the files is returned.
 
 Otherwise the files are listed from the file system on each call.
+
+## Features
+
+### `debug-embed`
+
+Always embed the files in the binary, even in debug mode.
 
 
 ## Usage
@@ -69,6 +82,10 @@ struct Asset;
 fn main() {
   let index_html = Asset::get("index.html").unwrap();
   println!("{:?}", std::str::from_utf8(index_html.as_ref()));
+
+  for file in Asset::iter() {
+      println!("{}", file.as_ref());
+  }
 }
 ```
 
