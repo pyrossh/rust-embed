@@ -15,9 +15,6 @@ mod utils;
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
-  use std::env::current_dir;
-  // resolve relative to current path
-  let folder_path = utils::path_to_str(current_dir().unwrap().join(folder_path));
   quote!{
       impl #ident {
           pub fn get(file_path: &str) -> Option<impl AsRef<[u8]>> {
