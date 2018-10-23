@@ -6,6 +6,12 @@
 # Rust needs at least Visual Studio 2013 Appveyor OS for MSVC targets.
 os: Visual Studio 2015
 
+
+# before repo cloning
+init:
+  - git config --global core.symlinks true
+
+
 ## Build Matrix ##
 
 # This configuration will setup a build for each channel & target combination (12 windows
