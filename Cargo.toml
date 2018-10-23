@@ -1,6 +1,6 @@
 [package]
 name = "rust-embed"
-version = "4.0.0"
+version = "4.1.0"
 description = "Rust Custom Derive Macro which loads files into the rust binary at compile time during release and loads the file from the fs during dev"
 readme = "readme.md"
 documentation = "https://docs.rs/rust-embed"
@@ -10,13 +10,9 @@ keywords = ["http", "rocket", "static", "web", "server"]
 categories = ["web-programming::http-server"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 
-[lib]
-proc-macro = true
-
 [dependencies]
-syn = "0.11"
-quote = "0.3"
 walkdir = "2.1.4"
+rust-embed-impl = { version = "4.1.0", path = "impl"}
 
 actix-web = { version = "0.7", optional = true }
 mime_guess = { version = "2.0.0-alpha.6", optional = true }
