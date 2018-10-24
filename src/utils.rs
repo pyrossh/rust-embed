@@ -28,6 +28,6 @@ pub fn get_files(folder_path: String) -> impl Iterator<Item = FileEntry> {
     })
 }
 
-pub fn path_to_str<P: AsRef<std::path::Path>>(p: P) -> String {
+fn path_to_str<P: AsRef<std::path::Path>>(p: P) -> String {
   p.as_ref().to_str().expect("Path does not have a string representation").to_owned()
 }
