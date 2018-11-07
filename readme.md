@@ -11,7 +11,7 @@ You can use this to embed your css, js and images into a single executable which
 
 ## Installation
 
-```
+```toml
 [dependencies]
 rust-embed="4.1.0"
 ```
