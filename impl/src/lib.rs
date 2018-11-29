@@ -15,9 +15,9 @@ mod utils;
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
-  quote!{
+  quote! {      
       impl #ident {
-          pub fn get(file_path: &str) -> Option<impl AsRef<[u8]>> {
+          pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
               use std::fs::File;
               use std::io::Read;
               use std::path::Path;
@@ -31,17 +31,17 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
               };
               let mut data: Vec<u8> = Vec::new();
               match file.read_to_end(&mut data) {
-                  Ok(_) => Some(data),
+                  Ok(_) => Some(std::borrow::Cow::from(data)),
                   Err(_e) =>  {
                       return None
                   }
               }
           }
 
-          pub fn iter() -> impl Iterator<Item = impl AsRef<str>> {
+          pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
               use std::path::Path;
               use rust_embed::utils::get_files;
-              get_files(String::from(#folder_path)).map(|e| e.rel_path)
+              get_files(String::from(#folder_path)).map(|e| std::borrow::Cow::from(e.rel_path))
           }
       }
   }
@@ -55,26 +55,29 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   let mut list_values = Vec::<String>::new();
 
   for FileEntry { rel_path, full_canonical_path } in get_files(folder_path) {
-    match_values.push(quote!{
-      #rel_path => Some(&include_bytes!(#full_canonical_path)[..]),
+    match_values.push(quote! {
+      #rel_path => {
+          let bytes = &include_bytes!(#full_canonical_path)[..];
+          Some(std::borrow::Cow::from(bytes))
+      },
     });
     list_values.push(rel_path);
   }
 
   let array_len = list_values.len();
 
-  quote!{
+  quote! {      
       impl #ident {
-          pub fn get(file_path: &str) -> Option<impl AsRef<[u8]>> {
+          pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
               match file_path {
                   #(#match_values)*
                   _ => None,
               }
           }
 
-          pub fn iter() -> impl Iterator<Item = impl AsRef<str>> {
+          pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
               static items: [&str; #array_len] = [#(#list_values),*];
-              items.iter()
+              items.iter().map(|x| std::borrow::Cow::from(*x))
           }
       }
   }
