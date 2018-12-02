@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
+## [4.2.0] - 2018-12-02
+### Changed
+- return `Cow<'static, [u8]>` to preserve static lifetime
+
+## [4.1.0] - 2018-10-24
+### Added
+- `iter()` method to list files
+
+## [4.0.0] - 2018-10-11
+### Changed
+- avoid vector allocation by returning `impl AsRef<[u8]>`
+
 ## [3.0.2] - 2018-09-05
 ### Added
 - appveyor for testing on windows
