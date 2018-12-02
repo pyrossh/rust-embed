@@ -26,11 +26,17 @@ fn index<'r>() -> response::Result<'r> {
 #[get("/dist/<file..>")]
 fn dist<'r>(file: PathBuf) -> response::Result<'r> {
   let filename = file.display().to_string();
-  let ext = file.as_path().extension().and_then(OsStr::to_str).expect("Could not get file extension");
-  let content_type = ContentType::from_extension(ext).expect("Could not get file content type");
-  Asset::get(&filename.clone()).map_or_else(
+  Asset::get(&filename).map_or_else(
     || Err(Status::NotFound),
-    |d| response::Response::build().header(content_type).sized_body(Cursor::new(d)).ok(),
+    |d| {
+      let ext = file
+        .as_path()
+        .extension()
+        .and_then(OsStr::to_str)
+        .ok_or(Status::new(400, "Could not get file extension"))?;
+      let content_type = ContentType::from_extension(ext).ok_or(Status::new(400, "Could not get file content type"))?;
+      response::Response::build().header(content_type).sized_body(Cursor::new(d)).ok()
+    },
   )
 }
 
