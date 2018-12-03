@@ -13,7 +13,7 @@ You can use this to embed your css, js and images into a single executable which
 
 ```toml
 [dependencies]
-rust-embed="4.1.0"
+rust-embed="4.2.0"
 ```
 
 ## Documentation
@@ -36,11 +36,11 @@ The macro will generate the following code:
 
 ```rust
 impl Asset {  
-  pub fn get(file_path: &str) -> Option<impl AsRef<[u8]>> {
+  pub fn get(file_path: &str) -> Option<Cow<'static, [u8]>> {
     ...    
   }
   
-  pub fn iter() -> impl Iterator<Item = impl AsRef<str>> {
+  pub fn iter() -> impl Iterator<Item = Cow<'static, str>> {
     ...
   }
 }
@@ -50,9 +50,9 @@ impl Asset {
 
 Given a relative path from the assets folder returns the bytes if found.
 
-If the feature `debug-embed` is enabled or the binary  compiled in release mode the bytes have been embeded in the binary and a `&'static [u8]` is returned.
+If the feature `debug-embed` is enabled or the binary  compiled in release mode the bytes have been embeded in the binary and a `Cow::Borrowed(&'static [u8])` is returned.
 
-Otherwise the bytes are read from the file system on each call and a `Vec<u8>` is returned.
+Otherwise the bytes are read from the file system on each call and a `Cow::Owned(Vec<u8>)` is returned.
 
 
 ### `iter()`
