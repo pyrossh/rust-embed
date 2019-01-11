@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
+## [4.3.0] - 2019-01-10
+### Fixed
+- debug_embed feature was not working at all
+### Added
+- a test run for debug_embed feature
 
 ## [4.2.0] - 2018-12-02
 ### Changed
