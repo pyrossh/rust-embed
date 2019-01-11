@@ -44,3 +44,32 @@ pub trait RustEmbed {
   /// Otherwise, the files are listed from the file system on each call.
   fn iter(&self) -> Filenames;
 }
+
+/// An iterator type over filenames.
+///
+/// This enum exists for optimization purposes, to avoid boxing the iterator in
+/// some cases. Do not try and match on it, as different variants will exist
+/// depending on the compilation context.
+pub enum Filenames {
+  /// Release builds use a nameable iterator type, which can be stack-allocated.
+  #[cfg(any(not(debug_assertions), feature = "debug-embed"))]
+  Embedded(std::slice::Iter<'static, &'static str>),
+
+  /// The debug iterator type is currently unnamable and still needs to be
+  /// boxed.
+  #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
+  Dynamic(Box<dyn Iterator<Item = std::borrow::Cow<'static, str>>>),
+}
+
+impl Iterator for Filenames {
+  type Item = std::borrow::Cow<'static, str>;
+  fn next(&mut self) -> Option<Self::Item> {
+    match self {
+      #[cfg(any(not(debug_assertions), feature = "debug-embed"))]
+      Filenames::Embedded(names) => names.next().map(|x| std::borrow::Cow::from(*x)),
+
+      #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
+      Filenames::Dynamic(boxed) => boxed.next(),
+    }
+  }
+}
