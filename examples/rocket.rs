@@ -1,7 +1,6 @@
-#![feature(test, plugin, decl_macro)]
-#![plugin(rocket_codegen)]
+#![feature(decl_macro, proc_macro_hygiene)]
+#[macro_use]
 extern crate rocket;
-extern crate rocket_contrib;
 #[macro_use]
 extern crate rust_embed;
 
