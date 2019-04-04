@@ -3,8 +3,8 @@ extern crate proc_macro;
 #[macro_use]
 extern crate quote;
 extern crate syn;
-
 extern crate walkdir;
+extern crate shellexpand;
 
 use proc_macro::TokenStream;
 use quote::Tokens;
@@ -15,7 +15,7 @@ mod utils;
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
-  quote! {      
+  quote! {
       impl #ident {
           pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
               use std::fs::File;
@@ -66,7 +66,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 
   let array_len = list_values.len();
 
-  quote! {      
+  quote! {
       impl #ident {
           pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
               match file_path {
@@ -118,6 +118,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
       panic!("#[derive(RustEmbed)] attribute value must be a string literal");
     }
   };
+  let folder_path = shellexpand::full(&folder_path).unwrap_or_else(|e| panic!("{}", e)).to_string();
   if !Path::new(&folder_path).exists() {
     panic!(
       "#[derive(RustEmbed)] folder '{}' does not exist. cwd: '{}'",

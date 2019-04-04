@@ -17,6 +17,7 @@ proc-macro = true
 syn = "0.11"
 quote = "0.3"
 walkdir = "2.2.7"
+shellexpand = "1.0"
 
 [features]
 debug-embed = []

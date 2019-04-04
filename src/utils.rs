@@ -8,8 +8,6 @@ pub struct FileEntry {
 
 #[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
 pub fn get_files(folder_path: String) -> impl Iterator<Item = FileEntry> {
-  use std;
-  use walkdir;
   walkdir::WalkDir::new(&folder_path)
     .into_iter()
     .filter_map(|e| e.ok())
@@ -29,5 +27,5 @@ pub fn get_files(folder_path: String) -> impl Iterator<Item = FileEntry> {
 }
 
 fn path_to_str<P: AsRef<std::path::Path>>(p: P) -> String {
-  p.as_ref().to_str().expect("Path does not have a string representation").to_owned()
+  p.as_ref().display().to_string()
 }
