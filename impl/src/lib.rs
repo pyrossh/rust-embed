@@ -4,6 +4,7 @@ extern crate proc_macro;
 extern crate quote;
 extern crate syn;
 extern crate walkdir;
+#[cfg(feature = "shellexpand")]
 extern crate shellexpand;
 
 use proc_macro::TokenStream;
@@ -118,6 +119,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
       panic!("#[derive(RustEmbed)] attribute value must be a string literal");
     }
   };
+  #[cfg(feature = "shellexpand")]
   let folder_path = shellexpand::full(&folder_path).unwrap_or_else(|e| panic!("{}", e)).to_string();
   if !Path::new(&folder_path).exists() {
     panic!(
