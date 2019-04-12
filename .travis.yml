@@ -20,3 +20,5 @@ script:
   - cargo build --example basic --release 
   - cargo build --example actix --features actix
   - cargo build --example actix --features actix --release
+  - cargo build --example warp --features warp-ex
+  - cargo build --example warp --features warp-ex --release
