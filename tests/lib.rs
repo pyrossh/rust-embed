@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate rust_embed;
 
+/// Test doc comment
 #[derive(RustEmbed)]
 #[folder = "examples/public/"]
 struct Asset;
