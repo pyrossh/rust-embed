@@ -83,7 +83,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   }
 }
 
-fn help() {
+fn help() -> ! {
   panic!("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]");
 }
 
@@ -95,22 +95,14 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
       _ => {}
     },
   };
-  let ident = &ast.ident;
-  if ast.attrs.len() == 0 || ast.attrs.len() > 1 {
-    help();
-  }
-  let value = &ast.attrs[0].value;
-  let literal_value = match value {
-    &MetaItem::NameValue(ref attr_name, ref value) => {
-      if attr_name == "folder" {
-        value
-      } else {
-        panic!("#[derive(RustEmbed)] attribute name must be folder");
-      }
-    }
-    _ => {
-      panic!("#[derive(RustEmbed)] attribute name must be folder");
-    }
+
+  let attribute = ast.attrs
+      .iter()
+      .map(|attr| &attr.value)
+      .find(|value| value.name() == "folder");
+  let literal_value = match attribute {
+    Some(&MetaItem::NameValue(_, ref literal)) => literal,
+    _ => help()
   };
   let folder_path = match literal_value {
     &Lit::Str(ref val, _) => val.clone(),
@@ -118,6 +110,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
       panic!("#[derive(RustEmbed)] attribute value must be a string literal");
     }
   };
+
   if !Path::new(&folder_path).exists() {
     panic!(
       "#[derive(RustEmbed)] folder '{}' does not exist. cwd: '{}'",
@@ -125,7 +118,8 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
       std::env::current_dir().unwrap().to_str().unwrap()
     );
   };
-  generate_assets(ident, folder_path)
+
+  generate_assets(&ast.ident, folder_path)
 }
 
 #[proc_macro_derive(RustEmbed, attributes(folder))]
