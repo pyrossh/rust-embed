@@ -33,7 +33,7 @@ pub trait RustEmbed {
   ///
   /// Otherwise, the bytes are read from the file system on each call and a
   /// `Cow::Owned(Vec<u8>)` is returned.
-  fn get(&self, file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>>;
+  fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>>;
 
   /// Iterates the files in this assets folder.
   ///
@@ -42,7 +42,7 @@ pub trait RustEmbed {
   /// is used.
   ///
   /// Otherwise, the files are listed from the file system on each call.
-  fn iter(&self) -> Filenames;
+  fn iter() -> Filenames;
 }
 
 /// An iterator type over filenames.

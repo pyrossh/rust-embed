@@ -45,10 +45,10 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
           }
       }
       impl rust_embed::RustEmbed for #ident {
-        fn get(&self, file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+        fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
           #ident::get(file_path)
         }
-        fn iter(&self) -> rust_embed::Filenames {
+        fn iter() -> rust_embed::Filenames {
           // the return type of iter() is unnamable, so we have to box it
           rust_embed::Filenames::Dynamic(Box::new(#ident::iter()))
         }
@@ -93,10 +93,10 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
           }
       }
       impl rust_embed::RustEmbed for #ident {
-        fn get(&self, file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+        fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
           #ident::get(file_path)
         }
-        fn iter(&self) -> rust_embed::Filenames {
+        fn iter() -> rust_embed::Filenames {
           rust_embed::Filenames::Embedded(#ident::names())
         }
       }
