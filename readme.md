@@ -44,6 +44,14 @@ impl Asset {
     ...
   }
 }
+impl RustEmbed for Asset {
+  fn get(file_path: &str) -> Option<Cow<'static, [u8]>> {
+    ...
+  }
+  fn iter() -> impl Iterator<Item = Cow<'static, str>> {
+    ...
+  }
+}
 ```
 
 ### `get(file_path: &str)`

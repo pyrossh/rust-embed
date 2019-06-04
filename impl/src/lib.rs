@@ -44,6 +44,15 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
               get_files(String::from(#folder_path)).map(|e| std::borrow::Cow::from(e.rel_path))
           }
       }
+      impl rust_embed::RustEmbed for #ident {
+        fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+          #ident::get(file_path)
+        }
+        fn iter() -> rust_embed::Filenames {
+          // the return type of iter() is unnamable, so we have to box it
+          rust_embed::Filenames::Dynamic(Box::new(#ident::iter()))
+        }
+      }
   }
 }
 
@@ -75,10 +84,21 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
               }
           }
 
-          pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
-              static items: [&str; #array_len] = [#(#list_values),*];
-              items.iter().map(|x| std::borrow::Cow::from(*x))
+          fn names() -> std::slice::Iter<'static, &'static str> {
+            const items: [&str; #array_len] = [#(#list_values),*];
+            items.iter()
           }
+          pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
+              Self::names().map(|x| std::borrow::Cow::from(*x))
+          }
+      }
+      impl rust_embed::RustEmbed for #ident {
+        fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+          #ident::get(file_path)
+        }
+        fn iter() -> rust_embed::Filenames {
+          rust_embed::Filenames::Embedded(#ident::names())
+        }
       }
   }
 }
