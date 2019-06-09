@@ -11,7 +11,7 @@ categories = ["web-programming::http-server"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 
 [dependencies]
-walkdir = "2.2.7"
+walkdir = "2.2.8"
 rust-embed-impl = { version = "4.4.0", path = "impl"}
 
 actix-web = { version = "0.7", optional = true }

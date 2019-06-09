@@ -16,7 +16,7 @@ proc-macro = true
 [dependencies]
 syn = "0.11"
 quote = "0.3"
-walkdir = "2.2.7"
+walkdir = "2.2.8"
 
 [features]
 debug-embed = []
