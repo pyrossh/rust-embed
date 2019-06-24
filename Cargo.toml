@@ -10,6 +10,16 @@ keywords = ["http", "rocket", "static", "web", "server"]
 categories = ["web-programming::http-server"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 
+[[test]]
+name = "lib"
+path = "tests/lib.rs"
+required-features = []
+
+[[test]]
+name = "interpolated_path"
+path = "tests/interpolated_path.rs"
+required-features = ["interpolate-folder-path"]
+
 [dependencies]
 walkdir = "2.2.7"
 rust-embed-impl = { version = "4.4.0", path = "impl"}
