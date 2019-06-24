@@ -18,5 +18,10 @@ syn = "0.11"
 quote = "0.3"
 walkdir = "2.2.8"
 
+[dependencies.shellexpand]
+version = "1.0"
+optional = true
+
 [features]
 debug-embed = []
+interpolate-folder-path = ["shellexpand"]

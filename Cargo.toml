@@ -21,6 +21,7 @@ rocket = { version = "0.4.1", optional = true }
 
 [features]
 debug-embed = ["rust-embed-impl/debug-embed"]
+interpolate-folder-path = ["rust-embed-impl/interpolate-folder-path"]
 nightly = ["rocket"]
 actix = ["actix-web", "mime_guess"]
 warp-ex = ["warp", "mime_guess"]
