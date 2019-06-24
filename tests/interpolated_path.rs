@@ -3,7 +3,7 @@ extern crate rust_embed;
 
 /// Test doc comment
 #[derive(RustEmbed)]
-#[folder = "$CARGO_MANFEST_ROOT/examples/public/"]
+#[folder = "$CARGO_MANIFEST_DIR/examples/public/"]
 struct Asset;
 
 #[test]
