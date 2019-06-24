@@ -4,6 +4,8 @@ extern crate proc_macro;
 extern crate quote;
 extern crate syn;
 
+#[cfg(feature = "interpolate-folder-path")]
+extern crate shellexpand;
 extern crate walkdir;
 
 use proc_macro::TokenStream;
@@ -15,7 +17,7 @@ mod utils;
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
-  quote! {      
+  quote! {
       impl #ident {
           pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
               use std::fs::File;
@@ -75,7 +77,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 
   let array_len = list_values.len();
 
-  quote! {      
+  quote! {
       impl #ident {
           pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
               match file_path {
@@ -116,13 +118,10 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
     },
   };
 
-  let attribute = ast.attrs
-      .iter()
-      .map(|attr| &attr.value)
-      .find(|value| value.name() == "folder");
+  let attribute = ast.attrs.iter().map(|attr| &attr.value).find(|value| value.name() == "folder");
   let literal_value = match attribute {
     Some(&MetaItem::NameValue(_, ref literal)) => literal,
-    _ => help()
+    _ => help(),
   };
   let folder_path = match literal_value {
     &Lit::Str(ref val, _) => val.clone(),
@@ -130,6 +129,9 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
       panic!("#[derive(RustEmbed)] attribute value must be a string literal");
     }
   };
+
+  #[cfg(feature = "interpolate-folder-path")]
+  let folder_path = shellexpand::full(&folder_path).unwrap().to_string();
 
   if !Path::new(&folder_path).exists() {
     panic!(
