@@ -22,6 +22,8 @@ pub mod utils;
 /// #[derive(RustEmbed)]
 /// #[folder = "examples/public/"]
 /// struct Asset;
+///
+/// fn main() {}
 /// ```
 
 pub trait RustEmbed {
