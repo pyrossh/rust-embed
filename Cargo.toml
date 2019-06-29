@@ -17,7 +17,7 @@ rust-embed-impl = { version = "4.5.0", path = "impl"}
 actix-web = { version = "0.7", optional = true }
 mime_guess = { version = "2.0.0-alpha.6", optional = true }
 warp = { version = "0.1", optional = true }
-rocket = { version = "0.4.1", optional = true }
+rocket = { version = "0.4.2", optional = true }
 
 [features]
 debug-embed = ["rust-embed-impl/debug-embed"]
