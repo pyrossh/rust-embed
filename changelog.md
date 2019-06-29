@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
+## [4.5.0] - 2019-06-29
+## Added
+- allow rust embed derive to take env variables in the folder path
+
 ## [4.4.0] - 2019-05-11
 ### Fixed
 - a panic when struct has doc comments
