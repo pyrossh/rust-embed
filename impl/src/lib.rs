@@ -105,15 +105,11 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   }
 }
 
-fn help() -> ! {
-  panic!("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]");
-}
-
 fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
   match ast.body {
-    Body::Enum(_) => help(),
+    Body::Enum(_) => panic!("RustEmbed cannot be derived for enums"),
     Body::Struct(ref data) => match data {
-      &VariantData::Struct(_) => help(),
+      &VariantData::Struct(_) => panic!("RustEmbed can only be derived for unit structs"),
       _ => {}
     },
   };
@@ -121,7 +117,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
   let attribute = ast.attrs.iter().map(|attr| &attr.value).find(|value| value.name() == "folder");
   let literal_value = match attribute {
     Some(&MetaItem::NameValue(_, ref literal)) => literal,
-    _ => help(),
+    _ => panic!("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]"),
   };
   let folder_path = match literal_value {
     &Lit::Str(ref val, _) => val.clone(),
