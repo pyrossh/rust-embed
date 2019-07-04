@@ -6,10 +6,6 @@ extern crate walkdir;
 extern crate rust_embed_impl;
 pub use rust_embed_impl::*;
 
-extern crate rust_embed_utils;
-#[allow(unused_imports)]
-use rust_embed_utils as utils;
-
 /// A directory of binary assets.
 ///
 /// They should be embedded into the executable for release builds,
