@@ -60,7 +60,6 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 #[cfg(any(not(debug_assertions), feature = "debug-embed"))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   extern crate rust_embed_utils;
-  //use rust_embed_utils::{get_files, FileEntry};
 
   let mut match_values = Vec::<Tokens>::new();
   let mut list_values = Vec::<String>::new();
