@@ -6,9 +6,9 @@ extern crate walkdir;
 extern crate rust_embed_impl;
 pub use rust_embed_impl::*;
 
-#[doc(hidden)]
-#[cfg(all(debug_assertions, not(feature = "debug-embed")))]
-pub mod utils;
+extern crate rust_embed_utils;
+#[allow(unused_imports)]
+use rust_embed_utils as utils;
 
 /// A directory of binary assets.
 ///

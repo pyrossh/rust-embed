@@ -13,7 +13,8 @@ use quote::Tokens;
 use std::path::Path;
 use syn::*;
 
-mod utils;
+extern crate rust_embed_utils;
+use rust_embed_utils as utils;
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
