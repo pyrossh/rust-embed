@@ -1,11 +1,11 @@
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 extern crate walkdir;
+
 #[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
 pub struct FileEntry {
   pub rel_path: String,
   pub full_canonical_path: String,
 }
-
 
 #[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
 pub fn get_files(folder_path: String) -> impl Iterator<Item = FileEntry> {
