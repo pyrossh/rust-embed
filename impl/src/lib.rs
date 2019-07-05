@@ -13,7 +13,6 @@ use quote::Tokens;
 use std::path::Path;
 use syn::*;
 
-mod utils;
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
@@ -42,8 +41,8 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 
           pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
               use std::path::Path;
-              use rust_embed::utils::get_files;
-              get_files(String::from(#folder_path)).map(|e| std::borrow::Cow::from(e.rel_path))
+              extern crate rust_embed_utils;
+              rust_embed_utils::get_files(String::from(#folder_path)).map(|e| std::borrow::Cow::from(e.rel_path))
           }
       }
       impl rust_embed::RustEmbed for #ident {
@@ -60,12 +59,12 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 
 #[cfg(any(not(debug_assertions), feature = "debug-embed"))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
-  use utils::{get_files, FileEntry};
+  extern crate rust_embed_utils;
 
   let mut match_values = Vec::<Tokens>::new();
   let mut list_values = Vec::<String>::new();
 
-  for FileEntry { rel_path, full_canonical_path } in get_files(folder_path) {
+  for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path) {
     match_values.push(quote! {
       #rel_path => {
           let bytes = &include_bytes!(#full_canonical_path)[..];
