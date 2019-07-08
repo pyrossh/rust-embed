@@ -6,13 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
+## [5.0.1] - 2019-07-07
+## Changed
+- derive is allowed only on unit structs now 
+
 ## [5.0.0] - 2019-07-05
 ## Added
 - proper error message stating only unit structs are supported
 ## Fixed
 - windows latest build
-## Changed
-- derive on tuple structs is removed
 
 ## [4.5.0] - 2019-06-29
 ## Added

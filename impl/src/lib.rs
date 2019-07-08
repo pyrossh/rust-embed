@@ -108,8 +108,8 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
   match ast.body {
     Body::Enum(_) => panic!("RustEmbed cannot be derived for enums"),
     Body::Struct(ref data) => match data {
-      &VariantData::Struct(_) => panic!("RustEmbed can only be derived for unit structs"),
-      _ => {}
+      &VariantData::Unit => {},
+      _ => panic!("RustEmbed can only be derived for unit structs")
     },
   };
 
