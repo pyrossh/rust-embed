@@ -1,6 +1,6 @@
 [package]
 name = "rust-embed-impl"
-version = "5.0.1"
+version = "5.1.0"
 description = "Rust Custom Derive Macro which loads files into the rust binary at compile time during release and loads the file from the fs during dev"
 readme = "readme.md"
 documentation = "https://docs.rs/rust-embed"
