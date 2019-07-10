@@ -1,19 +1,22 @@
 ## Rust Embed [![Build Status](https://travis-ci.org/pyros2097/rust-embed.svg?branch=master)](https://travis-ci.org/pyros2097/rust-embed) [![Build status](https://ci.appveyor.com/api/projects/status/jnr45fn1l1dop2a8/branch/master?svg=true)](https://ci.appveyor.com/project/pyros2097/rust-embed/branch/master) [![crates.io](http://meritbadge.herokuapp.com/rust-embed)](https://crates.io/crates/rust-embed)
+
 Rust Custom Derive Macro which loads files into the rust binary at compile time during release and loads the file from the fs during dev.
 
 You can use this to embed your css, js and images into a single executable which can be deployed to your servers. Also it makes it easy to build a very small docker image for you to deploy.
 
 ### Dev
+
 <img src="https://user-images.githubusercontent.com/1687946/40840773-b1ae1ce6-65c5-11e8-80ac-9e9196701ca2.png" width="700" height="100">
 
 ### Release
+
 <img src="https://user-images.githubusercontent.com/1687946/40840774-b1dd709a-65c5-11e8-858d-73a88e25f07a.png" width="700" height="184">
 
 ## Installation
 
 ```toml
 [dependencies]
-rust-embed="5.0.1"
+rust-embed="5.1.0"
 ```
 
 ## Documentation
@@ -31,15 +34,14 @@ The path resolution works as follows:
 struct Asset;
 ```
 
-
 The macro will generate the following code:
 
 ```rust
-impl Asset {  
+impl Asset {
   pub fn get(file_path: &str) -> Option<Cow<'static, [u8]>> {
-    ...    
+    ...
   }
-  
+
   pub fn iter() -> impl Iterator<Item = Cow<'static, str>> {
     ...
   }
@@ -58,13 +60,12 @@ impl RustEmbed for Asset {
 
 Given a relative path from the assets folder returns the bytes if found.
 
-If the feature `debug-embed` is enabled or the binary  compiled in release mode the bytes have been embeded in the binary and a `Cow::Borrowed(&'static [u8])` is returned.
+If the feature `debug-embed` is enabled or the binary compiled in release mode the bytes have been embeded in the binary and a `Cow::Borrowed(&'static [u8])` is returned.
 
 Otherwise the bytes are read from the file system on each call and a `Cow::Owned(Vec<u8>)` is returned.
 
-
 ### `iter()`
-    
+
 Iterates the files in this assets folder.
 
 If the feature `debug-embed` is enabled or the binary compiled in release mode a static array to the list of relative paths to the files is returned.
@@ -77,8 +78,8 @@ Otherwise the files are listed from the file system on each call.
 
 Always embed the files in the binary, even in debug mode.
 
-
 ## Usage
+
 ```rust
 #[macro_use]
 extern crate rust_embed;
@@ -98,6 +99,7 @@ fn main() {
 ```
 
 ## Examples
+
 To run the example in dev mode where it reads from the fs,
 
 `cargo run --example basic`
@@ -115,6 +117,7 @@ Note: To run the `rocket` example, add the `nightly` feature flag and run on a n
 `cargo +nightly run --example rocket --features nightly`
 
 ## Testing
+
 debug: `cargo test --test lib`
 
 release: `cargo test --test lib --release`
