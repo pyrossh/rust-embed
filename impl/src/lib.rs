@@ -41,8 +41,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 
           pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
               use std::path::Path;
-              extern crate rust_embed_utils;
-              rust_embed_utils::get_files(String::from(#folder_path)).map(|e| std::borrow::Cow::from(e.rel_path))
+              rust_embed::utils::get_files(String::from(#folder_path)).map(|e| std::borrow::Cow::from(e.rel_path))
           }
       }
       impl rust_embed::RustEmbed for #ident {
