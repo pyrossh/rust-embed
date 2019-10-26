@@ -13,7 +13,6 @@ use quote::Tokens;
 use std::path::Path;
 use syn::*;
 
-
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   quote! {
@@ -107,8 +106,8 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
   match ast.body {
     Body::Enum(_) => panic!("RustEmbed cannot be derived for enums"),
     Body::Struct(ref data) => match data {
-      &VariantData::Unit => {},
-      _ => panic!("RustEmbed can only be derived for unit structs")
+      &VariantData::Unit => {}
+      _ => panic!("RustEmbed can only be derived for unit structs"),
     },
   };
 
