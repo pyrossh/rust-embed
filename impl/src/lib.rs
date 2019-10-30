@@ -13,7 +13,6 @@ use quote::Tokens;
 use std::path::Path;
 use syn::*;
 
-
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   quote! {
@@ -107,8 +106,8 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
   match ast.body {
     Body::Enum(_) => panic!("RustEmbed cannot be derived for enums"),
     Body::Struct(ref data) => match data {
-      &VariantData::Unit => {},
-      _ => panic!("RustEmbed can only be derived for unit structs")
+      &VariantData::Unit => {}
+      _ => panic!("RustEmbed can only be derived for unit structs"),
     },
   };
 
@@ -128,11 +127,20 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
   let folder_path = shellexpand::full(&folder_path).unwrap().to_string();
 
   if !Path::new(&folder_path).exists() {
-    panic!(
+    let mut message = format!(
       "#[derive(RustEmbed)] folder '{}' does not exist. cwd: '{}'",
       folder_path,
       std::env::current_dir().unwrap().to_str().unwrap()
     );
+
+    // Add a message about the interpolate-folder-path feature if the path may
+    // include a variable
+    if folder_path.contains("$") && cfg!(not(feature = "interpolate-folder-path")) {
+      message += "\nA variable has been detected. RustEmbed can expand variables \
+                  when the `interpolate-folder-path` feature is enabled.";
+    }
+
+    panic!(message);
   };
 
   generate_assets(&ast.ident, folder_path)
