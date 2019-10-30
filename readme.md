@@ -78,6 +78,17 @@ Otherwise the files are listed from the file system on each call.
 
 Always embed the files in the binary, even in debug mode.
 
+### `interpolate-folder-path`
+
+Allow environment variables to be used in the `folder` path. Example:
+```rust
+#[derive(RustEmbed)]
+#[folder = "$CARGO_MANIFEST_DIR/foo"]
+struct Asset;
+```
+
+This will pull the `foo` directory relative to your `Cargo.toml` file.
+
 ## Usage
 
 ```rust
