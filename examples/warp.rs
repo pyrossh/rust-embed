@@ -22,7 +22,7 @@ fn main() {
 }
 
 fn serve(path: &str) -> Result<impl Reply, Rejection> {
-  let mime = mime_guess::guess_mime_type(path);
+  let mime = mime_guess::from_path(path).first_or_octet_stream();
 
   let asset: Option<Cow<'static, [u8]>> = Asset::get(path);
 
