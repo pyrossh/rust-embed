@@ -17,7 +17,7 @@ proc-macro = true
 rust-embed-utils = { version = "5.0.0", path = "../utils"}
 
 syn = "0.11"
-quote = "0.3"
+quote = "1.0"
 walkdir = "2.2.7"
 
 [dependencies.shellexpand]
