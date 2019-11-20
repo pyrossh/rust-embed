@@ -3,9 +3,9 @@ extern crate actix_web;
 extern crate rust_embed;
 extern crate mime_guess;
 
-use actix_web::http::Method;
-use actix_web::{server, App, Body, HttpRequest, HttpResponse};
-use mime_guess::guess_mime_type;
+use actix_web::body::Body;
+use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
+use mime_guess::from_path;
 use std::borrow::Cow;
 
 #[derive(RustEmbed)]
@@ -19,7 +19,7 @@ fn handle_embedded_file(path: &str) -> HttpResponse {
         Cow::Borrowed(bytes) => bytes.into(),
         Cow::Owned(bytes) => bytes.into(),
       };
-      HttpResponse::Ok().content_type(guess_mime_type(path).as_ref()).body(body)
+      HttpResponse::Ok().content_type(from_path(path).first_or_octet_stream().as_ref()).body(body)
     }
     None => HttpResponse::NotFound().body("404 Not Found"),
   }
@@ -35,8 +35,13 @@ fn dist(req: HttpRequest) -> HttpResponse {
 }
 
 fn main() {
-  server::new(|| App::new().route("/", Method::GET, index).route("/dist/{_:.*}", Method::GET, dist))
-    .bind("127.0.0.1:8000")
-    .unwrap()
-    .run();
+  HttpServer::new(|| {
+    App::new()
+      .service(web::resource("/").route(web::get().to(index)))
+      .service(web::resource("/dist/{_:.*}").route(web::get().to(dist)))
+  })
+  .bind("127.0.0.1:8000")
+  .unwrap()
+  .run()
+  .unwrap();
 }
