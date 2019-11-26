@@ -9,12 +9,11 @@ extern crate shellexpand;
 extern crate walkdir;
 
 use proc_macro::TokenStream;
-use quote::Tokens;
 use std::path::Path;
-use syn::*;
+use syn::{export::TokenStream2, Data, DeriveInput, Fields, Lit, Meta};
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
-fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
+fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   quote! {
       impl #ident {
           pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
@@ -56,10 +55,10 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
 }
 
 #[cfg(any(not(debug_assertions), feature = "debug-embed"))]
-fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
+fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   extern crate rust_embed_utils;
 
-  let mut match_values = Vec::<Tokens>::new();
+  let mut match_values = Vec::<TokenStream2>::new();
   let mut list_values = Vec::<String>::new();
 
   for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path) {
@@ -102,22 +101,29 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> quote::Tokens {
   }
 }
 
-fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
-  match ast.body {
-    Body::Enum(_) => panic!("RustEmbed cannot be derived for enums"),
-    Body::Struct(ref data) => match data {
-      &VariantData::Unit => {}
+fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
+  match ast.data {
+    Data::Struct(ref data) => match data.fields {
+      Fields::Unit => {}
       _ => panic!("RustEmbed can only be derived for unit structs"),
     },
+    _ => panic!("RustEmbed can only be derived for unit structs"),
   };
 
-  let attribute = ast.attrs.iter().map(|attr| &attr.value).find(|value| value.name() == "folder");
-  let literal_value = match attribute {
-    Some(&MetaItem::NameValue(_, ref literal)) => literal,
+  let attribute = ast
+    .attrs
+    .iter()
+    .find(|value| value.path.is_ident("folder"))
+    .expect("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]");
+  let meta = attribute
+    .parse_meta()
+    .expect("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]");
+  let literal_value = match meta {
+    Meta::NameValue(ref data) => &data.lit,
     _ => panic!("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]"),
   };
   let folder_path = match literal_value {
-    &Lit::Str(ref val, _) => val.clone(),
+    Lit::Str(ref val) => val.clone().value(),
     _ => {
       panic!("#[derive(RustEmbed)] attribute value must be a string literal");
     }
@@ -148,8 +154,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> Tokens {
 
 #[proc_macro_derive(RustEmbed, attributes(folder))]
 pub fn derive_input_object(input: TokenStream) -> TokenStream {
-  let s = input.to_string();
-  let ast = syn::parse_derive_input(&s).unwrap();
+  let ast: DeriveInput = syn::parse(input).unwrap();
   let gen = impl_rust_embed(&ast);
-  gen.parse().unwrap()
+  gen.into()
 }
