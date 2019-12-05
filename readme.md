@@ -16,7 +16,7 @@ You can use this to embed your css, js and images into a single executable which
 
 ```toml
 [dependencies]
-rust-embed="5.1.0"
+rust-embed="5.2.0"
 ```
 
 ## Documentation
@@ -81,6 +81,7 @@ Always embed the files in the binary, even in debug mode.
 ### `interpolate-folder-path`
 
 Allow environment variables to be used in the `folder` path. Example:
+
 ```rust
 #[derive(RustEmbed)]
 #[folder = "$CARGO_MANIFEST_DIR/foo"]
