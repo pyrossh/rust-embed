@@ -12,7 +12,7 @@ authors = ["pyros2097 <pyros2097@gmail.com>"]
 
 [dependencies]
 walkdir = "2.2.7"
-rust-embed-impl = { version = "5.1.0", path = "impl"}
+rust-embed-impl = { version = "5.2.0", path = "impl"}
 rust-embed-utils = { version = "5.0.0", path = "utils"}
 
 actix-web = { version = "1", optional = true }
