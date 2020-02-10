@@ -4,6 +4,7 @@ extern crate walkdir;
 #[cfg(feature = "compression")]
 extern crate include_flate;
 #[cfg(feature = "compression")]
+#[cfg_attr(feature = "compression", doc(hidden))]
 pub use include_flate::flate;
 
 #[allow(unused_imports)]
