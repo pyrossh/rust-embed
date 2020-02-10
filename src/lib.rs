@@ -1,6 +1,11 @@
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 extern crate walkdir;
 
+#[cfg(feature = "compression")]
+extern crate include_flate;
+#[cfg(feature = "compression")]
+pub use include_flate::flate;
+
 #[allow(unused_imports)]
 #[macro_use]
 extern crate rust_embed_impl;
