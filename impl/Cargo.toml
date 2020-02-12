@@ -27,3 +27,4 @@ optional = true
 [features]
 debug-embed = []
 interpolate-folder-path = ["shellexpand"]
+compression = []
