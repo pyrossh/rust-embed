@@ -54,6 +54,28 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   }
 }
 
+#[cfg(all(not(feature = "compression"), any(not(debug_assertions), feature = "debug-embed")))]
+fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
+  quote! {
+    #rel_path => {
+        let bytes = &include_bytes!(#full_canonical_path)[..];
+        Some(std::borrow::Cow::from(bytes))
+    },
+  }
+}
+
+#[cfg(all(feature = "compression", any(not(debug_assertions), feature = "debug-embed")))]
+fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
+  quote! {
+    #rel_path => {
+        rust_embed::flate!(static FILE: [u8] from #full_canonical_path);
+
+        let bytes = &FILE[..];
+        Some(std::borrow::Cow::from(bytes))
+    },
+  }
+}
+
 #[cfg(any(not(debug_assertions), feature = "debug-embed"))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   extern crate rust_embed_utils;
@@ -62,12 +84,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   let mut list_values = Vec::<String>::new();
 
   for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path) {
-    match_values.push(quote! {
-      #rel_path => {
-          let bytes = &include_bytes!(#full_canonical_path)[..];
-          Some(std::borrow::Cow::from(bytes))
-      },
-    });
+    match_values.push(embed_file(&rel_path, &full_canonical_path));
     list_values.push(rel_path);
   }
 
