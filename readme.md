@@ -90,6 +90,10 @@ struct Asset;
 
 This will pull the `foo` directory relative to your `Cargo.toml` file.
 
+### `compression`
+
+Compress each file when embedding into the binary. Compression is done via [`include-flate`].
+
 ## Usage
 
 ```rust
@@ -136,3 +140,5 @@ release: `cargo test --test lib --release`
 
 Go Rusketeers!
 The power is yours!
+
+[`include-flate`]: https://crates.io/crates/include-flate
