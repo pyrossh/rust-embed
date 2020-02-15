@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
-## Unreleased
+## [5.3.0] - 2020-02-15
+
 ### Added
+
 - `compression` feature for compressing embedded files
 
 ## [5.2.0] - 2019-12-05
