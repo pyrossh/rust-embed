@@ -17,12 +17,12 @@ rust-embed-impl = { version = "5.3.0", path = "impl"}
 rust-embed-utils = { version = "5.0.0", path = "utils"}
 
 include-flate = { version = "0.1", optional = true, features = ["stable"] }
-actix-web = { version = "2", optional = true }
+actix-web = { version = "2", default-features = false, optional = true }
 actix-rt = { version = "1", optional = true }
 mime_guess = { version = "2", optional = true }
 tokio = { version = "0.2", optional = true, features = ["macros"] }
-warp = { version = "0.2", optional = true }
-rocket = { version = "0.4.2", optional = true }
+warp = { version = "0.2", default-features = false, optional = true }
+rocket = { version = "0.4.2", default-features = false, optional = true }
 
 [features]
 debug-embed = ["rust-embed-impl/debug-embed", "rust-embed-utils/debug-embed"]
