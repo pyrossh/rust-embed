@@ -1,11 +1,12 @@
 #![feature(decl_macro, proc_macro_hygiene)]
 #[macro_use]
 extern crate rocket;
-#[macro_use]
 extern crate rust_embed;
 
 use rocket::http::{ContentType, Status};
 use rocket::response;
+use rust_embed::RustEmbed;
+
 use std::ffi::OsStr;
 use std::io::Cursor;
 use std::path::PathBuf;

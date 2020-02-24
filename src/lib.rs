@@ -23,8 +23,8 @@ pub extern crate rust_embed_utils as utils;
 ///
 /// This trait is meant to be derived like so:
 /// ```
-/// #[macro_use]
-/// extern crate rust_embed;
+/// use rust_embed::RustEmbed;
+///
 /// #[derive(RustEmbed)]
 /// #[folder = "examples/public/"]
 /// struct Asset;
