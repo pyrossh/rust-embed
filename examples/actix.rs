@@ -31,14 +31,14 @@ fn dist(req: HttpRequest) -> HttpResponse {
   handle_embedded_file(path)
 }
 
-fn main() {
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
   HttpServer::new(|| {
     App::new()
       .service(web::resource("/").route(web::get().to(index)))
       .service(web::resource("/dist/{_:.*}").route(web::get().to(dist)))
   })
-  .bind("127.0.0.1:8000")
-  .unwrap()
+  .bind("127.0.0.1:8000")?
   .run()
-  .unwrap();
+  .await
 }
