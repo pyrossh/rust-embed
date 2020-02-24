@@ -1,8 +1,3 @@
-#[cfg(all(debug_assertions, not(feature = "debug-embed")))]
-extern crate walkdir;
-
-#[cfg(feature = "compression")]
-extern crate include_flate;
 #[cfg(feature = "compression")]
 #[cfg_attr(feature = "compression", doc(hidden))]
 pub use include_flate::flate;
@@ -23,8 +18,8 @@ pub extern crate rust_embed_utils as utils;
 ///
 /// This trait is meant to be derived like so:
 /// ```
-/// #[macro_use]
-/// extern crate rust_embed;
+/// use rust_embed::RustEmbed;
+///
 /// #[derive(RustEmbed)]
 /// #[folder = "examples/public/"]
 /// struct Asset;

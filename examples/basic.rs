@@ -1,5 +1,4 @@
-#[macro_use]
-extern crate rust_embed;
+use rust_embed::RustEmbed;
 
 #[derive(RustEmbed)]
 #[folder = "examples/public/"]

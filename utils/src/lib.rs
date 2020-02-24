@@ -1,6 +1,3 @@
-#[cfg(all(debug_assertions, not(feature = "debug-embed")))]
-extern crate walkdir;
-
 #[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
 pub struct FileEntry {
   pub rel_path: String,
