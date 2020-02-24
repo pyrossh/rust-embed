@@ -1,5 +1,3 @@
-#![deny(warnings)]
-
 extern crate rust_embed;
 extern crate warp;
 
@@ -27,7 +25,7 @@ fn serve(path: &str) -> Result<impl Reply, Rejection> {
 
   let asset: Option<Cow<'static, [u8]>> = Asset::get(path);
 
-  let file = asset.ok_or_else(|| warp::reject::not_found())?;
+  let file = asset.ok_or_else(warp::reject::not_found)?;
 
   Ok(Response::builder().header("content-type", mime.to_string()).body(file))
 }

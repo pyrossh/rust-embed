@@ -33,8 +33,8 @@ fn dist<'r>(file: PathBuf) -> response::Result<'r> {
         .as_path()
         .extension()
         .and_then(OsStr::to_str)
-        .ok_or(Status::new(400, "Could not get file extension"))?;
-      let content_type = ContentType::from_extension(ext).ok_or(Status::new(400, "Could not get file content type"))?;
+        .ok_or_else(|| Status::new(400, "Could not get file extension"))?;
+      let content_type = ContentType::from_extension(ext).ok_or_else(|| Status::new(400, "Could not get file content type"))?;
       response::Response::build().header(content_type).sized_body(Cursor::new(d)).ok()
     },
   )
