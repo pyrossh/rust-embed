@@ -4,7 +4,7 @@ extern crate quote;
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
-use std::path::Path;
+use std::{env, path::Path};
 use syn::{export::TokenStream2, Data, DeriveInput, Fields, Lit, Meta};
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
@@ -143,6 +143,16 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
 
   #[cfg(feature = "interpolate-folder-path")]
   let folder_path = shellexpand::full(&folder_path).unwrap().to_string();
+
+  // Base relative paths on the Cargo.toml location
+  let folder_path = if Path::new(&folder_path).is_relative() {
+    Path::new(&env::var("CARGO_MANIFEST_DIR").unwrap())
+      .join(folder_path)
+      .to_string_lossy()
+      .to_string()
+  } else {
+    folder_path
+  };
 
   if !Path::new(&folder_path).exists() {
     let mut message = format!(
