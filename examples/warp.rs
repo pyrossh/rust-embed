@@ -1,6 +1,3 @@
-extern crate rust_embed;
-extern crate warp;
-
 use rust_embed::RustEmbed;
 use warp::{filters::path::Tail, http::Response, Filter, Rejection, Reply};
 

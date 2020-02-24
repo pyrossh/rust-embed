@@ -1,7 +1,3 @@
-extern crate actix_web;
-extern crate mime_guess;
-extern crate rust_embed;
-
 use actix_web::body::Body;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
 use mime_guess::from_path;

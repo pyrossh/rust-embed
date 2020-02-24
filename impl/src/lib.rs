@@ -1,12 +1,7 @@
 #![recursion_limit = "1024"]
-extern crate proc_macro;
 #[macro_use]
 extern crate quote;
-extern crate syn;
-
-#[cfg(feature = "interpolate-folder-path")]
-extern crate shellexpand;
-extern crate walkdir;
+extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use std::path::Path;
