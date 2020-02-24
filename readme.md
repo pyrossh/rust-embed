@@ -132,6 +132,10 @@ Note: To run the `rocket` example, add the `nightly` feature flag and run on a n
 
 `cargo +nightly run --example rocket --features nightly`
 
+Note: To run the `warp` example:
+
+`cargo run --example warp --features warp-ex`
+
 ## Testing
 
 debug: `cargo test --test lib`
