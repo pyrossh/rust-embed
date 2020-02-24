@@ -97,8 +97,7 @@ Compress each file when embedding into the binary. Compression is done via [`inc
 ## Usage
 
 ```rust
-#[macro_use]
-extern crate rust_embed;
+use rust_embed::RustEmbed;
 
 #[derive(RustEmbed)]
 #[folder = "examples/public/"]

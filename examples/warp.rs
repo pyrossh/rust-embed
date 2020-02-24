@@ -1,11 +1,12 @@
 #![deny(warnings)]
 
-#[macro_use]
 extern crate rust_embed;
 extern crate warp;
 
-use std::borrow::Cow;
+use rust_embed::RustEmbed;
 use warp::{filters::path::Tail, http::Response, Filter, Rejection, Reply};
+
+use std::borrow::Cow;
 
 #[derive(RustEmbed)]
 #[folder = "examples/public/"]

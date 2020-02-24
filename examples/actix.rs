@@ -1,11 +1,12 @@
 extern crate actix_web;
-#[macro_use]
-extern crate rust_embed;
 extern crate mime_guess;
+extern crate rust_embed;
 
 use actix_web::body::Body;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
 use mime_guess::from_path;
+use rust_embed::RustEmbed;
+
 use std::borrow::Cow;
 
 #[derive(RustEmbed)]
