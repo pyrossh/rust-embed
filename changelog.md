@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
+## [5.4.0] - 2020-02-24
+
+### Changed
+
+- using rust-2018 edition now
+- code cleanup
+- updated examples and crates 
+
 ## [5.3.0] - 2020-02-15
 
 ### Added
