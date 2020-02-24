@@ -22,7 +22,7 @@ quote = "1"
 walkdir = "2.2.7"
 
 [dependencies.shellexpand]
-version = "1.0"
+version = "2"
 optional = true
 
 [features]
