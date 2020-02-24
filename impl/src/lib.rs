@@ -158,7 +158,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
 
     // Add a message about the interpolate-folder-path feature if the path may
     // include a variable
-    if folder_path.contains("$") && cfg!(not(feature = "interpolate-folder-path")) {
+    if folder_path.contains('$') && cfg!(not(feature = "interpolate-folder-path")) {
       message += "\nA variable has been detected. RustEmbed can expand variables \
                   when the `interpolate-folder-path` feature is enabled.";
     }
