@@ -35,3 +35,6 @@ travis-ci = { repository = "pyros2097/rust-embed" }
 is-it-maintained-issue-resolution = { repository = "pyros2097/rust-embed" }
 is-it-maintained-open-issues = { repository = "pyros2097/rust-embed" }
 maintenance = { status = "passively-maintained" }
+
+[workspace]
+members = ["impl", "utils"]
