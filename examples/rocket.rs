@@ -1,7 +1,6 @@
 #![feature(decl_macro, proc_macro_hygiene)]
 #[macro_use]
 extern crate rocket;
-extern crate rust_embed;
 
 use rocket::http::{ContentType, Status};
 use rocket::response;

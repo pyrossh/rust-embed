@@ -7,17 +7,14 @@ struct Asset;
 
 #[test]
 fn get_works() {
-  match Asset::get("index.html") {
-    None => assert!(false, "index.html should exist"),
-    _ => assert!(true),
+  if Asset::get("index.html").is_none() {
+    panic!("index.html should exist");
   }
-  match Asset::get("gg.html") {
-    Some(_) => assert!(false, "gg.html should not exist"),
-    _ => assert!(true),
+  if Asset::get("gg.html").is_some() {
+    panic!("gg.html should not exist");
   }
-  match Asset::get("images/llama.png") {
-    None => assert!(false, "llama.png should exist"),
-    _ => assert!(true),
+  if Asset::get("images/llama.png").is_none() {
+    panic!("llama.png should exist");
   }
 }
 
