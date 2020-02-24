@@ -20,7 +20,8 @@ include-flate = { version = "0.1", optional = true, features = ["stable"] }
 actix-web = { version = "2", optional = true }
 actix-rt = { version = "1", optional = true }
 mime_guess = { version = "2", optional = true }
-warp = { version = "0.1", optional = true }
+tokio = { version = "0.2", optional = true, features = ["macros"] }
+warp = { version = "0.2", optional = true }
 rocket = { version = "0.4.2", optional = true }
 
 [features]
@@ -29,7 +30,7 @@ interpolate-folder-path = ["rust-embed-impl/interpolate-folder-path"]
 compression = ["rust-embed-impl/compression", "include-flate"]
 nightly = ["rocket"]
 actix = ["actix-web", "actix-rt", "mime_guess"]
-warp-ex = ["warp", "mime_guess"]
+warp-ex = ["warp", "tokio", "mime_guess"]
 
 [badges]
 appveyor = { repository = "pyros2097/rust-embed" }
