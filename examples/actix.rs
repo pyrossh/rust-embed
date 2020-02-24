@@ -1,11 +1,8 @@
-extern crate actix_web;
-#[macro_use]
-extern crate rust_embed;
-extern crate mime_guess;
-
 use actix_web::body::Body;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
 use mime_guess::from_path;
+use rust_embed::RustEmbed;
+
 use std::borrow::Cow;
 
 #[derive(RustEmbed)]
@@ -34,14 +31,14 @@ fn dist(req: HttpRequest) -> HttpResponse {
   handle_embedded_file(path)
 }
 
-fn main() {
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
   HttpServer::new(|| {
     App::new()
       .service(web::resource("/").route(web::get().to(index)))
       .service(web::resource("/dist/{_:.*}").route(web::get().to(dist)))
   })
-  .bind("127.0.0.1:8000")
-  .unwrap()
+  .bind("127.0.0.1:8000")?
   .run()
-  .unwrap();
+  .await
 }

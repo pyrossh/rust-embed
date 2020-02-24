@@ -97,8 +97,7 @@ Compress each file when embedding into the binary. Compression is done via [`inc
 ## Usage
 
 ```rust
-#[macro_use]
-extern crate rust_embed;
+use rust_embed::RustEmbed;
 
 #[derive(RustEmbed)]
 #[folder = "examples/public/"]
@@ -131,6 +130,10 @@ Note: To run the `actix-web` example:
 Note: To run the `rocket` example, add the `nightly` feature flag and run on a nightly build:
 
 `cargo +nightly run --example rocket --features nightly`
+
+Note: To run the `warp` example:
+
+`cargo run --example warp --features warp-ex`
 
 ## Testing
 
