@@ -8,7 +8,7 @@ struct Asset;
 #[tokio::main]
 async fn main() {
   let index_html = warp::path::end().and_then(serve_index);
-  let dist = warp::path!("dist").and(warp::path::tail()).and_then(serve);
+  let dist = warp::path("dist").and(warp::path::tail()).and_then(serve);
 
   let routes = index_html.or(dist);
   warp::serve(routes).run(([127, 0, 0, 1], 8080)).await;
