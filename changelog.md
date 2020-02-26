@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
+## Unreleased
+
+### Fixed
+
+- Fixed the `folder` directory being relative to the current directory.
+  It is now relative to `Cargo.toml`.
+
 ## [5.4.0] - 2020-02-24
 
 ### Changed
