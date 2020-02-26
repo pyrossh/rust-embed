@@ -148,8 +148,9 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
   let folder_path = if Path::new(&folder_path).is_relative() {
     Path::new(&env::var("CARGO_MANIFEST_DIR").unwrap())
       .join(folder_path)
-      .to_string_lossy()
-      .to_string()
+      .to_str()
+      .unwrap()
+      .to_owned()
   } else {
     folder_path
   };
