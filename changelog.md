@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
+## [5.5.1] - 2020-03-19
+
+### Fixed
+
+- Fixed warnings in latest nightly
+
 ## [5.5.0] - 2020-02-26
 
 ### Fixed
