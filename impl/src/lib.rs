@@ -12,20 +12,12 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   quote! {
       impl #ident {
           pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
-              use std::fs::File;
-              use std::io::Read;
+              use std::fs;
               use std::path::Path;
 
               let file_path = Path::new(#folder_path).join(file_path);
-              let mut file = match File::open(file_path) {
-                  Ok(mut file) => file,
-                  Err(_e) => {
-                      return None
-                  }
-              };
-              let mut data: Vec<u8> = Vec::new();
-              match file.read_to_end(&mut data) {
-                  Ok(_) => Some(std::borrow::Cow::from(data)),
+              match fs::read(file_path) {
+                  Ok(contents) => Some(std::borrow::Cow::from(contents)),
                   Err(_e) =>  {
                       return None
                   }
