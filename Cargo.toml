@@ -11,6 +11,26 @@ categories = ["web-programming::http-server"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 edition = "2018"
 
+[[example]]
+name = "warp"
+path = "examples/warp.rs"
+required-features = ["warp-ex"]
+
+[[example]]
+name = "actix"
+path = "examples/actix.rs"
+required-features = ["actix"]
+
+[[example]]
+name = "rocket"
+path = "examples/rocket.rs"
+required-features = ["rocket"]
+
+[[test]]
+name = "interpolated_path"
+path = "tests/interpolated_path.rs"
+required-features = ["interpolate-folder-path"]
+
 [dependencies]
 walkdir = "2.2.7"
 rust-embed-impl = { version = "5.5.1", path = "impl"}
