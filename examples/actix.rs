@@ -1,5 +1,5 @@
 use actix_web::body::Body;
-use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
+use actix_web::{web, App, HttpResponse, HttpServer};
 use mime_guess::from_path;
 use rust_embed::RustEmbed;
 
@@ -22,13 +22,12 @@ fn handle_embedded_file(path: &str) -> HttpResponse {
   }
 }
 
-fn index(_req: HttpRequest) -> HttpResponse {
+fn index() -> HttpResponse {
   handle_embedded_file("index.html")
 }
 
-fn dist(req: HttpRequest) -> HttpResponse {
-  let path = &req.path()["/dist/".len()..]; // trim the preceding `/dist/` in path
-  handle_embedded_file(path)
+fn dist(path: web::Path<(String,)>) -> HttpResponse {
+  handle_embedded_file(&path.0)
 }
 
 #[actix_rt::main]
