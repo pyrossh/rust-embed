@@ -7,11 +7,16 @@ use proc_macro::TokenStream;
 use std::{env, path::Path};
 use syn::{export::TokenStream2, Data, DeriveInput, Fields, Lit, Meta};
 
+#[allow(unused)]
+fn path_to_str<P: AsRef<Path>>(p: P) -> String {
+  p.as_ref().to_str().expect("Path does not have a string representation").to_owned()
+}
+
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   quote! {
       impl #ident {
-          pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+          fn __rustembed_get(file_path: &std::path::Path) -> Option<std::borrow::Cow<'static, [u8]>> {
               use std::fs;
               use std::path::Path;
 
@@ -23,20 +28,21 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
                   }
               }
           }
-
-          pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
-              use std::path::Path;
-              rust_embed::utils::get_files(String::from(#folder_path)).map(|e| std::borrow::Cow::from(e.rel_path))
-          }
       }
+
       impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
-          #ident::get(file_path)
-        }
-        fn iter() -> rust_embed::Filenames {
-          // the return type of iter() is unnamable, so we have to box it
-          rust_embed::Filenames::Dynamic(Box::new(#ident::iter()))
-        }
+          fn get<P: AsRef<std::path::Path>>(file_path: P) -> Option<std::borrow::Cow<'static, [u8]>> {
+              Self::__rustembed_get(file_path.as_ref())
+          }
+
+          fn iter() -> rust_embed::Filenames {
+              use std::path::Path;
+
+              rust_embed::Filenames::Dynamic(Box::new(
+                  rust_embed::utils::get_files(String::from(#folder_path))
+                      .map(|e| e.rel_path)
+              ))
+          }
       }
   }
 }
@@ -71,6 +77,9 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   let mut list_values = Vec::<String>::new();
 
   for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path) {
+    let rel_path = path_to_str(rel_path);
+    let full_canonical_path = path_to_str(full_canonical_path);
+
     match_values.push(embed_file(&rel_path, &full_canonical_path));
     list_values.push(rel_path);
   }
@@ -79,28 +88,25 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
 
   quote! {
       impl #ident {
-          pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+          fn __rustembed_get(file_path: &std::path::Path) -> Option<std::borrow::Cow<'static, [u8]>> {
+              let file_path = file_path.to_str()?;
+
               match file_path {
                   #(#match_values)*
                   _ => None,
               }
           }
-
-          fn names() -> std::slice::Iter<'static, &'static str> {
-            const items: [&str; #array_len] = [#(#list_values),*];
-            items.iter()
-          }
-          pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
-              Self::names().map(|x| std::borrow::Cow::from(*x))
-          }
       }
+
       impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
-          #ident::get(file_path)
-        }
-        fn iter() -> rust_embed::Filenames {
-          rust_embed::Filenames::Embedded(#ident::names())
-        }
+          fn get<P: AsRef<std::path::Path>>(file_path: P) -> Option<std::borrow::Cow<'static, [u8]>> {
+              Self::__rustembed_get(file_path.as_ref())
+          }
+
+          fn iter() -> rust_embed::Filenames {
+              const items: [&str; #array_len] = [#(#list_values),*];
+              rust_embed::Filenames::Embedded(items.iter())
+          }
       }
   }
 }

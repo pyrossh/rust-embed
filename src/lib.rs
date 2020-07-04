@@ -1,3 +1,6 @@
+use std::borrow::Cow;
+use std::path::Path;
+
 #[cfg(feature = "compression")]
 #[cfg_attr(feature = "compression", doc(hidden))]
 pub use include_flate::flate;
@@ -26,17 +29,16 @@ pub extern crate rust_embed_utils as utils;
 ///
 /// fn main() {}
 /// ```
-
 pub trait RustEmbed {
   /// Given a relative path from the assets folder, returns the bytes if found.
   ///
   /// If the feature `debug-embed` is enabled or the binary is compiled in
-  /// release mode, the bytes have been embeded in the binary and a
+  /// release mode, the bytes have been embedded in the binary and a
   /// `Cow::Borrowed(&'static [u8])` is returned.
   ///
   /// Otherwise, the bytes are read from the file system on each call and a
   /// `Cow::Owned(Vec<u8>)` is returned.
-  fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>>;
+  fn get<P: AsRef<Path>>(file_path: P) -> Option<std::borrow::Cow<'static, [u8]>>;
 
   /// Iterates the files in this assets folder.
   ///
@@ -58,21 +60,21 @@ pub enum Filenames {
   #[cfg(any(not(debug_assertions), feature = "debug-embed"))]
   Embedded(std::slice::Iter<'static, &'static str>),
 
-  /// The debug iterator type is currently unnamable and still needs to be
+  /// The debug iterator type is currently unnameable and still needs to be
   /// boxed.
   #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
-  Dynamic(Box<dyn Iterator<Item = std::borrow::Cow<'static, str>>>),
+  Dynamic(Box<dyn Iterator<Item = std::path::PathBuf>>),
 }
 
 impl Iterator for Filenames {
-  type Item = std::borrow::Cow<'static, str>;
+  type Item = std::borrow::Cow<'static, Path>;
   fn next(&mut self) -> Option<Self::Item> {
     match self {
       #[cfg(any(not(debug_assertions), feature = "debug-embed"))]
-      Filenames::Embedded(names) => names.next().map(|x| std::borrow::Cow::from(*x)),
+      Filenames::Embedded(names) => names.next().map(|x| Cow::Borrowed(Path::new(x))),
 
       #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
-      Filenames::Dynamic(boxed) => boxed.next(),
+      Filenames::Dynamic(boxed) => boxed.next().map(|x| Cow::Owned(x)),
     }
   }
 }
