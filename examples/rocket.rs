@@ -24,12 +24,10 @@ fn index<'r>() -> response::Result<'r> {
 
 #[get("/dist/<file..>")]
 fn dist<'r>(file: PathBuf) -> response::Result<'r> {
-  let filename = file.display().to_string();
-  Asset::get(&filename).map_or_else(
+  Asset::get(&file).map_or_else(
     || Err(Status::NotFound),
     |d| {
       let ext = file
-        .as_path()
         .extension()
         .and_then(OsStr::to_str)
         .ok_or_else(|| Status::new(400, "Could not get file extension"))?;
