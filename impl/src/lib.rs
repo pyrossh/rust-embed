@@ -9,7 +9,7 @@ use syn::{export::TokenStream2, Data, DeriveInput, Fields, Lit, Meta};
 
 #[allow(unused)]
 fn path_to_str<P: AsRef<Path>>(p: P) -> String {
-  p.as_ref().to_str().expect("Path does not have a string representation").replace("\\", "/")
+  p.as_ref().to_str().expect("Path does not have a string representation").to_owned()
 }
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
@@ -77,7 +77,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   let mut list_values = Vec::<String>::new();
 
   for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path) {
-    let rel_path = path_to_str(rel_path);
+    let rel_path = path_to_str(rel_path).replace("\\", "/");
     let full_canonical_path = path_to_str(full_canonical_path);
 
     match_values.push(embed_file(&rel_path, &full_canonical_path));
