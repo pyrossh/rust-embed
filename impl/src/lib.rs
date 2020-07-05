@@ -15,7 +15,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
               use std::fs;
               use std::path::Path;
 
-              let file_path = Path::new(#folder_path).join(file_path);
+              let file_path = Path::new(#folder_path).join(file_path.replace("\\", "/"));
               match fs::read(file_path) {
                   Ok(contents) => Some(std::borrow::Cow::from(contents)),
                   Err(_e) =>  {
@@ -80,7 +80,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   quote! {
       impl #ident {
           pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
-              match file_path {
+              match file_path.replace("\\", "/").as_str() {
                   #(#match_values)*
                   _ => None,
               }
