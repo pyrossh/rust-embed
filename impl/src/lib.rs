@@ -9,7 +9,7 @@ use syn::{export::TokenStream2, Data, DeriveInput, Fields, Lit, Meta};
 
 #[allow(unused)]
 fn path_to_str<P: AsRef<Path>>(p: P) -> String {
-  p.as_ref().to_str().expect("Path does not have a string representation").to_owned()
+  p.as_ref().to_str().expect("Path does not have a string representation").replace("\\", "/")
 }
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]
@@ -89,9 +89,9 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   quote! {
       impl #ident {
           fn __rustembed_get(file_path: &std::path::Path) -> Option<std::borrow::Cow<'static, [u8]>> {
-              let file_path = file_path.to_str()?;
+              let file_path = file_path.to_str()?.replace("\\", "/");
 
-              match file_path {
+              match file_path.as_str() {
                   #(#match_values)*
                   _ => None,
               }
