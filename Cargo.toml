@@ -32,7 +32,7 @@ path = "tests/interpolated_path.rs"
 required-features = ["interpolate-folder-path"]
 
 [dependencies]
-walkdir = "2.2.7"
+walkdir = "2.3.1"
 rust-embed-impl = { version = "5.5.1", path = "impl"}
 rust-embed-utils = { version = "5.0.0", path = "utils"}
 
