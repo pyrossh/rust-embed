@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
+## [5.6.0] - 2020-07-13
+
+### Fixed
+
+- Fixed windows path error in release mode
+
+### Changed
+
+- Using github actions for CI now
+
 ## [5.5.1] - 2020-03-19
 
 ### Fixed
@@ -26,7 +36,7 @@ Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
 - using rust-2018 edition now
 - code cleanup
-- updated examples and crates 
+- updated examples and crates
 
 ## [5.3.0] - 2020-02-15
 
