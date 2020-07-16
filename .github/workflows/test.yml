@@ -17,8 +17,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        rust: [stable, nightly]
-        experimental: [false, true]
+        rust: [stable]
+        experimental: [false]
+        include:
+          - rust: nightly
+            os: ubuntu-latest
+            experimental: true
     steps:
       - uses: actions-rs/toolchain@v1
         with:
