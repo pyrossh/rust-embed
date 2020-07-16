@@ -3,10 +3,12 @@ on: [push]
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         rust: [stable, nightly]
+        experimental: [false, true]
     steps:
       - uses: hecrj/setup-rust-action@v1
         with:
@@ -14,15 +16,16 @@ jobs:
       - uses: actions/checkout@master
       - name: Run tests
         run: |
+          cargo fmt --all -- --check
           cargo test --test lib
           cargo test --test lib --features "debug-embed"
-          cargo test --test lib --release
           cargo test --test lib --features "compression" --release
           cargo test --test interpolated_path --features "interpolate-folder-path"
           cargo test --test interpolated_path --features "interpolate-folder-path" --release
           cargo build --example basic
-          cargo build --example basic --release
           cargo build --example actix --features actix
-          cargo build --example actix --features actix --release
           cargo build --example warp --features warp-ex
+          cargo test --test lib --release
+          cargo build --example basic --release
+          cargo build --example actix --features actix --release
           cargo build --example warp --features warp-ex --release
