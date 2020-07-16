@@ -10,9 +10,9 @@ jobs:
         rust: [stable, nightly]
         experimental: [false, true]
     steps:
-      - uses: hecrj/setup-rust-action@v1
+      - uses: actions-rs/toolchain@v1
         with:
-          rust-version: ${{ matrix.rust }}
+          toolchain: ${{ matrix.rust }}
       - uses: actions/checkout@master
       - name: Run tests
         run: |
