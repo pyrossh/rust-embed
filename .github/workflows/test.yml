@@ -1,7 +1,7 @@
 name: Test
 on: [push]
 jobs:
-  check:
+  format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions-rs/toolchain@v1
