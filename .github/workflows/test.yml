@@ -1,10 +1,20 @@
 name: Test
 on: [push]
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions/checkout@master
+      - run: rustup component add rustfmt
+      - run: cargo fmt --all -- --check
   test:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         rust: [stable, nightly]
@@ -16,7 +26,6 @@ jobs:
       - uses: actions/checkout@master
       - name: Run tests
         run: |
-          cargo fmt --all -- --check
           cargo test --test lib
           cargo test --test lib --features "debug-embed"
           cargo test --test lib --features "compression" --release
