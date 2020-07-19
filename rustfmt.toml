@@ -1,4 +1,4 @@
-unstable_features = true
+unstable_features = false
 wrap_comments = true
 normalize_comments = true
 merge_derives = true
