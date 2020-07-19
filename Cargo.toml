@@ -7,7 +7,7 @@ documentation = "https://docs.rs/rust-embed"
 repository = "https://github.com/pyros2097/rust-embed"
 license = "MIT"
 keywords = ["http", "rocket", "static", "web", "server"]
-categories = ["web-programming::http-server"]
+categories = ["web-programming", "filesystem"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 edition = "2018"
 
@@ -32,7 +32,7 @@ path = "tests/interpolated_path.rs"
 required-features = ["interpolate-folder-path"]
 
 [dependencies]
-walkdir = "2.2.7"
+walkdir = "2.3.1"
 rust-embed-impl = { version = "5.5.1", path = "impl"}
 rust-embed-utils = { version = "5.0.0", path = "utils"}
 
@@ -42,7 +42,7 @@ actix-rt = { version = "1", optional = true }
 mime_guess = { version = "2", optional = true }
 tokio = { version = "0.2", optional = true, features = ["macros"] }
 warp = { version = "0.2", default-features = false, optional = true }
-rocket = { version = "0.4.2", default-features = false, optional = true }
+rocket = { version = "0.4.5", default-features = false, optional = true }
 
 [features]
 debug-embed = ["rust-embed-impl/debug-embed", "rust-embed-utils/debug-embed"]

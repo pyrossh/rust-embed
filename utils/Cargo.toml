@@ -12,7 +12,7 @@ authors = ["pyros2097 <pyros2097@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-walkdir = "2.2.7"
+walkdir = "2.3.1"
 
 [features]
 debug-embed = []

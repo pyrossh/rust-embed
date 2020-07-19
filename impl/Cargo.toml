@@ -19,7 +19,7 @@ rust-embed-utils = { version = "5.0.0", path = "../utils"}
 
 syn = "1"
 quote = "1"
-walkdir = "2.2.7"
+walkdir = "2.3.1"
 
 [dependencies.shellexpand]
 version = "2"
