@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
-## [5.6.0] - 2020-07-13
+## [5.6.0] - 2020-07-19
 
 ### Fixed
 
