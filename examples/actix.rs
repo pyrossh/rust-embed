@@ -26,7 +26,7 @@ fn index() -> HttpResponse {
   handle_embedded_file("index.html")
 }
 
-fn dist(path: web::Path<(String,)>) -> HttpResponse {
+fn dist(path: web::Path<String>) -> HttpResponse {
   handle_embedded_file(&path.0)
 }
 
