@@ -7,9 +7,62 @@ use proc_macro::TokenStream;
 use std::{env, path::Path};
 use syn::{export::TokenStream2, Data, DeriveInput, Fields, Lit, Meta};
 
-#[cfg(all(debug_assertions, not(feature = "debug-embed")))]
-fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
+fn embedded(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
+  extern crate rust_embed_utils;
+
+  let mut match_values = Vec::<TokenStream2>::new();
+  let mut list_values = Vec::<String>::new();
+
+  for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path) {
+    match_values.push(embed_file(&rel_path, &full_canonical_path));
+    list_values.push(rel_path);
+  }
+
+  let array_len = list_values.len();
+
+  // If debug-embed is on, unconditionally include the code below. Otherwise,
+  // make it conditional on cfg(not(debug_assertions)).
+  let not_debug_attr = if cfg!(feature = "debug-embed") {
+    quote! {}
+  } else {
+    quote! { #[cfg(not(debug_assertions))]}
+  };
+
   quote! {
+      #not_debug_attr
+      impl #ident {
+          pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+            match file_path.replace("\\", "/").as_str() {
+                #(#match_values)*
+                _ => None,
+            }
+          }
+
+          fn names() -> std::slice::Iter<'static, &'static str> {
+              const items: [&str; #array_len] = [#(#list_values),*];
+              items.iter()
+          }
+
+          pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
+              Self::names().map(|x| std::borrow::Cow::from(*x))
+          }
+      }
+
+      #not_debug_attr
+      impl rust_embed::RustEmbed for #ident {
+        fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+          #ident::get(file_path)
+        }
+        fn iter() -> rust_embed::Filenames {
+          rust_embed::Filenames::Embedded(#ident::names())
+        }
+      }
+  }
+}
+
+fn dynamic(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
+  quote! {
+      #[cfg(debug_assertions)]
       impl #ident {
           pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
               use std::fs;
@@ -29,6 +82,8 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
               rust_embed::utils::get_files(String::from(#folder_path)).map(|e| std::borrow::Cow::from(e.rel_path))
           }
       }
+
+      #[cfg(debug_assertions)]
       impl rust_embed::RustEmbed for #ident {
         fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
           #ident::get(file_path)
@@ -41,7 +96,21 @@ fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   }
 }
 
-#[cfg(all(not(feature = "compression"), any(not(debug_assertions), feature = "debug-embed")))]
+fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
+  let embedded_impl = embedded(ident, folder_path.clone());
+  if cfg!(feature = "rust-embed") {
+    return embedded_impl;
+  }
+
+  let dynamic_impl = dynamic(ident, folder_path);
+
+  quote! {
+      #embedded_impl
+      #dynamic_impl
+  }
+}
+
+#[cfg(not(feature = "compression"))]
 fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   quote! {
     #rel_path => {
@@ -51,7 +120,7 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   }
 }
 
-#[cfg(all(feature = "compression", any(not(debug_assertions), feature = "debug-embed")))]
+#[cfg(feature = "compression")]
 fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   quote! {
     #rel_path => {
@@ -60,48 +129,6 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
         let bytes = &FILE[..];
         Some(std::borrow::Cow::from(bytes))
     },
-  }
-}
-
-#[cfg(any(not(debug_assertions), feature = "debug-embed"))]
-fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
-  extern crate rust_embed_utils;
-
-  let mut match_values = Vec::<TokenStream2>::new();
-  let mut list_values = Vec::<String>::new();
-
-  for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path) {
-    match_values.push(embed_file(&rel_path, &full_canonical_path));
-    list_values.push(rel_path);
-  }
-
-  let array_len = list_values.len();
-
-  quote! {
-      impl #ident {
-          pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
-              match file_path.replace("\\", "/").as_str() {
-                  #(#match_values)*
-                  _ => None,
-              }
-          }
-
-          fn names() -> std::slice::Iter<'static, &'static str> {
-            const items: [&str; #array_len] = [#(#list_values),*];
-            items.iter()
-          }
-          pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
-              Self::names().map(|x| std::borrow::Cow::from(*x))
-          }
-      }
-      impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
-          #ident::get(file_path)
-        }
-        fn iter() -> rust_embed::Filenames {
-          rust_embed::Filenames::Embedded(#ident::names())
-        }
-      }
   }
 }
 
