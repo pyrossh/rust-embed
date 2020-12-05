@@ -98,7 +98,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
 
 fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   let embedded_impl = embedded(ident, folder_path.clone());
-  if cfg!(feature = "rust-embed") {
+  if cfg!(feature = "debug-embed") {
     return embedded_impl;
   }
 
