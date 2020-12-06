@@ -145,3 +145,5 @@ Go Rusketeers!
 The power is yours!
 
 [`include-flate`]: https://crates.io/crates/include-flate
+
+Test
