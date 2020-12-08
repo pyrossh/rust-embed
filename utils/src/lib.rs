@@ -7,6 +7,7 @@ pub struct FileEntry {
 #[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
 pub fn get_files(folder_path: String) -> impl Iterator<Item = FileEntry> {
   walkdir::WalkDir::new(&folder_path)
+    .follow_links(true)
     .into_iter()
     .filter_map(|e| e.ok())
     .filter(|e| e.file_type().is_file())
