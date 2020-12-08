@@ -16,7 +16,7 @@ You can use this to embed your css, js and images into a single executable which
 
 ```toml
 [dependencies]
-rust-embed="5.6.0"
+rust-embed="5.7.0"
 ```
 
 ## Documentation
