@@ -4,8 +4,9 @@ extern crate quote;
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
+use proc_macro2::TokenStream as TokenStream2;
 use std::{env, path::Path};
-use syn::{export::TokenStream2, Data, DeriveInput, Fields, Lit, Meta};
+use syn::{Data, DeriveInput, Fields, Lit, Meta};
 
 fn embedded(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   extern crate rust_embed_utils;
