@@ -138,9 +138,9 @@ fn generate_assets(ident: &syn::Ident, folder_path: String, prefix: Option<Strin
 }
 
 #[cfg(not(feature = "compression"))]
-fn embed_file(match_str: &str, full_canonical_path: &str) -> TokenStream2 {
+fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   quote! {
-    #match_str => {
+    #rel_path => {
         let bytes = &include_bytes!(#full_canonical_path)[..];
         Some(std::borrow::Cow::from(bytes))
     },
