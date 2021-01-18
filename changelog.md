@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mcat12](https://github.com/Mcat12) for the changelog.
 
+## [5.9.0] - 2021-01-18
+
+### Added
+
+- Added path prefix attribute
+
 ## [5.8.0] - 2021-01-06
 
 ### Fixed
