@@ -72,6 +72,11 @@ If the feature `debug-embed` is enabled or the binary compiled in release mode a
 
 Otherwise the files are listed from the file system on each call.
 
+## The `prefix` attribute
+You can add `#[prefix = "my_prefix/"]` to the `RustEmbed` struct to add a prefix
+to all of the file paths. This prefix will be required on `get` calls, and will
+be included in the file paths returned by `iter`.
+
 ## Features
 
 ### `debug-embed`
@@ -101,10 +106,11 @@ use rust_embed::RustEmbed;
 
 #[derive(RustEmbed)]
 #[folder = "examples/public/"]
+#[prefix = "prefix/"]
 struct Asset;
 
 fn main() {
-  let index_html = Asset::get("index.html").unwrap();
+  let index_html = Asset::get("prefix/index.html").unwrap();
   println!("{:?}", std::str::from_utf8(index_html.as_ref()));
 
   for file in Asset::iter() {

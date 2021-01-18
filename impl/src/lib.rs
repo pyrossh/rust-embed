@@ -6,9 +6,9 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use std::{env, path::Path};
-use syn::{Data, DeriveInput, Fields, Lit, Meta};
+use syn::{Data, DeriveInput, Fields, Lit, Meta, MetaNameValue};
 
-fn embedded(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
+fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>) -> TokenStream2 {
   extern crate rust_embed_utils;
 
   let mut match_values = Vec::<TokenStream2>::new();
@@ -16,7 +16,12 @@ fn embedded(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
 
   for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path) {
     match_values.push(embed_file(&rel_path, &full_canonical_path));
-    list_values.push(rel_path);
+
+    list_values.push(if let Some(prefix) = prefix {
+      format!("{}{}", prefix, rel_path)
+    } else {
+      rel_path
+    });
   }
 
   let array_len = list_values.len();
@@ -29,10 +34,19 @@ fn embedded(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
     quote! { #[cfg(not(debug_assertions))]}
   };
 
+  let handle_prefix = if let Some(prefix) = prefix {
+    quote! {
+      let file_path = file_path.strip_prefix(#prefix)?;
+    }
+  } else {
+    TokenStream2::new()
+  };
+
   quote! {
       #not_debug_attr
       impl #ident {
           pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+            #handle_prefix
             match file_path.replace("\\", "/").as_str() {
                 #(#match_values)*
                 _ => None,
@@ -61,13 +75,24 @@ fn embedded(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   }
 }
 
-fn dynamic(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
+fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>) -> TokenStream2 {
+  let (handle_prefix, map_iter) = if let Some(prefix) = prefix {
+    (
+      quote! { let file_path = file_path.strip_prefix(#prefix)?; },
+      quote! { std::borrow::Cow::Owned(format!("{}{}", #prefix, e.rel_path)) },
+    )
+  } else {
+    (TokenStream2::new(), quote! { std::borrow::Cow::from(e.rel_path) })
+  };
+
   quote! {
       #[cfg(debug_assertions)]
       impl #ident {
           pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
               use std::fs;
               use std::path::Path;
+
+              #handle_prefix
 
               let file_path = Path::new(#folder_path).join(file_path.replace("\\", "/"));
               match fs::read(file_path) {
@@ -80,7 +105,8 @@ fn dynamic(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
 
           pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
               use std::path::Path;
-              rust_embed::utils::get_files(String::from(#folder_path)).map(|e| std::borrow::Cow::from(e.rel_path))
+              rust_embed::utils::get_files(String::from(#folder_path))
+                  .map(|e| #map_iter)
           }
       }
 
@@ -97,13 +123,13 @@ fn dynamic(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
   }
 }
 
-fn generate_assets(ident: &syn::Ident, folder_path: String) -> TokenStream2 {
-  let embedded_impl = embedded(ident, folder_path.clone());
+fn generate_assets(ident: &syn::Ident, folder_path: String, prefix: Option<String>) -> TokenStream2 {
+  let embedded_impl = embedded(ident, folder_path.clone(), prefix.as_deref());
   if cfg!(feature = "debug-embed") {
     return embedded_impl;
   }
 
-  let dynamic_impl = dynamic(ident, folder_path);
+  let dynamic_impl = dynamic(ident, folder_path, prefix.as_deref());
 
   quote! {
       #embedded_impl
@@ -133,6 +159,19 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   }
 }
 
+/// Find a `name = "value"` attribute from the derive input
+fn find_attribute_value(ast: &syn::DeriveInput, attr_name: &str) -> Option<String> {
+  ast
+    .attrs
+    .iter()
+    .find(|value| value.path.is_ident(attr_name))
+    .and_then(|attr| attr.parse_meta().ok())
+    .and_then(|meta| match meta {
+      Meta::NameValue(MetaNameValue { lit: Lit::Str(val), .. }) => Some(val.value()),
+      _ => None,
+    })
+}
+
 fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
   match ast.data {
     Data::Struct(ref data) => match data.fields {
@@ -142,24 +181,8 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
     _ => panic!("RustEmbed can only be derived for unit structs"),
   };
 
-  let attribute = ast
-    .attrs
-    .iter()
-    .find(|value| value.path.is_ident("folder"))
-    .expect("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]");
-  let meta = attribute
-    .parse_meta()
-    .expect("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]");
-  let literal_value = match meta {
-    Meta::NameValue(ref data) => &data.lit,
-    _ => panic!("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]"),
-  };
-  let folder_path = match literal_value {
-    Lit::Str(ref val) => val.clone().value(),
-    _ => {
-      panic!("#[derive(RustEmbed)] attribute value must be a string literal");
-    }
-  };
+  let folder_path = find_attribute_value(ast, "folder").expect("#[derive(RustEmbed)] should contain one attribute like this #[folder = \"examples/public/\"]");
+  let prefix = find_attribute_value(ast, "prefix");
 
   #[cfg(feature = "interpolate-folder-path")]
   let folder_path = shellexpand::full(&folder_path).unwrap().to_string();
@@ -192,10 +215,10 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
     panic!(message);
   };
 
-  generate_assets(&ast.ident, folder_path)
+  generate_assets(&ast.ident, folder_path, prefix)
 }
 
-#[proc_macro_derive(RustEmbed, attributes(folder))]
+#[proc_macro_derive(RustEmbed, attributes(folder, prefix))]
 pub fn derive_input_object(input: TokenStream) -> TokenStream {
   let ast: DeriveInput = syn::parse(input).unwrap();
   let gen = impl_rust_embed(&ast);
