@@ -1,4 +1,5 @@
 #![recursion_limit = "1024"]
+#![forbid(unsafe_code)]
 #[macro_use]
 extern crate quote;
 extern crate proc_macro;

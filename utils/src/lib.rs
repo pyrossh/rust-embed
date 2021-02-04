@@ -1,4 +1,6 @@
+#![forbid(unsafe_code)]
 #[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
+
 pub struct FileEntry {
   pub rel_path: String,
   pub full_canonical_path: String,
