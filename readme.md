@@ -4,14 +4,6 @@ Rust Custom Derive Macro which loads files into the rust binary at compile time 
 
 You can use this to embed your css, js and images into a single executable which can be deployed to your servers. Also it makes it easy to build a very small docker image for you to deploy.
 
-### Dev
-
-<img src="https://user-images.githubusercontent.com/1687946/40840773-b1ae1ce6-65c5-11e8-80ac-9e9196701ca2.png" width="700" height="100">
-
-### Release
-
-<img src="https://user-images.githubusercontent.com/1687946/40840774-b1dd709a-65c5-11e8-858d-73a88e25f07a.png" width="700" height="184">
-
 ## Installation
 
 ```toml
