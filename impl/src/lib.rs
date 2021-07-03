@@ -140,12 +140,12 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
 
   let embedding_code = if cfg!(feature = "compression") {
     quote! {
-        let bytes = &include_bytes!(#full_canonical_path)[..];
+      rust_embed::flate!(static FILE: [u8] from #full_canonical_path);
+      let bytes = &FILE[..];
     }
   } else {
     quote! {
-        rust_embed::flate!(static FILE: [u8] from #full_canonical_path);
-        let bytes = &FILE[..];
+      let bytes = &include_bytes!(#full_canonical_path)[..];
     }
   };
 
