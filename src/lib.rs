@@ -3,9 +3,6 @@
 #[cfg_attr(feature = "compression", doc(hidden))]
 pub use include_flate::flate;
 
-#[doc(hidden)]
-pub use sha2;
-
 #[allow(unused_imports)]
 #[macro_use]
 extern crate rust_embed_impl;
