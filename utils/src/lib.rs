@@ -33,11 +33,13 @@ pub fn get_files(folder_path: String) -> impl Iterator<Item = FileEntry> {
     })
 }
 
+/// A file embedded into the binary
 pub struct EmbeddedFile {
   pub data: Cow<'static, [u8]>,
   pub metadata: Metadata,
 }
 
+/// Metadata about an embedded file
 pub struct Metadata {
   hash: [u8; 32],
   last_modified: Option<u64>,
