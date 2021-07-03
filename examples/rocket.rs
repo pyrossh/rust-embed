@@ -18,7 +18,7 @@ struct Asset;
 fn index<'r>() -> response::Result<'r> {
   Asset::get("index.html").map_or_else(
     || Err(Status::NotFound),
-    |d| response::Response::build().header(ContentType::HTML).sized_body(Cursor::new(d)).ok(),
+    |d| response::Response::build().header(ContentType::HTML).sized_body(Cursor::new(d.data)).ok(),
   )
 }
 
