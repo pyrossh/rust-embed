@@ -26,7 +26,7 @@ fn serve_impl(path: &str) -> Result<impl Reply, Rejection> {
   let asset = Asset::get(path).ok_or_else(warp::reject::not_found)?;
   let mime = mime_guess::from_path(path).first_or_octet_stream();
 
-  let mut res = Response::new(asset.into());
+  let mut res = Response::new(asset.data.into());
   res.headers_mut().insert("content-type", HeaderValue::from_str(mime.as_ref()).unwrap());
   Ok(res)
 }

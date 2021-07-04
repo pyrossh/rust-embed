@@ -43,6 +43,9 @@ tokio = { version = "0.2", optional = true, features = ["macros"] }
 warp = { version = "0.2", default-features = false, optional = true }
 rocket = { version = "0.4.5", default-features = false, optional = true }
 
+[dev-dependencies]
+sha2 = "0.9"
+
 [features]
 debug-embed = ["rust-embed-impl/debug-embed", "rust-embed-utils/debug-embed"]
 interpolate-folder-path = ["rust-embed-impl/interpolate-folder-path"]
