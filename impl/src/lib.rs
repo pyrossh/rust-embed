@@ -46,7 +46,7 @@ fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>) -> To
   quote! {
       #not_debug_attr
       impl #ident {
-          pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+          pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
             #handle_prefix
             match file_path.replace("\\", "/").as_str() {
                 #(#match_values)*
@@ -66,7 +66,7 @@ fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>) -> To
 
       #not_debug_attr
       impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+        fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
           #ident::get(file_path)
         }
         fn iter() -> rust_embed::Filenames {
@@ -89,19 +89,11 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>) -> Tok
   quote! {
       #[cfg(debug_assertions)]
       impl #ident {
-          pub fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
-              use std::fs;
-              use std::path::Path;
-
+          pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
               #handle_prefix
 
-              let file_path = Path::new(#folder_path).join(file_path.replace("\\", "/"));
-              match fs::read(file_path) {
-                  Ok(contents) => Some(std::borrow::Cow::from(contents)),
-                  Err(_e) =>  {
-                      return None
-                  }
-              }
+              let file_path = std::path::Path::new(#folder_path).join(file_path.replace("\\", "/"));
+              rust_embed::utils::read_file_from_fs(&file_path).ok()
           }
 
           pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
@@ -113,7 +105,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>) -> Tok
 
       #[cfg(debug_assertions)]
       impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>> {
+        fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
           #ident::get(file_path)
         }
         fn iter() -> rust_embed::Filenames {
@@ -138,25 +130,34 @@ fn generate_assets(ident: &syn::Ident, folder_path: String, prefix: Option<Strin
   }
 }
 
-#[cfg(not(feature = "compression"))]
 fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
-  quote! {
-    #rel_path => {
-        let bytes = &include_bytes!(#full_canonical_path)[..];
-        Some(std::borrow::Cow::from(bytes))
-    },
-  }
-}
+  let file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect("File should be readable");
+  let hash = file.metadata.sha256_hash();
+  let last_modified = match file.metadata.last_modified() {
+    Some(last_modified) => quote! { Some(#last_modified) },
+    None => quote! { None },
+  };
 
-#[cfg(feature = "compression")]
-fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
-  quote! {
-    #rel_path => {
-        rust_embed::flate!(static FILE: [u8] from #full_canonical_path);
+  let embedding_code = if cfg!(feature = "compression") {
+    quote! {
+      rust_embed::flate!(static FILE: [u8] from #full_canonical_path);
+      let bytes = &FILE[..];
+    }
+  } else {
+    quote! {
+      let bytes = &include_bytes!(#full_canonical_path)[..];
+    }
+  };
 
-        let bytes = &FILE[..];
-        Some(std::borrow::Cow::from(bytes))
-    },
+  quote! {
+      #rel_path => {
+          #embedding_code
+
+          Some(rust_embed::EmbeddedFile {
+              data: std::borrow::Cow::from(bytes),
+              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified)
+          })
+      }
   }
 }
 
@@ -213,7 +214,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
                   when the `interpolate-folder-path` feature is enabled.";
     }
 
-    panic!(message);
+    panic!("{}", message);
   };
 
   generate_assets(&ast.ident, folder_path, prefix)

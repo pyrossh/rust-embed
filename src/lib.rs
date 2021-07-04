@@ -8,8 +8,9 @@ pub use include_flate::flate;
 extern crate rust_embed_impl;
 pub use rust_embed_impl::*;
 
+pub use rust_embed_utils::{EmbeddedFile, Metadata};
+
 #[doc(hidden)]
-#[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 pub extern crate rust_embed_utils as utils;
 
 /// A directory of binary assets.
@@ -37,7 +38,7 @@ pub trait RustEmbed {
   ///
   /// Otherwise, the bytes are read from the file system on each call and a
   /// `Cow::Owned(Vec<u8>)` is returned.
-  fn get(file_path: &str) -> Option<std::borrow::Cow<'static, [u8]>>;
+  fn get(file_path: &str) -> Option<EmbeddedFile>;
 
   /// Iterates the files in this assets folder.
   ///
