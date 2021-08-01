@@ -15,7 +15,7 @@ edition = "2018"
 proc-macro = true
 
 [dependencies]
-rust-embed-utils = { version = "5.0.0", path = "../utils"}
+rust-embed-utils = { version = "6.0.0", path = "../utils"}
 
 syn = "1"
 quote = "1"

@@ -30,7 +30,7 @@ The macro will generate the following code:
 
 ```rust
 impl Asset {
-  pub fn get(file_path: &str) -> Option<Cow<'static, [u8]>> {
+  pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
     ...
   }
 
@@ -39,22 +39,32 @@ impl Asset {
   }
 }
 impl RustEmbed for Asset {
-  fn get(file_path: &str) -> Option<Cow<'static, [u8]>> {
+  fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
     ...
   }
   fn iter() -> impl Iterator<Item = Cow<'static, str>> {
     ...
   }
 }
+
+// Where EmbeddedFile contains these fields,
+pub struct EmbeddedFile {
+  pub data: Cow<'static, [u8]>,
+  pub metadata: Metadata,
+}
+pub struct Metadata {
+  hash: [u8; 32],
+  last_modified: Option<u64>,
+}
 ```
 
-### `get(file_path: &str)`
+### `get(file_path: &str) -> Option<rust_embed::EmbeddedFile>`
 
-Given a relative path from the assets folder returns the bytes if found.
+Given a relative path from the assets folder returns the `EmbeddedFile` if found.
 
-If the feature `debug-embed` is enabled or the binary compiled in release mode the bytes have been embeded in the binary and a `Cow::Borrowed(&'static [u8])` is returned.
+If the feature `debug-embed` is enabled or the binary compiled in release mode the bytes have been embeded in the binary and a `Option<rust_embed::EmbeddedFile>` is returned.
 
-Otherwise the bytes are read from the file system on each call and a `Cow::Owned(Vec<u8>)` is returned.
+Otherwise the bytes are read from the file system on each call and a `Option<rust_embed::EmbeddedFile>` is returned.
 
 ### `iter()`
 
@@ -65,6 +75,7 @@ If the feature `debug-embed` is enabled or the binary compiled in release mode a
 Otherwise the files are listed from the file system on each call.
 
 ## The `prefix` attribute
+
 You can add `#[prefix = "my_prefix/"]` to the `RustEmbed` struct to add a prefix
 to all of the file paths. This prefix will be required on `get` calls, and will
 be included in the file paths returned by `iter`.
@@ -103,7 +114,7 @@ struct Asset;
 
 fn main() {
   let index_html = Asset::get("prefix/index.html").unwrap();
-  println!("{:?}", std::str::from_utf8(index_html.as_ref()));
+  println!("{:?}", std::str::from_utf8(index_html.data.as_ref()));
 
   for file in Asset::iter() {
       println!("{}", file.as_ref());
