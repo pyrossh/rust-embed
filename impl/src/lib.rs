@@ -46,6 +46,7 @@ fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>) -> To
   quote! {
       #not_debug_attr
       impl #ident {
+          /// Get an embedded file and its metadata.
           pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
             #handle_prefix
             match file_path.replace("\\", "/").as_str() {
@@ -59,6 +60,7 @@ fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>) -> To
               items.iter()
           }
 
+          /// Iterates over the file paths in the folder.
           pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
               Self::names().map(|x| std::borrow::Cow::from(*x))
           }
@@ -89,6 +91,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>) -> Tok
   quote! {
       #[cfg(debug_assertions)]
       impl #ident {
+          /// Get an embedded file and its metadata.
           pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
               #handle_prefix
 
@@ -96,6 +99,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>) -> Tok
               rust_embed::utils::read_file_from_fs(&file_path).ok()
           }
 
+          /// Iterates over the file paths in the folder.
           pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
               use std::path::Path;
               rust_embed::utils::get_files(String::from(#folder_path))
