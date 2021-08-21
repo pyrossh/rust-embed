@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [6.0.1] - 2021-08-21
+
+- Added doc comments to macro generated functions
+
 ## [6.0.0] - 2021-08-01
 
 Idea came about from [Cody Casterline](https://github.com/NfNitLoop)
