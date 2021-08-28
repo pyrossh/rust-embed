@@ -102,6 +102,21 @@ This will pull the `foo` directory relative to your `Cargo.toml` file.
 
 Compress each file when embedding into the binary. Compression is done via [`include-flate`].
 
+### `include-exclude`
+Filter files to be embedded with multiple `#[include = "*.txt"]` and `#[exclude = "*.jpg"]` attributes. 
+Matching is done on relative file paths, via [`glob`].
+`exclude` attributes have higher priority than `include` attributes.
+Example:
+
+```rust
+#[derive(RustEmbed)]
+#[folder = "examples/public/"]
+#[include = "*.html"]
+#[include = "images/*"]
+#[exclude = "*.txt"]
+struct Asset;
+```
+
 ## Usage
 
 ```rust
@@ -154,3 +169,4 @@ Go Rusketeers!
 The power is yours!
 
 [`include-flate`]: https://crates.io/crates/include-flate
+[`glob`]: https://crates.io/crates/glob
