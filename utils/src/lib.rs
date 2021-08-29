@@ -13,17 +13,17 @@ pub struct FileEntry {
 }
 
 #[cfg(not(feature = "include-exclude"))]
-pub fn is_path_included(_path: &str, _includes: &Vec<String>, _excludes: &Vec<String>) -> bool {
+pub fn is_path_included(_path: &str, _includes: &[&str], _excludes: &[&str]) -> bool {
   return true;
 }
 
 #[cfg(feature = "include-exclude")]
-pub fn is_path_included(rel_path: &str, includes: &Vec<String>, excludes: &Vec<String>) -> bool {
+pub fn is_path_included(rel_path: &str, includes: &[&str], excludes: &[&str]) -> bool {
   use glob::Pattern;
 
   // ignore path matched by exclusion pattern
   for exclude in excludes {
-    let pattern = Pattern::new(exclude).expect(&format!("invalid exclude pattern '{}'", exclude));
+    let pattern = Pattern::new(exclude).unwrap_or_else(|_| panic!("invalid exclude pattern '{}'", exclude));
 
     if pattern.matches(rel_path) {
       return false;
@@ -37,18 +37,18 @@ pub fn is_path_included(rel_path: &str, includes: &Vec<String>, excludes: &Vec<S
 
   // accept path if matched by inclusion pattern
   for include in includes {
-    let pattern = Pattern::new(include).expect(&format!("invalid include pattern '{}'", include));
+    let pattern = Pattern::new(include).unwrap_or_else(|_| panic!("invalid include pattern '{}'", include));
 
     if pattern.matches(rel_path) {
       return true;
     }
   }
 
-  return false;
+  false
 }
 
 #[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
-pub fn get_files(folder_path: String, includes: Vec<String>, excludes: Vec<String>) -> impl Iterator<Item = FileEntry> {
+pub fn get_files<'patterns>(folder_path: String, includes: &'patterns [&str], excludes: &'patterns [&str]) -> impl Iterator<Item = FileEntry> + 'patterns {
   walkdir::WalkDir::new(&folder_path)
     .follow_links(true)
     .into_iter()
@@ -64,7 +64,7 @@ pub fn get_files(folder_path: String, includes: Vec<String>, excludes: Vec<Strin
         rel_path
       };
 
-      if is_path_included(&rel_path, &includes, &excludes) {
+      if is_path_included(&rel_path, includes, excludes) {
         Some(FileEntry { rel_path, full_canonical_path })
       } else {
         None
