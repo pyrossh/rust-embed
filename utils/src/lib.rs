@@ -14,7 +14,7 @@ pub struct FileEntry {
 
 #[cfg(not(feature = "include-exclude"))]
 pub fn is_path_included(_path: &str, _includes: &[&str], _excludes: &[&str]) -> bool {
-  return true;
+  true
 }
 
 #[cfg(feature = "include-exclude")]

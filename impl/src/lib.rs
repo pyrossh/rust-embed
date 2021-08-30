@@ -211,16 +211,11 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
     _ => panic!("RustEmbed can only be derived for unit structs"),
   };
 
-  let folder_path: String = {
-    let mut it = find_attribute_values(ast, "folder").into_iter();
-
-    match (it.next(), it.next()) {
-      (Some(folder_path), None) => folder_path,
-      _ => {
-        panic!("#[derive(RustEmbed)] must contain one attribute like this #[folder = \"examples/public/\"]");
-      }
-    }
-  };
+  let mut folder_paths = find_attribute_values(ast, "folder");
+  if folder_paths.len() != 1 {
+    panic!("#[derive(RustEmbed)] must contain one attribute like this #[folder = \"examples/public/\"]");
+  }
+  let folder_path = folder_paths.remove(0);
 
   let prefix = find_attribute_values(ast, "prefix").into_iter().next();
   let includes = find_attribute_values(ast, "include");
