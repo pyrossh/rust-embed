@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [6.1.0] - 2021-08-31
+
+- Added `include-exclude` feature by [mbme](https://github.com/mbme)
+
 ## [6.0.1] - 2021-08-21
 
 - Added doc comments to macro generated functions
