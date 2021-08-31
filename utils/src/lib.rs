@@ -12,14 +12,49 @@ pub struct FileEntry {
   pub full_canonical_path: String,
 }
 
+#[cfg(not(feature = "include-exclude"))]
+pub fn is_path_included(_path: &str, _includes: &[&str], _excludes: &[&str]) -> bool {
+  true
+}
+
+#[cfg(feature = "include-exclude")]
+pub fn is_path_included(rel_path: &str, includes: &[&str], excludes: &[&str]) -> bool {
+  use glob::Pattern;
+
+  // ignore path matched by exclusion pattern
+  for exclude in excludes {
+    let pattern = Pattern::new(exclude).unwrap_or_else(|_| panic!("invalid exclude pattern '{}'", exclude));
+
+    if pattern.matches(rel_path) {
+      return false;
+    }
+  }
+
+  // accept path if no includes provided
+  if includes.is_empty() {
+    return true;
+  }
+
+  // accept path if matched by inclusion pattern
+  for include in includes {
+    let pattern = Pattern::new(include).unwrap_or_else(|_| panic!("invalid include pattern '{}'", include));
+
+    if pattern.matches(rel_path) {
+      return true;
+    }
+  }
+
+  false
+}
+
 #[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
-pub fn get_files(folder_path: String) -> impl Iterator<Item = FileEntry> {
+pub fn get_files<'patterns>(folder_path: String, includes: &'patterns [&str], excludes: &'patterns [&str]) -> impl Iterator<Item = FileEntry> + 'patterns {
   walkdir::WalkDir::new(&folder_path)
     .follow_links(true)
     .into_iter()
     .filter_map(|e| e.ok())
     .filter(|e| e.file_type().is_file())
-    .map(move |e| {
+    .filter_map(move |e| {
       let rel_path = path_to_str(e.path().strip_prefix(&folder_path).unwrap());
       let full_canonical_path = path_to_str(std::fs::canonicalize(e.path()).expect("Could not get canonical path"));
 
@@ -29,7 +64,11 @@ pub fn get_files(folder_path: String) -> impl Iterator<Item = FileEntry> {
         rel_path
       };
 
-      FileEntry { rel_path, full_canonical_path }
+      if is_path_included(&rel_path, includes, excludes) {
+        Some(FileEntry { rel_path, full_canonical_path })
+      } else {
+        None
+      }
     })
 }
 

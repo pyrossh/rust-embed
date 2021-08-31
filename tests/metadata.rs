@@ -1,5 +1,6 @@
 use rust_embed::{EmbeddedFile, RustEmbed};
 use sha2::Digest;
+use std::{fs, time::SystemTime};
 
 #[derive(RustEmbed)]
 #[folder = "examples/public/"]
@@ -18,7 +19,9 @@ fn hash_is_accurate() {
 #[test]
 fn last_modified_is_accurate() {
   let index_file: EmbeddedFile = Asset::get("index.html").expect("index.html exists");
-  let expected_datetime_utc = 1527818165;
+
+  let metadata = fs::metadata(format!("{}/examples/public/index.html", env!("CARGO_MANIFEST_DIR"))).unwrap();
+  let expected_datetime_utc = metadata.modified().unwrap().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs();
 
   assert_eq!(index_file.metadata.last_modified(), Some(expected_datetime_utc));
 }

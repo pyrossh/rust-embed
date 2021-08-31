@@ -31,6 +31,11 @@ name = "interpolated_path"
 path = "tests/interpolated_path.rs"
 required-features = ["interpolate-folder-path"]
 
+[[test]]
+name = "include_exclude"
+path = "tests/include_exclude.rs"
+required-features = ["include-exclude"]
+
 [dependencies]
 walkdir = "2.3.1"
 rust-embed-impl = { version = "6.0.1", path = "impl"}
@@ -50,6 +55,7 @@ sha2 = "0.9"
 debug-embed = ["rust-embed-impl/debug-embed", "rust-embed-utils/debug-embed"]
 interpolate-folder-path = ["rust-embed-impl/interpolate-folder-path"]
 compression = ["rust-embed-impl/compression", "include-flate"]
+include-exclude = ["rust-embed-impl/include-exclude"]
 nightly = ["rocket"]
 actix = ["actix-web", "mime_guess"]
 warp-ex = ["warp", "tokio", "mime_guess"]

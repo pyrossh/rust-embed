@@ -30,3 +30,4 @@ optional = true
 debug-embed = []
 interpolate-folder-path = ["shellexpand"]
 compression = []
+include-exclude = ["rust-embed-utils/include-exclude"]
