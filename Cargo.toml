@@ -49,10 +49,11 @@ rust-embed-utils = { version = "7.0.0", path = "utils"}
 include-flate = { version = "0.1", optional = true, features = ["stable"] }
 actix-web = { version = "3", default-features = false, optional = true }
 mime_guess = { version = "2", optional = true }
-tokio = { version = "1.0", features = ["macros", "rt-multi-thread"], optional = true }
+tokio = { version = "0.2", optional = true, features = ["macros"] }
 warp = { version = "0.2", default-features = false, optional = true }
 rocket = { version = "0.4.5", default-features = false, optional = true }
 axum = { version = "0.2.3", default-features = false, optional = true  }
+tokio-1 = { package = "tokio", version = "1.0", features = ["macros", "rt-multi-thread"], optional = true }
 
 [dev-dependencies]
 sha2 = "0.9"
@@ -65,7 +66,7 @@ include-exclude = ["rust-embed-impl/include-exclude"]
 nightly = ["rocket"]
 actix = ["actix-web", "mime_guess"]
 warp-ex = ["warp", "tokio", "mime_guess"]
-axum-ex = ["axum", "tokio", "mime_guess"]
+axum-ex = ["axum", "tokio-1", "mime_guess"]
 
 
 [badges]
