@@ -19,6 +19,9 @@ async fn main() {
   let app = Router::new()
     .route("/hello", get(helloworld))
     // handle static files with rust_embed
+    .route("/", get(index_handler))
+    .route("/index.html", get(index_handler))
+    .route("/dist/", static_handler.into_service())
     .or(static_handler.into_service());
 
   // run it
@@ -31,9 +34,17 @@ async fn helloworld() -> Html<&'static str> {
   Html("<h1>Hello, World!</h1>")
 }
 
-async fn static_handler(uri: Uri) -> impl IntoResponse {
-  let path = uri.path().trim_start_matches('/').to_string();
+// serve index.html from examples/public/index.html
+async fn index_handler() -> impl IntoResponse {
+  static_handler("/index.html".parse::<Uri>().unwrap()).await
+}
 
+// static_handler is a handler that serves static files from the
+async fn static_handler(uri: Uri) -> impl IntoResponse {
+  let mut path = uri.path().trim_start_matches('/').to_string();
+  if path.starts_with("dist/") {
+    path = path.replace("dist/", "");
+  }
   StaticFile(path)
 }
 
