@@ -1,4 +1,4 @@
-## Rust Embed [![Build Status](https://github.com/pyros2097/rust-embed/workflows/Test/badge.svg)](https://github.com/pyros2097/rust-embed/actions?query=workflow%3ATest) [![crates.io](https://meritbadge.herokuapp.com/rust-embed)](https://crates.io/crates/rust-embed)
+## Rust Embed [![Build Status](https://github.com/pyros2097/rust-embed/workflows/Test/badge.svg)](https://github.com/pyros2097/rust-embed/actions?query=workflow%3ATest) [![crates.io](https://img.shields.io/crates/v/rust-embed.svg)](https://crates.io/crates/rust-embed)
 
 Rust Custom Derive Macro which loads files into the rust binary at compile time during release and loads the file from the fs during dev.
 
