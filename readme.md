@@ -159,6 +159,10 @@ Note: To run the `warp` example:
 
 `cargo run --example warp --features warp-ex`
 
+Note: To run the `axum` example:
+
+`cargo run --example axum --features axum-ex`
+
 ## Testing
 
 debug: `cargo test --test lib`
