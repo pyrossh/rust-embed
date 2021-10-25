@@ -163,6 +163,10 @@ Note: To run the `axum` example:
 
 `cargo run --example axum --features axum-ex`
 
+Note: To run the [poem](https://github.com/poem-web/poem) example:
+
+`cargo run --example poem --features poem-ex`
+
 ## Testing
 
 debug: `cargo test --test lib`
