@@ -15,10 +15,10 @@ edition = "2018"
 walkdir = "2.3.1"
 sha2 = "0.9"
 
-[dependencies.glob]
+[dependencies.globset]
 version = "0.3.0"
 optional = true
 
 [features]
 debug-embed = []
-include-exclude = ["glob"]
+include-exclude = ["globset"]

@@ -19,13 +19,15 @@ pub fn is_path_included(_path: &str, _includes: &[&str], _excludes: &[&str]) -> 
 
 #[cfg(feature = "include-exclude")]
 pub fn is_path_included(rel_path: &str, includes: &[&str], excludes: &[&str]) -> bool {
-  use glob::Pattern;
+  use globset::Glob;
 
   // ignore path matched by exclusion pattern
   for exclude in excludes {
-    let pattern = Pattern::new(exclude).unwrap_or_else(|_| panic!("invalid exclude pattern '{}'", exclude));
+    let pattern = Glob::new(exclude)
+      .unwrap_or_else(|_| panic!("invalid exclude pattern '{}'", exclude))
+      .compile_matcher();
 
-    if pattern.matches(rel_path) {
+    if pattern.is_match(rel_path) {
       return false;
     }
   }
@@ -37,9 +39,11 @@ pub fn is_path_included(rel_path: &str, includes: &[&str], excludes: &[&str]) ->
 
   // accept path if matched by inclusion pattern
   for include in includes {
-    let pattern = Pattern::new(include).unwrap_or_else(|_| panic!("invalid include pattern '{}'", include));
+    let pattern = Glob::new(include)
+      .unwrap_or_else(|_| panic!("invalid include pattern '{}'", include))
+      .compile_matcher();
 
-    if pattern.matches(rel_path) {
+    if pattern.is_match(rel_path) {
       return true;
     }
   }
