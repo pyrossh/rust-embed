@@ -16,7 +16,7 @@ walkdir = "2.3.1"
 sha2 = "0.9"
 
 [dependencies.globset]
-version = "0.3.0"
+version = "0.4.8"
 optional = true
 
 [features]
