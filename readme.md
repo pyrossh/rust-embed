@@ -104,7 +104,7 @@ Compress each file when embedding into the binary. Compression is done via [`inc
 
 ### `include-exclude`
 Filter files to be embedded with multiple `#[include = "*.txt"]` and `#[exclude = "*.jpg"]` attributes. 
-Matching is done on relative file paths, via [`glob`].
+Matching is done on relative file paths, via [`globset`].
 `exclude` attributes have higher priority than `include` attributes.
 Example:
 
@@ -177,4 +177,4 @@ Go Rusketeers!
 The power is yours!
 
 [`include-flate`]: https://crates.io/crates/include-flate
-[`glob`]: https://crates.io/crates/glob
+[`globset`]: https://crates.io/crates/globset
