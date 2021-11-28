@@ -98,6 +98,9 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
     const excludes: &[&str] = &[#(#excludes),*];
   };
 
+  let canonical_folder_path = Path::new(&folder_path).canonicalize().expect("folder path must resolve to an absolute path");
+  let canonical_folder_path = canonical_folder_path.to_str().expect("absolute folder path must be valid unicode");
+
   quote! {
       #[cfg(debug_assertions)]
       impl #ident {
@@ -111,8 +114,15 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
               let rel_file_path = file_path.replace("\\", "/");
               let file_path = std::path::Path::new(#folder_path).join(&rel_file_path);
 
+              // Make sure the path requested does not escape the folder path
+              let canonical_file_path = file_path.canonicalize().ok()?;
+              if !canonical_file_path.starts_with(#canonical_folder_path) {
+                  // Tried to request a path that is not in the embedded folder
+                  return None;
+              }
+
               if rust_embed::utils::is_path_included(&rel_file_path, includes, excludes) {
-                rust_embed::utils::read_file_from_fs(&file_path).ok()
+                rust_embed::utils::read_file_from_fs(&canonical_file_path).ok()
               } else {
                 None
               }
