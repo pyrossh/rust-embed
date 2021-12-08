@@ -1,14 +1,10 @@
-use std::convert::Infallible;
-
 use axum::{
-  body::{Bytes, Full},
-  handler::get,
-  http::{header, Response, StatusCode, Uri},
-  response::{Html, IntoResponse},
-  routing::Router,
+  body::{boxed, Full},
+  handler::Handler,
+  http::{header, StatusCode, Uri},
+  response::{Html, IntoResponse, Response},
+  routing::{get, Router},
 };
-
-use axum::handler::Handler;
 use mime_guess;
 use rust_embed::RustEmbed;
 use std::net::SocketAddr;
@@ -22,7 +18,7 @@ async fn main() {
     .route("/", get(index_handler))
     .route("/index.html", get(index_handler))
     .route("/dist/", static_handler.into_service())
-    .or(static_handler.into_service());
+    .fallback(static_handler.into_service());
 
   // run it
   let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
@@ -57,18 +53,15 @@ impl<T> IntoResponse for StaticFile<T>
 where
   T: Into<String>,
 {
-  type Body = Full<Bytes>;
-  type BodyError = Infallible;
-
-  fn into_response(self) -> Response<Self::Body> {
+  fn into_response(self) -> Response {
     let path = self.0.into();
     match Asset::get(path.as_str()) {
       Some(content) => {
-        let body = content.data.into();
+        let body = boxed(Full::from(content.data));
         let mime = mime_guess::from_path(path).first_or_octet_stream();
         Response::builder().header(header::CONTENT_TYPE, mime.as_ref()).body(body).unwrap()
       }
-      None => Response::builder().status(StatusCode::NOT_FOUND).body(Full::from("404")).unwrap(),
+      None => Response::builder().status(StatusCode::NOT_FOUND).body(boxed(Full::from("404"))).unwrap(),
     }
   }
 }
