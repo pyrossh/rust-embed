@@ -36,9 +36,11 @@ jobs:
           cargo test --test interpolated_path --features "interpolate-folder-path"
           cargo test --test interpolated_path --features "interpolate-folder-path" --release
           cargo build --example basic
+          cargo build --example rocket --features rocket
           cargo build --example actix --features actix
           cargo build --example warp --features warp-ex
           cargo test --test lib --release
           cargo build --example basic --release
+          cargo build --example rocket --features rocket --release
           cargo build --example actix --features actix --release
           cargo build --example warp --features warp-ex --release

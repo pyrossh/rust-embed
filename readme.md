@@ -151,9 +151,9 @@ Note: To run the `actix-web` example:
 
 `cargo run --example actix --features actix`
 
-Note: To run the `rocket` example, add the `nightly` feature flag and run on a nightly build:
+Note: To run the `rocket` example:
 
-`cargo +nightly run --example rocket --features nightly`
+`cargo run --example rocket --features rocket`
 
 Note: To run the `warp` example:
 
