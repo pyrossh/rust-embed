@@ -9,7 +9,7 @@ async fn main() -> Result<(), std::io::Error> {
   let app = Route::new().at("/", StaticEmbed).at("/index.html", StaticEmbed).nest("/dist", StaticEmbed);
 
   let listener = TcpListener::bind("127.0.0.1:3000");
-  let server = Server::new(listener).await?;
+  let server = Server::new(listener);
   server.run(app).await?;
   Ok(())
 }
