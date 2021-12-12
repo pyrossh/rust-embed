@@ -167,6 +167,10 @@ Note: To run the [poem](https://github.com/poem-web/poem) example:
 
 `cargo run --example poem --features poem-ex`
 
+Note: To run the [salvo](https://github.com/salvo-rs/salvo) example:
+
+`cargo run --example salvo --features salvo-ex`
+
 ## Testing
 
 debug: `cargo test --test lib`
