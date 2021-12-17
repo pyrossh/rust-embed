@@ -17,7 +17,7 @@ proc-macro = true
 [dependencies]
 rust-embed-utils = { version = "7.1.0", path = "../utils"}
 
-syn = "1"
+syn = { version = "1", default-features = false, features = ["derive", "parsing", "proc-macro"] }
 quote = "1"
 proc-macro2 = "1"
 walkdir = "2.3.1"
