@@ -2,7 +2,7 @@ use poem::{
   async_trait,
   http::{header, Method, StatusCode},
   listener::TcpListener,
-  Endpoint, Request, Response, Route, Server,
+  Endpoint, Request, Response, Result, Route, Server,
 };
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
@@ -23,9 +23,9 @@ pub(crate) struct StaticEmbed;
 impl Endpoint for StaticEmbed {
   type Output = Response;
 
-  async fn call(&self, req: Request) -> Self::Output {
+  async fn call(&self, req: Request) -> Result<Self::Output> {
     if req.method() != Method::GET {
-      return StatusCode::METHOD_NOT_ALLOWED.into();
+      return Ok(StatusCode::METHOD_NOT_ALLOWED.into());
     }
 
     let mut path = req.uri().path().trim_start_matches('/').trim_end_matches('/').to_string();
@@ -46,18 +46,20 @@ impl Endpoint for StaticEmbed {
           .map(|etag| etag.to_str().unwrap_or("000000").eq(&hash))
           .unwrap_or(false)
         {
-          return StatusCode::NOT_MODIFIED.into();
+          return Ok(StatusCode::NOT_MODIFIED.into());
         }
 
         // otherwise, return 200 with etag hash
         let body: Vec<u8> = content.data.into();
         let mime = mime_guess::from_path(path).first_or_octet_stream();
-        Response::builder()
-          .header(header::CONTENT_TYPE, mime.as_ref())
-          .header(header::ETAG, hash)
-          .body(body)
+        Ok(
+          Response::builder()
+            .header(header::CONTENT_TYPE, mime.as_ref())
+            .header(header::ETAG, hash)
+            .body(body),
+        )
       }
-      None => Response::builder().status(StatusCode::NOT_FOUND).finish(),
+      None => Ok(Response::builder().status(StatusCode::NOT_FOUND).finish()),
     }
   }
 }
