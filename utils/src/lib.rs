@@ -55,6 +55,7 @@ pub fn is_path_included(rel_path: &str, includes: &[&str], excludes: &[&str]) ->
 pub fn get_files<'patterns>(folder_path: String, includes: &'patterns [&str], excludes: &'patterns [&str]) -> impl Iterator<Item = FileEntry> + 'patterns {
   walkdir::WalkDir::new(&folder_path)
     .follow_links(true)
+    .sort_by_file_name()
     .into_iter()
     .filter_map(|e| e.ok())
     .filter(|e| e.file_type().is_file())
