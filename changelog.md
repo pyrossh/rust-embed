@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [6.4.0] - 2022-04-15
+
+- Order files by filename [#171](https://github.com/pyros2097/rust-embed/issues/171). Thanks to [apognu](https://github.com/apognu)
+
+
 ## [6.3.0] - 2021-11-28
 
 - Fixed a security issue in debug mode [#159](https://github.com/pyros2097/rust-embed/issues/159). Thanks to [5225225](https://github.com/5225225)
