@@ -2,7 +2,7 @@
 extern crate rocket;
 
 use rocket::http::ContentType;
-use rocket::response::content::Html;
+use rocket::response::content::RawHtml;
 use rust_embed::RustEmbed;
 
 use std::borrow::Cow;
@@ -14,9 +14,9 @@ use std::path::PathBuf;
 struct Asset;
 
 #[get("/")]
-fn index() -> Option<Html<Cow<'static, [u8]>>> {
+fn index() -> Option<RawHtml<Cow<'static, [u8]>>> {
   let asset = Asset::get("index.html")?;
-  Some(Html(asset.data))
+  Some(RawHtml(asset.data))
 }
 
 #[get("/dist/<file..>")]
