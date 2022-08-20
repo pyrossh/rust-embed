@@ -101,6 +101,8 @@ This will pull the `foo` directory relative to your `Cargo.toml` file.
 ### `compression`
 
 Compress each file when embedding into the binary. Compression is done via [`include-flate`].
+> Note this feature should only be used with clean builds as it doesn't work properly for incremental builds yet. Please look at this issue for more details [#182](https://github.com/pyrossh/rust-embed/issues/182)
+
 
 ### `include-exclude`
 Filter files to be embedded with multiple `#[include = "*.txt"]` and `#[exclude = "*.jpg"]` attributes. 
