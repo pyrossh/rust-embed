@@ -27,7 +27,7 @@ async fn main() {
 }
 
 async fn static_handler(uri: Uri) -> impl IntoResponse {
-    let path = uri.path().trim_start_matches('/').to_string();
+    let path = uri.path().trim_start_matches('/');
 
     if path.is_empty() || path == INDEX_HTML {
         return index_html().await.into_response();
