@@ -5,7 +5,6 @@ use axum::{
     response::{IntoResponse, Response},
     routing::Router,
 };
-use mime_guess;
 use rust_embed::RustEmbed;
 use std::net::SocketAddr;
 
