@@ -33,7 +33,7 @@ async fn static_handler(uri: Uri) -> impl IntoResponse {
         return index_html().await.into_response();
     }
 
-    match Assets::get(path.as_str()) {
+    match Assets::get(path) {
         Some(content) => {
             let body = boxed(Full::from(content.data));
             let mime = mime_guess::from_path(path).first_or_octet_stream();
