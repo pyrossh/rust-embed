@@ -26,7 +26,7 @@ async fn main() {
         .unwrap();
 }
 
-async fn static_handler(uri: Uri) -> impl IntoResponse {
+async fn static_handler(uri: Uri) -> Response {
     let path = uri.path().trim_start_matches('/');
 
     if path.is_empty() || path == INDEX_HTML {
@@ -53,7 +53,7 @@ async fn static_handler(uri: Uri) -> impl IntoResponse {
     }
 }
 
-async fn index_html() -> impl IntoResponse {
+async fn index_html() -> Response {
     match Assets::get(INDEX_HTML) {
         Some(content) => {
             let body = boxed(Full::from(content.data));
