@@ -11,7 +11,7 @@ use std::net::SocketAddr;
 static INDEX_HTML: &str = "index.html";
 
 #[derive(RustEmbed)]
-#[folder = "assets/"]
+#[folder = "examples/axum-spa/assets/"]
 struct Assets;
 
 #[tokio::main]
