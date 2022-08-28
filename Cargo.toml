@@ -32,6 +32,11 @@ path = "examples/axum.rs"
 required-features = ["axum-ex"]
 
 [[example]]
+name = "axum-spa"
+path = "examples/axum-spa/main.rs"
+required-features = ["axum-ex"]
+
+[[example]]
 name = "poem"
 path = "examples/poem.rs"
 required-features = ["poem-ex"]
