@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [6.4.1] - 2022-09-13
+
+- Update sha2 dependency version in utils crate [#186](https://github.com/pyrossh/rust-embed/issues/186)
+
 ## [6.4.0] - 2022-04-15
 
 - Order files by filename [#171](https://github.com/pyros2097/rust-embed/issues/171). Thanks to [apognu](https://github.com/apognu)
