@@ -115,6 +115,11 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
   hasher.update(&data);
   let hash: [u8; 32] = hasher.finalize().into();
 
+  let source_date_epoch = match std::env::var("SOURCE_DATE_EPOCH") {
+    Ok(value) => value.parse::<u64>().map_or(None, |v| Some(v)),
+    Err(_) => None,
+  };
+
   let last_modified = fs::metadata(file_path)?.modified().ok().map(|last_modified| {
     last_modified
       .duration_since(SystemTime::UNIX_EPOCH)
@@ -124,7 +129,10 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
 
   Ok(EmbeddedFile {
     data,
-    metadata: Metadata { hash, last_modified },
+    metadata: Metadata {
+      hash,
+      last_modified: source_date_epoch.or(last_modified),
+    },
   })
 }
 
