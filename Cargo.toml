@@ -11,36 +11,6 @@ categories = ["web-programming", "filesystem"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 edition = "2018"
 
-[[example]]
-name = "warp"
-path = "examples/warp.rs"
-required-features = ["warp-ex"]
-
-[[example]]
-name = "actix"
-path = "examples/actix.rs"
-required-features = ["actix"]
-
-[[example]]
-name = "rocket"
-path = "examples/rocket.rs"
-required-features = ["rocket"]
-
-[[example]]
-name = "axum"
-path = "examples/axum.rs"
-required-features = ["axum-ex"]
-
-[[example]]
-name = "axum-spa"
-path = "examples/axum-spa/main.rs"
-required-features = ["axum-ex"]
-
-[[example]]
-name = "poem"
-path = "examples/poem.rs"
-required-features = ["poem-ex"]
-
 [[test]]
 name = "interpolated_path"
 path = "tests/interpolated_path.rs"
@@ -56,32 +26,14 @@ walkdir = "2.3.1"
 rust-embed-impl = { version = "6.3.0", path = "impl"}
 rust-embed-utils = { version = "7.3.0", path = "utils"}
 
-include-flate = { version = "0.1", optional = true, features = ["stable"] }
-actix-web = { version = "4", optional = true }
-mime_guess = { version = "2", optional = true }
-hex = { version = "0.4.3", optional = true }
-tokio = { version = "1.0", optional = true, features = ["macros", "rt-multi-thread"] }
-warp = { version = "0.3", default-features = false, optional = true }
-rocket = { version = "0.5.0-rc.2", default-features = false, optional = true }
-axum = { version = "0.5", default-features = false, features = ["http1"], optional = true  }
-poem = { version = "1.3.30", default-features = false, features = ["server"], optional = true  }
-salvo = { version = "0.16", default-features = false, optional = true  }
-
 [dev-dependencies]
-sha2 = "0.10"
 chrono = "0.4"
 
 [features]
+default = ["debug-embed"]
 debug-embed = ["rust-embed-impl/debug-embed", "rust-embed-utils/debug-embed"]
 interpolate-folder-path = ["rust-embed-impl/interpolate-folder-path"]
-compression = ["rust-embed-impl/compression", "include-flate"]
 include-exclude = ["rust-embed-impl/include-exclude", "rust-embed-utils/include-exclude"]
-actix = ["actix-web", "mime_guess"]
-warp-ex = ["warp", "tokio", "mime_guess"]
-axum-ex = ["axum", "tokio", "mime_guess"]
-poem-ex = ["poem", "tokio", "mime_guess", "hex"]
-salvo-ex = ["salvo", "tokio", "mime_guess", "hex"]
-
 
 [badges]
 appveyor = { repository = "pyros2097/rust-embed" }

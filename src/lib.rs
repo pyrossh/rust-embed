@@ -1,7 +1,4 @@
 #![forbid(unsafe_code)]
-#[cfg(feature = "compression")]
-#[cfg_attr(feature = "compression", doc(hidden))]
-pub use include_flate::flate;
 
 #[allow(unused_imports)]
 #[macro_use]

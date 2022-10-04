@@ -185,10 +185,9 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   let data_gzip = file.data_gzip;
   let data_gzip_borrow = std::borrow::Cow::from(data_gzip);
 
-
   let embed_data = quote! {
-    let data = [#(#data_borrow),*];
-    let data_gzip = [#(#data_gzip_borrow),*];
+    let data = Vec::from([#(#data_borrow),*]);
+    let data_gzip = Vec::from([#(#data_gzip_borrow),*]);
   };
 
   quote! {

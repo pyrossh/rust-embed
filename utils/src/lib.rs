@@ -84,8 +84,8 @@ pub fn get_files<'patterns>(folder_path: String, includes: &'patterns [&str], ex
 
 /// A file embedded into the binary
 pub struct EmbeddedFile {
-  pub data: Cow<'static, [u8]>,
-  pub data_gzip: Cow<'static, [u8]>,
+  pub data: Vec<u8>,
+  pub data_gzip: Vec<u8>,
   pub metadata: Metadata,
 }
 
@@ -99,12 +99,12 @@ pub struct Metadata {
 
 impl Metadata {
   #[doc(hidden)]
-  pub fn __rust_embed_new(hash: String, etag: String, last_modified: Option<String>, mime_type: Option<String>) -> Self {
+  pub fn __rust_embed_new(hash: &str, etag: &str, last_modified: Option<&str>, mime_type: Option<&str>) -> Self {
     Self {
-      hash,
-      etag,
-      last_modified,
-      mime_type,
+      hash: hash.to_string(),
+      etag: etag.to_string(),
+      last_modified: last_modified.map(str::to_string),
+      mime_type: mime_type.map(str::to_string),
     }
   }
 
@@ -135,7 +135,6 @@ impl Metadata {
 
 pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
   let data = fs::read(file_path)?;
-  let data = Cow::from(data);
 
   // During debugging, use no compression to avoid causing slowdowns. For
   // production, we'll go with default compression: it's usually almost as good
@@ -143,7 +142,6 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
   let mut encoder = GzEncoder::new(Vec::new(), if cfg!(debug_assertions) { Compression::none() } else { Compression::default() });
   encoder.write_all(&data).unwrap();
   let data_gzip = encoder.finish().unwrap();
-  let data_gzip = Cow::from(data_gzip);
 
   let mut hasher = sha2::Sha256::new();
   hasher.update(&data);
