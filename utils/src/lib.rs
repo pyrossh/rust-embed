@@ -1,7 +1,12 @@
 #![forbid(unsafe_code)]
 
+use chrono::TimeZone;
+use flate2::write::GzEncoder;
+use flate2::Compression;
+use sha2::digest::generic_array::GenericArray;
 use sha2::Digest;
 use std::borrow::Cow;
+use std::io::Write;
 use std::path::Path;
 use std::time::SystemTime;
 use std::{fs, io};
@@ -80,30 +85,51 @@ pub fn get_files<'patterns>(folder_path: String, includes: &'patterns [&str], ex
 /// A file embedded into the binary
 pub struct EmbeddedFile {
   pub data: Cow<'static, [u8]>,
+  pub data_gzip: Cow<'static, [u8]>,
   pub metadata: Metadata,
 }
 
 /// Metadata about an embedded file
 pub struct Metadata {
-  hash: [u8; 32],
-  last_modified: Option<u64>,
+  hash: String,
+  etag: String,
+  last_modified: Option<String>,
+  mime_type: Option<String>,
 }
 
 impl Metadata {
   #[doc(hidden)]
-  pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>) -> Self {
-    Self { hash, last_modified }
+  pub fn __rust_embed_new(hash: String, etag: String, last_modified: Option<String>, mime_type: Option<String>) -> Self {
+    Self {
+      hash,
+      etag,
+      last_modified,
+      mime_type,
+    }
   }
 
-  /// The SHA256 hash of the file
-  pub fn sha256_hash(&self) -> [u8; 32] {
-    self.hash
+  /// The SHA256 hash of the file contents, base64 encoded.
+  pub fn sha256_hash(&self) -> &str {
+    self.hash.as_str()
   }
 
-  /// The last modified date in seconds since the UNIX epoch. If the underlying
-  /// platform/file-system does not support this, None is returned.
-  pub fn last_modified(&self) -> Option<u64> {
-    self.last_modified
+  /// The `sha256_hash`, surrounded by quotes. This is the format required in
+  /// `ETag` headers.
+  pub fn etag(&self) -> &str {
+    self.etag.as_str()
+  }
+
+  /// The last modified date in the rfc2822 format. This is the format required
+  /// in `Last-Modified` headers.
+  ///
+  /// This may be None on some platforms that don't support last modified
+  /// timestamps.
+  pub fn last_modified(&self) -> Option<&str> {
+    self.last_modified.as_ref().map(String::as_str)
+  }
+
+  pub fn mime_type(&self) -> Option<&str> {
+    self.mime_type.as_ref().map(String::as_str)
   }
 }
 
@@ -111,27 +137,40 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
   let data = fs::read(file_path)?;
   let data = Cow::from(data);
 
+  // During debugging, use no compression to avoid causing slowdowns. For
+  // production, we'll go with default compression: it's usually almost as good
+  // as best compression but significantly faster.
+  let mut encoder = GzEncoder::new(Vec::new(), if cfg!(debug_assertions) { Compression::none() } else { Compression::default() });
+  encoder.write_all(&data).unwrap();
+  let data_gzip = encoder.finish().unwrap();
+  let data_gzip = Cow::from(data_gzip);
+
   let mut hasher = sha2::Sha256::new();
   hasher.update(&data);
-  let hash: [u8; 32] = hasher.finalize().into();
+  let mut hash_bytes = GenericArray::default();
+  hasher.finalize_into(&mut hash_bytes);
+  let hash = base85::encode(&hash_bytes[..]);
 
-  let source_date_epoch = match std::env::var("SOURCE_DATE_EPOCH") {
-    Ok(value) => value.parse::<u64>().map_or(None, |v| Some(v)),
-    Err(_) => None,
-  };
+  let last_modified_timestamp = fs::metadata(file_path)?.modified().ok();
+  let last_modified = last_modified_timestamp
+    .and_then(|value| value.duration_since(SystemTime::UNIX_EPOCH).ok().map(|value| value.as_secs() as i64))
+    .or_else(|| {
+      last_modified_timestamp
+        .and_then(|value| SystemTime::UNIX_EPOCH.duration_since(value).ok())
+        .map(|value| (-1) * (value.as_secs() as i64))
+    })
+    .map(|timestamp| chrono::Utc.timestamp(timestamp, 0).to_rfc2822());
 
-  let last_modified = fs::metadata(file_path)?.modified().ok().map(|last_modified| {
-    last_modified
-      .duration_since(SystemTime::UNIX_EPOCH)
-      .expect("Time before the UNIX epoch is unsupported")
-      .as_secs()
-  });
+  let mime_type = new_mime_guess::from_path(file_path).first().map(|mime| mime.to_string());
 
   Ok(EmbeddedFile {
     data,
+    data_gzip,
     metadata: Metadata {
+      etag: format!("\"{hash}\""),
       hash,
-      last_modified: source_date_epoch.or(last_modified),
+      last_modified,
+      mime_type,
     },
   })
 }

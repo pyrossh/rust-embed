@@ -170,29 +170,35 @@ fn generate_assets(ident: &syn::Ident, folder_path: String, prefix: Option<Strin
 fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   let file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect("File should be readable");
   let hash = file.metadata.sha256_hash();
+  let etag = file.metadata.etag();
   let last_modified = match file.metadata.last_modified() {
     Some(last_modified) => quote! { Some(#last_modified) },
     None => quote! { None },
   };
+  let mime_type = match file.metadata.mime_type() {
+    Some(mime_type) => quote! { Some(#mime_type ) },
+    None => quote! { None },
+  };
 
-  let embedding_code = if cfg!(feature = "compression") {
-    quote! {
-      rust_embed::flate!(static FILE: [u8] from #full_canonical_path);
-      let bytes = &FILE[..];
-    }
-  } else {
-    quote! {
-      let bytes = &include_bytes!(#full_canonical_path)[..];
-    }
+  let data = file.data;
+  let data_borrow = std::borrow::Cow::from(data);
+  let data_gzip = file.data_gzip;
+  let data_gzip_borrow = std::borrow::Cow::from(data_gzip);
+
+
+  let embed_data = quote! {
+    let data = [#(#data_borrow),*];
+    let data_gzip = [#(#data_gzip_borrow),*];
   };
 
   quote! {
       #rel_path => {
-          #embedding_code
+        #embed_data
 
           Some(rust_embed::EmbeddedFile {
-              data: std::borrow::Cow::from(bytes),
-              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified)
+              data,
+              data_gzip,
+              metadata: rust_embed::Metadata::__rust_embed_new(#hash, #etag, #last_modified, #mime_type)
           })
       }
   }
@@ -243,23 +249,6 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
       .to_owned()
   } else {
     folder_path
-  };
-
-  if !Path::new(&folder_path).exists() {
-    let mut message = format!(
-      "#[derive(RustEmbed)] folder '{}' does not exist. cwd: '{}'",
-      folder_path,
-      std::env::current_dir().unwrap().to_str().unwrap()
-    );
-
-    // Add a message about the interpolate-folder-path feature if the path may
-    // include a variable
-    if folder_path.contains('$') && cfg!(not(feature = "interpolate-folder-path")) {
-      message += "\nA variable has been detected. RustEmbed can expand variables \
-                  when the `interpolate-folder-path` feature is enabled.";
-    }
-
-    panic!("{}", message);
   };
 
   generate_assets(&ast.ident, folder_path, prefix, includes, excludes)

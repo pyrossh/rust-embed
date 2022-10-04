@@ -14,6 +14,13 @@ edition = "2018"
 [dependencies]
 walkdir = "2.3.1"
 sha2 = "0.10.5"
+base85 = "1.1"
+# Compute last-modified timestamps
+chrono = "0.4"
+# Compute the mime types
+new_mime_guess = "4.0.1"
+# Compression
+flate2 = "1.0"
 
 [dependencies.globset]
 version = "0.4.8"

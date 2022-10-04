@@ -69,6 +69,7 @@ salvo = { version = "0.16", default-features = false, optional = true  }
 
 [dev-dependencies]
 sha2 = "0.10"
+chrono = "0.4"
 
 [features]
 debug-embed = ["rust-embed-impl/debug-embed", "rust-embed-utils/debug-embed"]
