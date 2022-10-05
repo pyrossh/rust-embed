@@ -10,14 +10,14 @@ use std::{env, path::Path};
 use syn::{Data, DeriveInput, Fields, Lit, Meta, MetaNameValue};
 
 fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String]) -> TokenStream2 {
-  extern crate rust_embed_utils;
+  extern crate rust_embed_for_web_utils;
 
   let mut match_values = Vec::<TokenStream2>::new();
   let mut list_values = Vec::<String>::new();
 
   let includes: Vec<&str> = includes.iter().map(AsRef::as_ref).collect();
   let excludes: Vec<&str> = excludes.iter().map(AsRef::as_ref).collect();
-  for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path, &includes, &excludes) {
+  for rust_embed_for_web_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_for_web_utils::get_files(folder_path, &includes, &excludes) {
     match_values.push(embed_file(&rel_path, &full_canonical_path));
 
     list_values.push(if let Some(prefix) = prefix {
@@ -49,7 +49,7 @@ fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, inclu
       #not_debug_attr
       impl #ident {
           /// Get an embedded file and its metadata.
-          pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
+          pub fn get(file_path: &str) -> Option<rust_embed_for_web::EmbeddedFile> {
             #handle_prefix
             match file_path.replace("\\", "/").as_str() {
                 #(#match_values)*
@@ -69,12 +69,12 @@ fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, inclu
       }
 
       #not_debug_attr
-      impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
+      impl rust_embed_for_web::RustEmbed for #ident {
+        fn get(file_path: &str) -> Option<rust_embed_for_web::EmbeddedFile> {
           #ident::get(file_path)
         }
-        fn iter() -> rust_embed::Filenames {
-          rust_embed::Filenames::Embedded(#ident::names())
+        fn iter() -> rust_embed_for_web::Filenames {
+          rust_embed_for_web::Filenames::Embedded(#ident::names())
         }
       }
   }
@@ -105,7 +105,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
       #[cfg(debug_assertions)]
       impl #ident {
           /// Get an embedded file and its metadata.
-          pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
+          pub fn get(file_path: &str) -> Option<rust_embed_for_web::EmbeddedFile> {
               #handle_prefix
 
               #declare_includes
@@ -121,8 +121,8 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
                   return None;
               }
 
-              if rust_embed::utils::is_path_included(&rel_file_path, includes, excludes) {
-                rust_embed::utils::read_file_from_fs(&canonical_file_path).ok()
+              if rust_embed_for_web::utils::is_path_included(&rel_file_path, includes, excludes) {
+                rust_embed_for_web::utils::read_file_from_fs(&canonical_file_path).ok()
               } else {
                 None
               }
@@ -135,19 +135,19 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
               #declare_includes
               #declare_excludes
 
-              rust_embed::utils::get_files(String::from(#folder_path), includes, excludes)
+              rust_embed_for_web::utils::get_files(String::from(#folder_path), includes, excludes)
                   .map(|e| #map_iter)
           }
       }
 
       #[cfg(debug_assertions)]
-      impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
+      impl rust_embed_for_web::RustEmbed for #ident {
+        fn get(file_path: &str) -> Option<rust_embed_for_web::EmbeddedFile> {
           #ident::get(file_path)
         }
-        fn iter() -> rust_embed::Filenames {
+        fn iter() -> rust_embed_for_web::Filenames {
           // the return type of iter() is unnamable, so we have to box it
-          rust_embed::Filenames::Dynamic(Box::new(#ident::iter()))
+          rust_embed_for_web::Filenames::Dynamic(Box::new(#ident::iter()))
         }
       }
   }
@@ -168,7 +168,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String, prefix: Option<Strin
 }
 
 fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
-  let file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect("File should be readable");
+  let file = rust_embed_for_web_utils::read_file_from_fs(Path::new(full_canonical_path)).expect("File should be readable");
   let hash = file.metadata.sha256_hash();
   let etag = file.metadata.etag();
   let last_modified = match file.metadata.last_modified() {
@@ -181,23 +181,26 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   };
 
   let data = file.data;
-  let data_borrow = std::borrow::Cow::from(data);
   let data_gzip = file.data_gzip;
-  let data_gzip_borrow = std::borrow::Cow::from(data_gzip);
+
+  // TODO: if data_gzip is bigger than data (or very close in size) then don't
+  // include it. data_gzip should be optional. This can happen with files that
+  // are very small, or that are in already-compressed formats like images or
+  // video.
 
   let embed_data = quote! {
-    let data = Vec::from([#(#data_borrow),*]);
-    let data_gzip = Vec::from([#(#data_gzip_borrow),*]);
+    let data = Vec::from([#(#data),*]);
+    let data_gzip = Vec::from([#(#data_gzip),*]);
   };
 
   quote! {
       #rel_path => {
         #embed_data
 
-          Some(rust_embed::EmbeddedFile {
+          Some(rust_embed_for_web::EmbeddedFile {
               data,
               data_gzip,
-              metadata: rust_embed::Metadata::__rust_embed_new(#hash, #etag, #last_modified, #mime_type)
+              metadata: rust_embed_for_web::Metadata::__rust_embed_for_web_new(#hash, #etag, #last_modified, #mime_type)
           })
       }
   }
@@ -217,7 +220,7 @@ fn find_attribute_values(ast: &syn::DeriveInput, attr_name: &str) -> Vec<String>
     .collect()
 }
 
-fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
+fn impl_rust_embed_for_web(ast: &syn::DeriveInput) -> TokenStream2 {
   match ast.data {
     Data::Struct(ref data) => match data.fields {
       Fields::Unit => {}
@@ -256,6 +259,6 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
 #[proc_macro_derive(RustEmbed, attributes(folder, prefix, include, exclude))]
 pub fn derive_input_object(input: TokenStream) -> TokenStream {
   let ast: DeriveInput = syn::parse(input).unwrap();
-  let gen = impl_rust_embed(&ast);
+  let gen = impl_rust_embed_for_web(&ast);
   gen.into()
 }

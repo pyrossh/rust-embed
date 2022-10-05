@@ -1,14 +1,12 @@
 [package]
-name = "rust-embed-utils"
-version = "7.3.0"
-description = "Utilities for rust-embed"
+name = "rust-embed-for-web-utils"
+version = "8.0.0"
+description = "Utilities for rust-embed-for-web"
 readme = "readme.md"
-documentation = "https://docs.rs/rust-embed"
-repository = "https://github.com/pyros2097/rust-embed"
+repository = "https://github.com/SeriousBug/rust-embed-for-web"
 license = "MIT"
 keywords = ["http", "rocket", "static", "web", "server"]
 categories = ["web-programming::http-server"]
-authors = ["pyros2097 <pyros2097@gmail.com>"]
 edition = "2018"
 
 [dependencies]

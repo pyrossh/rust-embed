@@ -1,4 +1,4 @@
-use rust_embed::RustEmbed;
+use rust_embed_for_web::RustEmbed;
 
 #[derive(RustEmbed)]
 #[folder = "examples/public/"]

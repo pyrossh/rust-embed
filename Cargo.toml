@@ -1,14 +1,13 @@
 [package]
-name = "rust-embed"
-version = "6.4.1"
-description = "Rust Custom Derive Macro which loads files into the rust binary at compile time during release and loads the file from the fs during dev"
+name = "rust-embed-for-web"
+version = "7.0.0"
+description = "Rust Macro which embeds files into your executable. A fork of `rust-embed` with a focus on usage on web servers."
 readme = "readme.md"
 documentation = "https://docs.rs/rust-embed"
 repository = "https://github.com/pyros2097/rust-embed"
 license = "MIT"
-keywords = ["http", "rocket", "static", "web", "server"]
+keywords = ["http", "embed", "static", "web", "server"]
 categories = ["web-programming", "filesystem"]
-authors = ["pyros2097 <pyros2097@gmail.com>"]
 edition = "2018"
 
 [[test]]
@@ -23,24 +22,17 @@ required-features = ["include-exclude"]
 
 [dependencies]
 walkdir = "2.3.1"
-rust-embed-impl = { version = "6.3.0", path = "impl"}
-rust-embed-utils = { version = "7.3.0", path = "utils"}
+rust-embed-for-web-impl = { version = "7.0.0", path = "impl"}
+rust-embed-for-web-utils = { version = "8.0.0", path = "utils"}
 
 [dev-dependencies]
 chrono = "0.4"
 
 [features]
-default = ["debug-embed"]
-debug-embed = ["rust-embed-impl/debug-embed", "rust-embed-utils/debug-embed"]
-interpolate-folder-path = ["rust-embed-impl/interpolate-folder-path"]
-include-exclude = ["rust-embed-impl/include-exclude", "rust-embed-utils/include-exclude"]
-
-[badges]
-appveyor = { repository = "pyros2097/rust-embed" }
-travis-ci = { repository = "pyros2097/rust-embed" }
-is-it-maintained-issue-resolution = { repository = "pyros2097/rust-embed" }
-is-it-maintained-open-issues = { repository = "pyros2097/rust-embed" }
-maintenance = { status = "passively-maintained" }
+default = []
+debug-embed = ["rust-embed-for-web-impl/debug-embed", "rust-embed-for-web-utils/debug-embed"]
+interpolate-folder-path = ["rust-embed-for-web-impl/interpolate-folder-path"]
+include-exclude = ["rust-embed-for-web-impl/include-exclude", "rust-embed-for-web-utils/include-exclude"]
 
 [workspace]
 members = ["impl", "utils"]

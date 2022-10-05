@@ -1,4 +1,4 @@
-use rust_embed::{EmbeddedFile, RustEmbed};
+use rust_embed_for_web::{EmbeddedFile, RustEmbed};
 use std::{fs, time::SystemTime};
 
 use chrono::TimeZone;

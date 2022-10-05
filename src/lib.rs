@@ -2,13 +2,13 @@
 
 #[allow(unused_imports)]
 #[macro_use]
-extern crate rust_embed_impl;
-pub use rust_embed_impl::*;
+extern crate rust_embed_for_web_impl;
+pub use rust_embed_for_web_impl::*;
 
-pub use rust_embed_utils::{EmbeddedFile, Metadata};
+pub use rust_embed_for_web_utils::{EmbeddedFile, Metadata};
 
 #[doc(hidden)]
-pub extern crate rust_embed_utils as utils;
+pub extern crate rust_embed_for_web_utils as utils;
 
 /// A directory of binary assets.
 ///
@@ -18,7 +18,7 @@ pub extern crate rust_embed_utils as utils;
 ///
 /// This trait is meant to be derived like so:
 /// ```
-/// use rust_embed::RustEmbed;
+/// use rust_embed_for_web::RustEmbed;
 ///
 /// #[derive(RustEmbed)]
 /// #[folder = "examples/public/"]

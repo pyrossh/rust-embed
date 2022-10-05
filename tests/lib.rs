@@ -1,4 +1,4 @@
-use rust_embed::RustEmbed;
+use rust_embed_for_web::RustEmbed;
 
 /// Test doc comment
 #[derive(RustEmbed)]
@@ -35,7 +35,7 @@ fn iter_works() {
 fn trait_works_generic() {
   trait_works_generic_helper::<Asset>();
 }
-fn trait_works_generic_helper<E: rust_embed::RustEmbed>() {
+fn trait_works_generic_helper<E: rust_embed_for_web::RustEmbed>() {
   let mut num_files = 0;
   for file in E::iter() {
     assert!(E::get(file.as_ref()).is_some());

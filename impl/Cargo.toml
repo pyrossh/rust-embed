@@ -1,21 +1,18 @@
 [package]
-name = "rust-embed-impl"
-version = "6.3.0"
-description = "Rust Custom Derive Macro which loads files into the rust binary at compile time during release and loads the file from the fs during dev"
+name = "rust-embed-for-web-impl"
+version = "7.0.0"
 readme = "readme.md"
-documentation = "https://docs.rs/rust-embed"
-repository = "https://github.com/pyros2097/rust-embed"
+repository = "https://github.com/SeriousBug/rust-embed-for-web"
 license = "MIT"
 keywords = ["http", "rocket", "static", "web", "server"]
 categories = ["web-programming::http-server"]
-authors = ["pyros2097 <pyros2097@gmail.com>"]
 edition = "2018"
 
 [lib]
 proc-macro = true
 
 [dependencies]
-rust-embed-utils = { version = "7.3.0", path = "../utils"}
+rust-embed-for-web-utils = { version = "8.0.0", path = "../utils"}
 
 syn = { version = "1", default-features = false, features = ["derive", "parsing", "proc-macro"] }
 quote = "1"
@@ -30,4 +27,4 @@ optional = true
 debug-embed = []
 interpolate-folder-path = ["shellexpand"]
 compression = []
-include-exclude = ["rust-embed-utils/include-exclude"]
+include-exclude = ["rust-embed-for-web-utils/include-exclude"]

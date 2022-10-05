@@ -1,14 +1,8 @@
-name: tests
-on:
-  push:
-    branches:
-      - "main"
-  pull_request:
-    branches:
-      - "*"
+name: release
+on: workflow_dispatch
 jobs:
-  test:
-    name: test
+  tests:
+    name: tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,3 +18,12 @@ jobs:
         with:
           files: lcov.info
           fail_ci_if_error: true
+  release:
+    name: release
+    needs: [tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: cargo publish --token ${CRATES_TOKEN}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}

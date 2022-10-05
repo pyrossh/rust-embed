@@ -5,7 +5,6 @@ use flate2::write::GzEncoder;
 use flate2::Compression;
 use sha2::digest::generic_array::GenericArray;
 use sha2::Digest;
-use std::borrow::Cow;
 use std::io::Write;
 use std::path::Path;
 use std::time::SystemTime;
@@ -99,7 +98,7 @@ pub struct Metadata {
 
 impl Metadata {
   #[doc(hidden)]
-  pub fn __rust_embed_new(hash: &str, etag: &str, last_modified: Option<&str>, mime_type: Option<&str>) -> Self {
+  pub fn __rust_embed_for_web_new(hash: &str, etag: &str, last_modified: Option<&str>, mime_type: Option<&str>) -> Self {
     Self {
       hash: hash.to_string(),
       etag: etag.to_string(),
