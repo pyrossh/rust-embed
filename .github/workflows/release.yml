@@ -30,11 +30,21 @@ jobs:
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
         working-directory: utils
+      - name: wait for utils to finish publishing
+        # If we try to publish the next crate too quickly, it will fail to
+        # publish because it's not up on crates.io fully yet. We need to wait a
+        # bit until the previous crate is done publishing.
+        run: sleep 20s
       - name: Publish impl
         run: cargo publish --token ${CRATES_TOKEN}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
         working-directory: impl
+      - name: wait for impl to finish publishing
+        # If we try to publish the next crate too quickly, it will fail to
+        # publish because it's not up on crates.io fully yet. We need to wait a
+        # bit until the previous crate is done publishing.
+        run: sleep 20s
       - name: Publish main crate
         run: cargo publish --token ${CRATES_TOKEN}
         env:
