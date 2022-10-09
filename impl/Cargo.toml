@@ -1,5 +1,6 @@
 [package]
 name = "rust-embed-for-web-impl"
+description = "The proc-macro implementation of rust-embed-for-web."
 version = "7.0.0"
 readme = "readme.md"
 repository = "https://github.com/SeriousBug/rust-embed-for-web"
