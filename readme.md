@@ -1,4 +1,4 @@
-# Rust Embed for Web [![Build Status](https://github.com/SeriousBug/rust-embed-for-web/workflows/Test/badge.svg)](https://github.com/SeriousBug/rust-embed-for-web/actions?query=workflow%3ATest) [![crates.io](https://img.shields.io/crates/v/rust-embed-for-web.svg)](https://crates.io/crates/rust-embed-for-web)
+# Rust Embed for Web
 
 Rust Macro which embeds files into your executable. A fork of `rust-embed` with a focus on usage on web servers.
 
