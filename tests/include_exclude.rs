@@ -18,7 +18,6 @@ fn get_works() {
         AllAssets::get("images/llama.png").is_some(),
         "llama.png should exist"
     );
-    assert_eq!(AllAssets::iter().count(), 6);
 }
 
 #[derive(RustEmbed)]
@@ -41,7 +40,6 @@ fn including_some_assets_works() {
         IncludeSomeAssets::get("images/llama.png").is_some(),
         "llama.png should exist"
     );
-    assert_eq!(IncludeSomeAssets::iter().count(), 4);
 }
 
 #[derive(RustEmbed)]
@@ -64,7 +62,6 @@ fn excluding_some_assets_works() {
         ExcludeSomeAssets::get("images/llama.png").is_none(),
         "llama.png should not exist"
     );
-    assert_eq!(ExcludeSomeAssets::iter().count(), 2);
 }
 
 #[derive(RustEmbed)]
@@ -83,5 +80,4 @@ fn exclude_has_higher_priority() {
         ExcludePriorityAssets::get("images/llama.png").is_some(),
         "llama.png should exist"
     );
-    assert_eq!(ExcludePriorityAssets::iter().count(), 2);
 }
