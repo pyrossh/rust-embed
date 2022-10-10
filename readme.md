@@ -1,6 +1,6 @@
 # Rust Embed for Web
 
-Rust Macro which embeds files into your executable. A fork of `rust-embed` with a focus on usage on web servers.
+Rust Macro which embeds files into your executable. A fork of `rust-embed` with a focus on usage in web servers.
 
 ## Differences from `rust-embed`
 
@@ -11,9 +11,17 @@ executable in exchange for better performance at runtime. In particular:
   possible to serve files from a server, depending on whether the client accepts
   compression or not, without having to compress or decompress anything at
   runtime.
+  - If the compression makes little difference, for example a jpeg file won't
+    compress much further if at all, then the compressed version is skipped.
 - Some metadata that is useful for web headers like `ETag` and `Last-Modified`
   are computed ahead of time and embedded into the executable. This makes it
   possible to use these in a web server without any computation at runtime.
+- The file data is returned as a `&'static` reference. This makes is easy to use
+  the file data in a server response without creating copies or reference
+  counting.
+  - As a result, this fork doesn't have the "debug mode" feature that
+    dynamically looks up files, that just wouldn't be static! You will need to
+    recompile even during debugging to update embedded files.
 
 These differences can be useful for web servers, with the caveat that it will
 increase executable size beyond what the original `rust-embed` does. If you are
@@ -39,29 +47,17 @@ struct Asset;
 fn main() {
   let index_html = Asset::get("path/index.html").unwrap();
   println!("{:?}", std::str::from_utf8(index_html.data.as_ref()));
-
-  for file in Asset::iter() {
-      println!("{:?}", file.as_ref());
-  }
 }
 ```
 
-The path resolution for the `folder` works as follows:
-
-- In a `release` build, or when `debug-embed` feature is enabled, the folder path is resolved relative to where `Cargo.toml` is.
-- Otherwise, the folder path is resolved relative to where the binary is run from.
+The path resolution for the `folder` is resolved relative to where `Cargo.toml` is.
 
 ### The `prefix` attribute
 
 You can add `#[prefix = "my_prefix/"]` to the `RustEmbed` struct to add a prefix
-to all of the file paths. This prefix will be required on `get` calls, and will
-be included in the file paths returned by `iter`.
+to all of the file paths. This prefix will be required on `get` calls.
 
 ## Features
-
-### `debug-embed`
-
-Always embed the files in the binary, even in debug mode.
 
 ### `interpolate-folder-path`
 
@@ -88,24 +84,4 @@ Example:
 #[include = "images/*"]
 #[exclude = "*.txt"]
 struct Asset;
-```
-
-## Usage
-
-```rust
-use rust_embed_for_web::RustEmbed;
-
-#[derive(RustEmbed)]
-#[folder = "examples/public/"]
-#[prefix = "prefix/"]
-struct Asset;
-
-fn main() {
-  let index_html = Asset::get("prefix/index.html").unwrap();
-  println!("{:?}", std::str::from_utf8(index_html.data.as_ref()));
-
-  for file in Asset::iter() {
-      println!("{}", file.as_ref());
-  }
-}
 ```

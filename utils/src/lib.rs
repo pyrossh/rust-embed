@@ -10,7 +10,6 @@ use std::path::Path;
 use std::time::SystemTime;
 use std::{fs, io};
 
-#[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
 pub struct FileEntry {
     pub rel_path: String,
     pub full_canonical_path: String,
@@ -55,7 +54,6 @@ pub fn is_path_included(rel_path: &str, includes: &[&str], excludes: &[&str]) ->
     false
 }
 
-#[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
 pub fn get_files<'patterns>(
     folder_path: String,
     includes: &'patterns [&str],
@@ -91,6 +89,13 @@ pub fn get_files<'patterns>(
 
 /// A file embedded into the binary
 pub struct EmbeddedFile {
+    pub data: &'static [u8],
+    pub data_gzip: Option<&'static [u8]>,
+    pub metadata: Metadata,
+}
+
+/// A file, read from the file system
+pub struct ReadFile {
     pub data: Vec<u8>,
     pub data_gzip: Vec<u8>,
     pub metadata: Metadata,
@@ -145,7 +150,7 @@ impl Metadata {
     }
 }
 
-pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
+pub fn read_file_from_fs(file_path: &Path) -> io::Result<ReadFile> {
     let data = fs::read(file_path)?;
 
     // During debugging, use no compression to avoid causing slowdowns. For
@@ -154,7 +159,7 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
     let mut encoder = GzEncoder::new(
         Vec::new(),
         if cfg!(debug_assertions) {
-            Compression::none()
+            Compression::fast()
         } else {
             Compression::default()
         },
@@ -187,7 +192,7 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
         .first()
         .map(|mime| mime.to_string());
 
-    Ok(EmbeddedFile {
+    Ok(ReadFile {
         data,
         data_gzip,
         metadata: Metadata {

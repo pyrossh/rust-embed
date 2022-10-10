@@ -1,6 +1,6 @@
 [package]
 name = "rust-embed-for-web-utils"
-version = "8.0.0"
+version = "9.0.0"
 description = "Utilities for rust-embed-for-web"
 readme = "readme.md"
 repository = "https://github.com/SeriousBug/rust-embed-for-web"
@@ -25,5 +25,4 @@ version = "0.4.8"
 optional = true
 
 [features]
-debug-embed = []
 include-exclude = ["globset"]

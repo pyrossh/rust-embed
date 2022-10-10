@@ -9,5 +9,5 @@ struct Assets;
 /// the file system at runtime.
 #[test]
 fn path_traversal_attack_fails() {
-    assert!(Assets::get("../basic.rs").is_none());
+    assert!(Assets::get("../../Cargo.toml").is_none());
 }

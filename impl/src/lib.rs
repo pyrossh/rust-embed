@@ -4,6 +4,10 @@
 extern crate quote;
 extern crate proc_macro;
 
+/// Only include the gzipped version if it is at least this much smaller than
+/// the uncompressed version.
+const GZIP_INCLUDE_THRESHOLD: f64 = 0.95;
+
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use std::{env, path::Path};
@@ -37,16 +41,6 @@ fn embedded(
         });
     }
 
-    let array_len = list_values.len();
-
-    // If debug-embed is on, unconditionally include the code below. Otherwise,
-    // make it conditional on cfg(not(debug_assertions)).
-    let not_debug_attr = if cfg!(feature = "debug-embed") {
-        quote! {}
-    } else {
-        quote! { #[cfg(not(debug_assertions))]}
-    };
-
     let handle_prefix = if let Some(prefix) = prefix {
         quote! {
           let file_path = file_path.strip_prefix(#prefix)?;
@@ -56,7 +50,6 @@ fn embedded(
     };
 
     quote! {
-        #not_debug_attr
         impl #ident {
             /// Get an embedded file and its metadata.
             pub fn get(file_path: &str) -> Option<rust_embed_for_web::EmbeddedFile> {
@@ -66,111 +59,11 @@ fn embedded(
                   _ => None,
               }
             }
-
-            fn names() -> std::slice::Iter<'static, &'static str> {
-                const items: [&str; #array_len] = [#(#list_values),*];
-                items.iter()
-            }
-
-            /// Iterates over the file paths in the folder.
-            pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
-                Self::names().map(|x| std::borrow::Cow::from(*x))
-            }
         }
 
-        #not_debug_attr
         impl rust_embed_for_web::RustEmbed for #ident {
           fn get(file_path: &str) -> Option<rust_embed_for_web::EmbeddedFile> {
             #ident::get(file_path)
-          }
-          fn iter() -> rust_embed_for_web::Filenames {
-            rust_embed_for_web::Filenames::Embedded(#ident::names())
-          }
-        }
-    }
-}
-
-fn dynamic(
-    ident: &syn::Ident,
-    folder_path: String,
-    prefix: Option<&str>,
-    includes: &[String],
-    excludes: &[String],
-) -> TokenStream2 {
-    let (handle_prefix, map_iter) = if let Some(prefix) = prefix {
-        (
-            quote! { let file_path = file_path.strip_prefix(#prefix)?; },
-            quote! { std::borrow::Cow::Owned(format!("{}{}", #prefix, e.rel_path)) },
-        )
-    } else {
-        (
-            TokenStream2::new(),
-            quote! { std::borrow::Cow::from(e.rel_path) },
-        )
-    };
-
-    let declare_includes = quote! {
-      const includes: &[&str] = &[#(#includes),*];
-    };
-
-    let declare_excludes = quote! {
-      const excludes: &[&str] = &[#(#excludes),*];
-    };
-
-    let canonical_folder_path = Path::new(&folder_path)
-        .canonicalize()
-        .expect("folder path must resolve to an absolute path");
-    let canonical_folder_path = canonical_folder_path
-        .to_str()
-        .expect("absolute folder path must be valid unicode");
-
-    quote! {
-        #[cfg(debug_assertions)]
-        impl #ident {
-            /// Get an embedded file and its metadata.
-            pub fn get(file_path: &str) -> Option<rust_embed_for_web::EmbeddedFile> {
-                #handle_prefix
-
-                #declare_includes
-                #declare_excludes
-
-                let rel_file_path = file_path.replace("\\", "/");
-                let file_path = std::path::Path::new(#folder_path).join(&rel_file_path);
-
-                // Make sure the path requested does not escape the folder path
-                let canonical_file_path = file_path.canonicalize().ok()?;
-                if !canonical_file_path.starts_with(#canonical_folder_path) {
-                    // Tried to request a path that is not in the embedded folder
-                    return None;
-                }
-
-                if rust_embed_for_web::utils::is_path_included(&rel_file_path, includes, excludes) {
-                  rust_embed_for_web::utils::read_file_from_fs(&canonical_file_path).ok()
-                } else {
-                  None
-                }
-            }
-
-            /// Iterates over the file paths in the folder.
-            pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
-                use std::path::Path;
-
-                #declare_includes
-                #declare_excludes
-
-                rust_embed_for_web::utils::get_files(String::from(#folder_path), includes, excludes)
-                    .map(|e| #map_iter)
-            }
-        }
-
-        #[cfg(debug_assertions)]
-        impl rust_embed_for_web::RustEmbed for #ident {
-          fn get(file_path: &str) -> Option<rust_embed_for_web::EmbeddedFile> {
-            #ident::get(file_path)
-          }
-          fn iter() -> rust_embed_for_web::Filenames {
-            // the return type of iter() is unnamable, so we have to box it
-            rust_embed_for_web::Filenames::Dynamic(Box::new(#ident::iter()))
           }
         }
     }
@@ -190,15 +83,9 @@ fn generate_assets(
         &includes,
         &excludes,
     );
-    if cfg!(feature = "debug-embed") {
-        return embedded_impl;
-    }
-
-    let dynamic_impl = dynamic(ident, folder_path, prefix.as_deref(), &includes, &excludes);
 
     quote! {
         #embedded_impl
-        #dynamic_impl
     }
 }
 
@@ -217,16 +104,34 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
     };
 
     let data = file.data;
+    let data_len = data.len();
     let data_gzip = file.data_gzip;
+    let data_gzip_len = data_gzip.len();
 
-    // TODO: if data_gzip is bigger than data (or very close in size) then don't
-    // include it. data_gzip should be optional. This can happen with files that
-    // are very small, or that are in already-compressed formats like images or
-    // video.
+    // Sometimes, the gzipped data is barely any smaller than the original data
+    // or it may even be larger. This especially happens in files that are way
+    // too small, or files in already compressed formats like images and videos.
+    let include_data_gzip = data_gzip_len < (data_len as f64 * GZIP_INCLUDE_THRESHOLD) as usize;
+    let data_gzip_data_embed = if include_data_gzip {
+        quote! {
+            static data_gzip: [u8; #data_gzip_len] = [#(#data_gzip),*];
+        }
+    } else {
+        quote! {}
+    };
+    let data_gzip_value_embed = if include_data_gzip {
+        quote! {
+            Some(&data_gzip)
+        }
+    } else {
+        quote! {
+            None
+        }
+    };
 
     let embed_data = quote! {
-      let data = Vec::from([#(#data),*]);
-      let data_gzip = Vec::from([#(#data_gzip),*]);
+      static data: [u8; #data_len] = [#(#data),*];
+      #data_gzip_data_embed
     };
 
     quote! {
@@ -234,8 +139,8 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
           #embed_data
 
             Some(rust_embed_for_web::EmbeddedFile {
-                data,
-                data_gzip,
+                data: &data,
+                data_gzip: #data_gzip_value_embed,
                 metadata: rust_embed_for_web::Metadata::__rust_embed_for_web_new(#hash, #etag, #last_modified, #mime_type)
             })
         }
