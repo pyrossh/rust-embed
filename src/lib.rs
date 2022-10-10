@@ -29,4 +29,3 @@ pub trait RustEmbed {
     /// Get an embedded file and its metadata.
     fn get(file_path: &str) -> Option<EmbeddedFile>;
 }
-

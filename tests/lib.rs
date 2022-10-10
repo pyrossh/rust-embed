@@ -48,7 +48,7 @@ fn file_contents_work() {
 fn gzipped_file_contents_work() {
     let index = Asset::get("index.html").unwrap();
     let index_data_compressed = index.data_gzip.unwrap();
-    
+
     let mut gz = flate2::read::GzDecoder::new(index_data_compressed);
     let mut index_data = String::new();
 
