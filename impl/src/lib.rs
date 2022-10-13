@@ -98,6 +98,10 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
         Some(last_modified) => quote! { Some(#last_modified) },
         None => quote! { None },
     };
+    let last_modified_timestamp = match file.metadata.last_modified_timestamp() {
+        Some(last_modified) => quote! { Some(#last_modified) },
+        None => quote! { None },
+    };
     let mime_type = match file.metadata.mime_type() {
         Some(mime_type) => quote! { Some(#mime_type ) },
         None => quote! { None },
@@ -141,7 +145,7 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
             Some(rust_embed_for_web::EmbeddedFile {
                 data: &data,
                 data_gzip: #data_gzip_value_embed,
-                metadata: rust_embed_for_web::Metadata::__rust_embed_for_web_new(#hash, #etag, #last_modified, #mime_type)
+                metadata: rust_embed_for_web::Metadata::__rust_embed_for_web_new(#hash, #etag, #last_modified, #last_modified_timestamp, #mime_type)
             })
         }
     }
