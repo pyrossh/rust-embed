@@ -106,6 +106,7 @@ pub struct Metadata {
     hash: String,
     etag: String,
     last_modified: Option<String>,
+    last_modified_timestamp: Option<i64>,
     mime_type: Option<String>,
 }
 
@@ -115,12 +116,14 @@ impl Metadata {
         hash: &str,
         etag: &str,
         last_modified: Option<&str>,
+        last_modified_timestamp: Option<i64>,
         mime_type: Option<&str>,
     ) -> Self {
         Self {
             hash: hash.to_string(),
             etag: etag.to_string(),
             last_modified: last_modified.map(str::to_string),
+            last_modified_timestamp,
             mime_type: mime_type.map(str::to_string),
         }
     }
@@ -143,6 +146,11 @@ impl Metadata {
     /// timestamps.
     pub fn last_modified(&self) -> Option<&str> {
         self.last_modified.as_ref().map(String::as_str)
+    }
+
+    /// The last modified date for the file, as a timestamp.
+    pub fn last_modified_timestamp(&self) -> Option<i64> {
+        self.last_modified_timestamp
     }
 
     pub fn mime_type(&self) -> Option<&str> {
@@ -186,7 +194,7 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<ReadFile> {
                 .and_then(|value| SystemTime::UNIX_EPOCH.duration_since(value).ok())
                 .map(|value| (-1) * (value.as_secs() as i64))
         })
-        .map(|timestamp| chrono::Utc.timestamp(timestamp, 0).to_rfc2822());
+        .map(|timestamp| chrono::Utc.timestamp(timestamp, 0));
 
     let mime_type = new_mime_guess::from_path(file_path)
         .first()
@@ -198,7 +206,8 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<ReadFile> {
         metadata: Metadata {
             etag: format!("\"{hash}\""),
             hash,
-            last_modified,
+            last_modified: last_modified.map(|v| v.to_rfc2822()),
+            last_modified_timestamp: last_modified.map(|v| v.timestamp()),
             mime_type,
         },
     })
