@@ -13,6 +13,8 @@ executable in exchange for better performance at runtime. In particular:
   runtime.
   - If the compression makes little difference, for example a jpeg file won't
     compress much further if at all, then the compressed version is skipped.
+  - You can also disable this behavior by adding an attribute `#[gzip = false]`.
+    When disabled, the compressed files won't be included for that embed.
 - Some metadata that is useful for web headers like `ETag` and `Last-Modified`
   are computed ahead of time and embedded into the executable. This makes it
   possible to use these in a web server without any computation at runtime.
@@ -56,6 +58,13 @@ The path resolution for the `folder` is resolved relative to where `Cargo.toml` 
 
 You can add `#[prefix = "my_prefix/"]` to the `RustEmbed` struct to add a prefix
 to all of the file paths. This prefix will be required on `get` calls.
+
+### The `gzip` attribute
+
+You can add `#[gzip = false]` to the `RustEmbed` struct to disable gzip
+compression for the files in that embed. Only files where the compression
+reduces the file size is compressed already; but you can completely disable gzip
+compression if you are concerned with file sizes.
 
 ## Features
 

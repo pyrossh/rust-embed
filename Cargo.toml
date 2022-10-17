@@ -1,6 +1,6 @@
 [package]
 name = "rust-embed-for-web"
-version = "8.1.0"
+version = "9.0.0"
 description = "Rust Macro which embeds files into your executable. A fork of `rust-embed` with a focus on usage on web servers."
 readme = "readme.md"
 documentation = "https://docs.rs/rust-embed"
@@ -22,8 +22,8 @@ required-features = ["include-exclude"]
 
 [dependencies]
 walkdir = "2.3.1"
-rust-embed-for-web-impl = { version = "8.1.0", path = "impl"}
-rust-embed-for-web-utils = { version = "9.1.0", path = "utils"}
+rust-embed-for-web-impl = { version = "9.0.0", path = "impl"}
+rust-embed-for-web-utils = { version = "10.0.0", path = "utils"}
 
 [dev-dependencies]
 chrono = "0.4"

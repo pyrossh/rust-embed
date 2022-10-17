@@ -1,6 +1,6 @@
 [package]
 name = "rust-embed-for-web-utils"
-version = "9.1.0"
+version = "10.0.0"
 description = "Utilities for rust-embed-for-web"
 readme = "readme.md"
 repository = "https://github.com/SeriousBug/rust-embed-for-web"

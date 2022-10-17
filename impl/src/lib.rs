@@ -19,6 +19,7 @@ fn embedded(
     prefix: Option<&str>,
     includes: &[String],
     excludes: &[String],
+    gzip: bool
 ) -> TokenStream2 {
     extern crate rust_embed_for_web_utils;
 
@@ -32,7 +33,7 @@ fn embedded(
         full_canonical_path,
     } in rust_embed_for_web_utils::get_files(folder_path, &includes, &excludes)
     {
-        match_values.push(embed_file(&rel_path, &full_canonical_path));
+        match_values.push(embed_file(&rel_path, &full_canonical_path, gzip));
 
         list_values.push(if let Some(prefix) = prefix {
             format!("{}{}", prefix, rel_path)
@@ -75,6 +76,7 @@ fn generate_assets(
     prefix: Option<String>,
     includes: Vec<String>,
     excludes: Vec<String>,
+    gzip: bool,
 ) -> TokenStream2 {
     let embedded_impl = embedded(
         ident,
@@ -82,6 +84,7 @@ fn generate_assets(
         prefix.as_deref(),
         &includes,
         &excludes,
+        gzip,
     );
 
     quote! {
@@ -89,20 +92,20 @@ fn generate_assets(
     }
 }
 
-fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
+fn embed_file(rel_path: &str, full_canonical_path: &str, gzip: bool) -> TokenStream2 {
     let file = rust_embed_for_web_utils::read_file_from_fs(Path::new(full_canonical_path))
         .expect("File should be readable");
-    let hash = file.metadata.sha256_hash();
-    let etag = file.metadata.etag();
-    let last_modified = match file.metadata.last_modified() {
+    let hash = file.metadata.hash;
+    let etag = file.metadata.etag;
+    let last_modified = match file.metadata.last_modified {
         Some(last_modified) => quote! { Some(#last_modified) },
         None => quote! { None },
     };
-    let last_modified_timestamp = match file.metadata.last_modified_timestamp() {
+    let last_modified_timestamp = match file.metadata.last_modified_timestamp {
         Some(last_modified) => quote! { Some(#last_modified) },
         None => quote! { None },
     };
-    let mime_type = match file.metadata.mime_type() {
+    let mime_type = match file.metadata.mime_type {
         Some(mime_type) => quote! { Some(#mime_type ) },
         None => quote! { None },
     };
@@ -115,7 +118,7 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
     // Sometimes, the gzipped data is barely any smaller than the original data
     // or it may even be larger. This especially happens in files that are way
     // too small, or files in already compressed formats like images and videos.
-    let include_data_gzip = data_gzip_len < (data_len as f64 * GZIP_INCLUDE_THRESHOLD) as usize;
+    let include_data_gzip = data_gzip_len < (data_len as f64 * GZIP_INCLUDE_THRESHOLD) as usize && gzip;
     let data_gzip_data_embed = if include_data_gzip {
         quote! {
             static data_gzip: [u8; #data_gzip_len] = [#(#data_gzip),*];
@@ -145,7 +148,7 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
             Some(rust_embed_for_web::EmbeddedFile {
                 data: &data,
                 data_gzip: #data_gzip_value_embed,
-                metadata: rust_embed_for_web::Metadata::__rust_embed_for_web_new(#hash, #etag, #last_modified, #last_modified_timestamp, #mime_type)
+                metadata: rust_embed_for_web::Metadata { hash: #hash, etag: #etag, last_modified: #last_modified, last_modified_timestamp: #last_modified_timestamp, mime_type: #mime_type }
             })
         }
     }
@@ -184,6 +187,7 @@ fn impl_rust_embed_for_web(ast: &syn::DeriveInput) -> TokenStream2 {
     let prefix = find_attribute_values(ast, "prefix").into_iter().next();
     let includes = find_attribute_values(ast, "include");
     let excludes = find_attribute_values(ast, "exclude");
+    let gzip: Option<bool> = find_attribute_values(ast, "gzip").into_iter().next().map(|v| v.parse().expect("Value for the gzip attribute must be true or false"));
 
     #[cfg(feature = "interpolate-folder-path")]
     let folder_path = shellexpand::full(&folder_path).unwrap().to_string();
@@ -199,7 +203,7 @@ fn impl_rust_embed_for_web(ast: &syn::DeriveInput) -> TokenStream2 {
         folder_path
     };
 
-    generate_assets(&ast.ident, folder_path, prefix, includes, excludes)
+    generate_assets(&ast.ident, folder_path, prefix, includes, excludes, gzip.unwrap_or(true))
 }
 
 #[proc_macro_derive(RustEmbed, attributes(folder, prefix, include, exclude))]

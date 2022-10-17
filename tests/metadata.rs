@@ -11,7 +11,7 @@ struct Asset;
 fn hash_is_accurate() {
     let index_file: EmbeddedFile = Asset::get("index.html").expect("index.html exists");
 
-    let hash = index_file.metadata.sha256_hash();
+    let hash = index_file.metadata.hash;
     assert_eq!(hash, "l@tew^Cz<vw>3!wg?Q}D1@!!8DX+Hwg&-~7mA~T$");
 }
 
@@ -35,7 +35,7 @@ fn last_modified_is_accurate() {
         .to_rfc2822();
 
     assert_eq!(
-        index_file.metadata.last_modified(),
+        index_file.metadata.last_modified,
         Some(expected_datetime.as_str())
     );
 }

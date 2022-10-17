@@ -1,3 +1,3 @@
 # Rust Embed Utilities
 
-The utilities used by rust-embed and rust-embed-impl lie here.
+The utilities used by rust-embed-for-web and rust-embed-for-web-impl lie here.

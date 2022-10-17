@@ -98,64 +98,25 @@ pub struct EmbeddedFile {
 pub struct ReadFile {
     pub data: Vec<u8>,
     pub data_gzip: Vec<u8>,
-    pub metadata: Metadata,
+    pub metadata: ReadMetadata,
 }
 
 /// Metadata about an embedded file
 pub struct Metadata {
-    hash: String,
-    etag: String,
-    last_modified: Option<String>,
-    last_modified_timestamp: Option<i64>,
-    mime_type: Option<String>,
+    pub hash: &'static str,
+    pub etag: &'static str,
+    pub last_modified: Option<&'static str>,
+    pub last_modified_timestamp: Option<i64>,
+    pub mime_type: Option<&'static str>,
 }
 
-impl Metadata {
-    #[doc(hidden)]
-    pub fn __rust_embed_for_web_new(
-        hash: &str,
-        etag: &str,
-        last_modified: Option<&str>,
-        last_modified_timestamp: Option<i64>,
-        mime_type: Option<&str>,
-    ) -> Self {
-        Self {
-            hash: hash.to_string(),
-            etag: etag.to_string(),
-            last_modified: last_modified.map(str::to_string),
-            last_modified_timestamp,
-            mime_type: mime_type.map(str::to_string),
-        }
-    }
-
-    /// The SHA256 hash of the file contents, base64 encoded.
-    pub fn sha256_hash(&self) -> &str {
-        self.hash.as_str()
-    }
-
-    /// The `sha256_hash`, surrounded by quotes. This is the format required in
-    /// `ETag` headers.
-    pub fn etag(&self) -> &str {
-        self.etag.as_str()
-    }
-
-    /// The last modified date in the rfc2822 format. This is the format required
-    /// in `Last-Modified` headers.
-    ///
-    /// This may be None on some platforms that don't support last modified
-    /// timestamps.
-    pub fn last_modified(&self) -> Option<&str> {
-        self.last_modified.as_ref().map(String::as_str)
-    }
-
-    /// The last modified date for the file, as a timestamp.
-    pub fn last_modified_timestamp(&self) -> Option<i64> {
-        self.last_modified_timestamp
-    }
-
-    pub fn mime_type(&self) -> Option<&str> {
-        self.mime_type.as_ref().map(String::as_str)
-    }
+/// Metadata about a file read from the filesystem
+pub struct ReadMetadata {
+    pub hash: String,
+    pub etag: String,
+    pub last_modified: Option<String>,
+    pub last_modified_timestamp: Option<i64>,
+    pub mime_type: Option<String>,
 }
 
 pub fn read_file_from_fs(file_path: &Path) -> io::Result<ReadFile> {
@@ -203,7 +164,7 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<ReadFile> {
     Ok(ReadFile {
         data,
         data_gzip,
-        metadata: Metadata {
+        metadata: ReadMetadata {
             etag: format!("\"{hash}\""),
             hash,
             last_modified: last_modified.map(|v| v.to_rfc2822()),

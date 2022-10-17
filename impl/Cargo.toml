@@ -1,7 +1,7 @@
 [package]
 name = "rust-embed-for-web-impl"
 description = "The proc-macro implementation of rust-embed-for-web."
-version = "8.1.0"
+version = "9.0.0"
 readme = "readme.md"
 repository = "https://github.com/SeriousBug/rust-embed-for-web"
 license = "MIT"
@@ -13,7 +13,7 @@ edition = "2018"
 proc-macro = true
 
 [dependencies]
-rust-embed-for-web-utils = { version = "9.1.0", path = "../utils"}
+rust-embed-for-web-utils = { version = "10.0.0", path = "../utils"}
 
 syn = { version = "1", default-features = false, features = ["derive", "parsing", "proc-macro"] }
 quote = "1"
