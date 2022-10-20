@@ -231,6 +231,11 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
   let includes = find_attribute_values(ast, "include");
   let excludes = find_attribute_values(ast, "exclude");
 
+  #[cfg(not(feature = "include-exclude"))]
+  if !includes.is_empty() || !excludes.is_empty() {
+    panic!("Please turn on the `include-exclude` feature to use the `include` and `exclude` attributes")
+  }
+
   #[cfg(feature = "interpolate-folder-path")]
   let folder_path = shellexpand::full(&folder_path).unwrap().to_string();
 
