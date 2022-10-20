@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [6.4.2] - 2022-10-20
+
+- Fail the proc macro if include/exclude are used without the feature [#187](https://github.com/pyrossh/rust-embed/issues/187)
+
 ## [6.4.1] - 2022-09-13
 
 - Update sha2 dependency version in utils crate [#186](https://github.com/pyrossh/rust-embed/issues/186)
