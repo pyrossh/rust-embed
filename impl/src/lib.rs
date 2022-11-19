@@ -6,7 +6,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
-use std::{env, path::Path};
+use std::{env, fs, path::Path};
 use syn::{Data, DeriveInput, Fields, Lit, Meta, MetaNameValue};
 
 fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String]) -> TokenStream2 {
@@ -170,6 +170,7 @@ fn generate_assets(ident: &syn::Ident, folder_path: String, prefix: Option<Strin
 fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   let file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect("File should be readable");
   let hash = file.metadata.sha256_hash();
+  let is_dir = file.metadata.is_dir();
   let last_modified = match file.metadata.last_modified() {
     Some(last_modified) => quote! { Some(#last_modified) },
     None => quote! { None },
@@ -192,7 +193,8 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
 
           Some(rust_embed::EmbeddedFile {
               data: std::borrow::Cow::from(bytes),
-              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified)
+              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified),
+              is_dir: #is_dir
           })
       }
   }
