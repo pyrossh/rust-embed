@@ -193,8 +193,7 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
 
           Some(rust_embed::EmbeddedFile {
               data: std::borrow::Cow::from(bytes),
-              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified),
-              is_dir: #is_dir
+              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified, #is_dir),
           })
       }
   }
