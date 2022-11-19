@@ -6,7 +6,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
-use std::{env, fs, path::Path};
+use std::{env, path::Path};
 use syn::{Data, DeriveInput, Fields, Lit, Meta, MetaNameValue};
 
 fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String]) -> TokenStream2 {
