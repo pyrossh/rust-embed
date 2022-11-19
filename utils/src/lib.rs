@@ -87,12 +87,13 @@ pub struct EmbeddedFile {
 pub struct Metadata {
   hash: [u8; 32],
   last_modified: Option<u64>,
+  is_dir: bool,
 }
 
 impl Metadata {
   #[doc(hidden)]
-  pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>) -> Self {
-    Self { hash, last_modified }
+  pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>, is_dir: bool) -> Self {
+    Self { hash, last_modified, is_dir }
   }
 
   /// The SHA256 hash of the file
@@ -105,6 +106,9 @@ impl Metadata {
   pub fn last_modified(&self) -> Option<u64> {
     self.last_modified
   }
+
+  /// Check if an entry is a directory
+  pub fn is_dir(&self) -> bool { self.is_dir }
 }
 
 pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
@@ -132,6 +136,7 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
     metadata: Metadata {
       hash,
       last_modified: source_date_epoch.or(last_modified),
+      is_dir: fs::metadata(file_path)?.is_dir(),
     },
   })
 }
