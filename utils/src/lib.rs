@@ -108,7 +108,9 @@ impl Metadata {
   }
 
   /// Check if an entry is a directory
-  pub fn is_dir(&self) -> bool { self.is_dir }
+  pub fn is_dir(&self) -> bool {
+    self.is_dir
+  }
 }
 
 pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
