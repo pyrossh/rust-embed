@@ -17,7 +17,12 @@ fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, inclu
 
   let includes: Vec<&str> = includes.iter().map(AsRef::as_ref).collect();
   let excludes: Vec<&str> = excludes.iter().map(AsRef::as_ref).collect();
-  for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path, &includes, &excludes) {
+  for rust_embed_utils::FileEntry {
+    rel_path,
+    full_canonical_path,
+    is_dir: _,
+  } in rust_embed_utils::get_files(folder_path, &includes, &excludes)
+  {
     match_values.push(embed_file(&rel_path, &full_canonical_path));
 
     list_values.push(if let Some(prefix) = prefix {
@@ -176,14 +181,18 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
     None => quote! { None },
   };
 
-  let embedding_code = if cfg!(feature = "compression") {
+  let embedding_code = if cfg!(feature = "compression") && !is_dir {
     quote! {
       rust_embed::flate!(static FILE: [u8] from #full_canonical_path);
       let bytes = &FILE[..];
     }
-  } else {
+  } else if !is_dir {
     quote! {
       let bytes = &include_bytes!(#full_canonical_path)[..];
+    }
+  } else {
+    quote! {
+      let bytes = Vec::new();
     }
   };
 

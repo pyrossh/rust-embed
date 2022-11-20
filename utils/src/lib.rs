@@ -10,6 +10,7 @@ use std::{fs, io};
 pub struct FileEntry {
   pub rel_path: String,
   pub full_canonical_path: String,
+  pub is_dir: bool,
 }
 
 #[cfg(not(feature = "include-exclude"))]
@@ -58,10 +59,10 @@ pub fn get_files<'patterns>(folder_path: String, includes: &'patterns [&str], ex
     .sort_by_file_name()
     .into_iter()
     .filter_map(|e| e.ok())
-    .filter(|e| e.file_type().is_file())
     .filter_map(move |e| {
       let rel_path = path_to_str(e.path().strip_prefix(&folder_path).unwrap());
       let full_canonical_path = path_to_str(std::fs::canonicalize(e.path()).expect("Could not get canonical path"));
+      let is_dir = e.file_type().is_dir();
 
       let rel_path = if std::path::MAIN_SEPARATOR == '\\' {
         rel_path.replace('\\', "/")
@@ -70,7 +71,11 @@ pub fn get_files<'patterns>(folder_path: String, includes: &'patterns [&str], ex
       };
 
       if is_path_included(&rel_path, includes, excludes) {
-        Some(FileEntry { rel_path, full_canonical_path })
+        Some(FileEntry {
+          rel_path,
+          full_canonical_path,
+          is_dir,
+        })
       } else {
         None
       }
