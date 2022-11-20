@@ -114,7 +114,7 @@ impl Metadata {
 }
 
 pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
-  let data = fs::read(file_path)?;
+  let data = if !file_path.is_dir() { fs::read(file_path)? } else { Vec::new() };
   let data = Cow::from(data);
 
   let mut hasher = sha2::Sha256::new();

@@ -10,6 +10,7 @@ fn get_works() {
   assert!(Asset::get("index.html").is_some(), "index.html should exist");
   assert!(Asset::get("gg.html").is_none(), "gg.html should not exist");
   assert!(Asset::get("images/llama.png").is_some(), "llama.png should exist");
+  assert!(Asset::get("images").is_some(), "images should exist");
 }
 
 /// Using Windows-style path separators (`\`) is acceptable

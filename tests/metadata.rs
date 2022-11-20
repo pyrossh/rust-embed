@@ -25,3 +25,14 @@ fn last_modified_is_accurate() {
 
   assert_eq!(index_file.metadata.last_modified(), Some(expected_datetime_utc));
 }
+
+#[test]
+fn is_dir_is_accurate() {
+  let index_file: EmbeddedFile = Asset::get("index.html").expect("index.html exists");
+  let doc_file: EmbeddedFile = Asset::get("images/doc.txt").expect("doc.txt exists");
+  let images_folder: EmbeddedFile = Asset::get("images/").expect("images exists");
+
+  assert_eq!(index_file.metadata.is_dir(), false);
+  assert_eq!(doc_file.metadata.is_dir(), false);
+  assert!(images_folder.metadata.is_dir());
+}
