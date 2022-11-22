@@ -17,7 +17,12 @@ fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, inclu
 
   let includes: Vec<&str> = includes.iter().map(AsRef::as_ref).collect();
   let excludes: Vec<&str> = excludes.iter().map(AsRef::as_ref).collect();
-  for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(folder_path, &includes, &excludes) {
+  for rust_embed_utils::FileEntry {
+    rel_path,
+    full_canonical_path,
+    is_dir: _,
+  } in rust_embed_utils::get_files(folder_path, &includes, &excludes)
+  {
     match_values.push(embed_file(&rel_path, &full_canonical_path));
 
     list_values.push(if let Some(prefix) = prefix {
@@ -170,19 +175,24 @@ fn generate_assets(ident: &syn::Ident, folder_path: String, prefix: Option<Strin
 fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   let file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect("File should be readable");
   let hash = file.metadata.sha256_hash();
+  let is_dir = file.metadata.is_dir();
   let last_modified = match file.metadata.last_modified() {
     Some(last_modified) => quote! { Some(#last_modified) },
     None => quote! { None },
   };
 
-  let embedding_code = if cfg!(feature = "compression") {
+  let embedding_code = if cfg!(feature = "compression") && !is_dir {
     quote! {
       rust_embed::flate!(static FILE: [u8] from #full_canonical_path);
       let bytes = &FILE[..];
     }
-  } else {
+  } else if !is_dir {
     quote! {
       let bytes = &include_bytes!(#full_canonical_path)[..];
+    }
+  } else {
+    quote! {
+      let bytes = Vec::new();
     }
   };
 
@@ -192,7 +202,7 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
 
           Some(rust_embed::EmbeddedFile {
               data: std::borrow::Cow::from(bytes),
-              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified)
+              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified, #is_dir),
           })
       }
   }

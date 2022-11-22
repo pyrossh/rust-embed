@@ -10,6 +10,7 @@ use std::{fs, io};
 pub struct FileEntry {
   pub rel_path: String,
   pub full_canonical_path: String,
+  pub is_dir: bool,
 }
 
 #[cfg(not(feature = "include-exclude"))]
@@ -58,10 +59,10 @@ pub fn get_files<'patterns>(folder_path: String, includes: &'patterns [&str], ex
     .sort_by_file_name()
     .into_iter()
     .filter_map(|e| e.ok())
-    .filter(|e| e.file_type().is_file())
     .filter_map(move |e| {
       let rel_path = path_to_str(e.path().strip_prefix(&folder_path).unwrap());
       let full_canonical_path = path_to_str(std::fs::canonicalize(e.path()).expect("Could not get canonical path"));
+      let is_dir = e.file_type().is_dir();
 
       let rel_path = if std::path::MAIN_SEPARATOR == '\\' {
         rel_path.replace('\\', "/")
@@ -70,7 +71,11 @@ pub fn get_files<'patterns>(folder_path: String, includes: &'patterns [&str], ex
       };
 
       if is_path_included(&rel_path, includes, excludes) {
-        Some(FileEntry { rel_path, full_canonical_path })
+        Some(FileEntry {
+          rel_path,
+          full_canonical_path,
+          is_dir,
+        })
       } else {
         None
       }
@@ -87,12 +92,13 @@ pub struct EmbeddedFile {
 pub struct Metadata {
   hash: [u8; 32],
   last_modified: Option<u64>,
+  is_dir: bool,
 }
 
 impl Metadata {
   #[doc(hidden)]
-  pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>) -> Self {
-    Self { hash, last_modified }
+  pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>, is_dir: bool) -> Self {
+    Self { hash, last_modified, is_dir }
   }
 
   /// The SHA256 hash of the file
@@ -105,10 +111,15 @@ impl Metadata {
   pub fn last_modified(&self) -> Option<u64> {
     self.last_modified
   }
+
+  /// Check if an entry is a directory
+  pub fn is_dir(&self) -> bool {
+    self.is_dir
+  }
 }
 
 pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
-  let data = fs::read(file_path)?;
+  let data = if !file_path.is_dir() { fs::read(file_path)? } else { Vec::new() };
   let data = Cow::from(data);
 
   let mut hasher = sha2::Sha256::new();
@@ -132,6 +143,7 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
     metadata: Metadata {
       hash,
       last_modified: source_date_epoch.or(last_modified),
+      is_dir: fs::metadata(file_path)?.is_dir(),
     },
   })
 }
