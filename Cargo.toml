@@ -1,6 +1,6 @@
 [package]
 name = "rust-embed"
-version = "6.4.2"
+version = "6.5.0"
 description = "Rust Custom Derive Macro which loads files into the rust binary at compile time during release and loads the file from the fs during dev"
 readme = "readme.md"
 documentation = "https://docs.rs/rust-embed"
@@ -53,8 +53,8 @@ required-features = ["include-exclude"]
 
 [dependencies]
 walkdir = "2.3.1"
-rust-embed-impl = { version = "6.3.1", path = "impl"}
-rust-embed-utils = { version = "7.3.0", path = "utils"}
+rust-embed-impl = { version = "6.4.0", path = "impl"}
+rust-embed-utils = { version = "7.4.0", path = "utils"}
 
 include-flate = { version = "0.1", optional = true, features = ["stable"] }
 actix-web = { version = "4", optional = true }
