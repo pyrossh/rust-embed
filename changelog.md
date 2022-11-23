@@ -7,10 +7,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
-## [6.5.0] - 2022-11-22
-
-- Add is_dir to File metadata [#170](https://github.com/pyrossh/rust-embed/issues/170). Thanks to [jaztec](https://github.com/jaztec)
-
 ## [6.4.2] - 2022-10-20
 
 - Fail the proc macro if include/exclude are used without the feature [#187](https://github.com/pyrossh/rust-embed/issues/187)
