@@ -41,6 +41,11 @@ name = "poem"
 path = "examples/poem.rs"
 required-features = ["poem-ex"]
 
+[[example]]
+name = "salvo"
+path = "examples/salvo.rs"
+required-features = ["salvo-ex"]
+
 [[test]]
 name = "interpolated_path"
 path = "tests/interpolated_path.rs"
