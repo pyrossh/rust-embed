@@ -1,8 +1,7 @@
 use axum::{
   body::{boxed, Full},
-  handler::Handler,
   http::{header, StatusCode, Uri},
-  response::Response,
+  response::{IntoResponse, Response},
   routing::Router,
 };
 use rust_embed::RustEmbed;
@@ -16,14 +15,14 @@ struct Assets;
 
 #[tokio::main]
 async fn main() {
-  let app = Router::new().fallback(static_handler.into_service());
+  let app = Router::new().fallback(static_handler);
 
   let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
   println!("listening on {}", addr);
   axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
 }
 
-async fn static_handler(uri: Uri) -> Response {
+async fn static_handler(uri: Uri) -> impl IntoResponse {
   let path = uri.path().trim_start_matches('/');
 
   if path.is_empty() || path == INDEX_HTML {
