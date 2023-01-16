@@ -87,12 +87,21 @@ pub struct EmbeddedFile {
 pub struct Metadata {
   hash: [u8; 32],
   last_modified: Option<u64>,
+  #[cfg(feature = "mime-guess")]
+  mimetype: Cow<'static, str>,
 }
 
 impl Metadata {
   #[doc(hidden)]
+  #[cfg(not(feature = "mime-guess"))]
   pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>) -> Self {
     Self { hash, last_modified }
+  }
+
+  #[doc(hidden)]
+  #[cfg(feature = "mime-guess")]
+  pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>, mimetype: &'static str) -> Self {
+    Self { hash, last_modified, mimetype: mimetype.into() }
   }
 
   /// The SHA256 hash of the file
@@ -104,6 +113,12 @@ impl Metadata {
   /// platform/file-system does not support this, None is returned.
   pub fn last_modified(&self) -> Option<u64> {
     self.last_modified
+  }
+
+  /// The mime type of the file
+  #[cfg(feature = "mime-guess")]
+  pub fn mimetype(&self) -> &Cow<str> {
+    &self.mimetype
   }
 }
 
@@ -127,11 +142,16 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
       .as_secs()
   });
 
+  #[cfg(feature = "mime-guess")]
+  let mimetype = mime_guess::from_path(file_path).first_or_octet_stream().to_string();
+
   Ok(EmbeddedFile {
     data,
     metadata: Metadata {
       hash,
       last_modified: source_date_epoch.or(last_modified),
+      #[cfg(feature = "mime-guess")]
+      mimetype: mimetype.into(),
     },
   })
 }

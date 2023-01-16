@@ -79,6 +79,7 @@ sha2 = "0.10"
 debug-embed = ["rust-embed-impl/debug-embed", "rust-embed-utils/debug-embed"]
 interpolate-folder-path = ["rust-embed-impl/interpolate-folder-path"]
 compression = ["rust-embed-impl/compression", "include-flate"]
+mime-guess = ["rust-embed-impl/mime-guess"]
 include-exclude = ["rust-embed-impl/include-exclude", "rust-embed-utils/include-exclude"]
 actix = ["actix-web", "mime_guess"]
 warp-ex = ["warp", "tokio", "mime_guess"]

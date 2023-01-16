@@ -174,6 +174,12 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
     Some(last_modified) => quote! { Some(#last_modified) },
     None => quote! { None },
   };
+  let mimetype = if cfg!(feature = "mime-guess") {
+    let mt = file.metadata.mimetype().to_string();
+    quote! { #mt }
+  } else {
+    quote! { None }
+  };
 
   let embedding_code = if cfg!(feature = "compression") {
     quote! {
@@ -192,7 +198,7 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
 
           Some(rust_embed::EmbeddedFile {
               data: std::borrow::Cow::from(bytes),
-              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified)
+              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified, #mimetype)
           })
       }
   }
