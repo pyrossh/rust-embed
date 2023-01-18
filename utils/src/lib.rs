@@ -101,7 +101,11 @@ impl Metadata {
   #[doc(hidden)]
   #[cfg(feature = "mime-guess")]
   pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>, mimetype: &'static str) -> Self {
-    Self { hash, last_modified, mimetype: mimetype.into() }
+    Self {
+      hash,
+      last_modified,
+      mimetype: mimetype.into(),
+    }
   }
 
   /// The SHA256 hash of the file
