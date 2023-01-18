@@ -174,12 +174,13 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
     Some(last_modified) => quote! { Some(#last_modified) },
     None => quote! { None },
   };
-  let mimetype = if cfg!(feature = "mime-guess") {
+  #[cfg(feature = "mime-guess")]
+  let mimetype = {
     let mt = file.metadata.mimetype().to_string();
-    quote! { #mt }
-  } else {
-    quote! { None }
+    quote! { Some(#mt) }
   };
+  #[cfg(not(feature = "mime-guess"))]
+  let mimetype = quote! { None };
 
   let embedding_code = if cfg!(feature = "compression") {
     quote! {
