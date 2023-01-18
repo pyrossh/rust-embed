@@ -56,6 +56,11 @@ name = "include_exclude"
 path = "tests/include_exclude.rs"
 required-features = ["include-exclude"]
 
+[[test]]
+name = "mime_guess"
+path = "tests/mime_guess.rs"
+required-features = ["mime-guess"]
+
 [dependencies]
 walkdir = "2.3.1"
 rust-embed-impl = { version = "6.3.1", path = "impl"}
