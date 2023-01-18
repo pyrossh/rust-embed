@@ -175,10 +175,7 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
     None => quote! { None },
   };
   #[cfg(feature = "mime-guess")]
-  let mimetype = {
-    let mt = file.metadata.mimetype();
-    quote! { #mt }
-  };
+  let mimetype = file.metadata.mimetype();
   #[cfg(not(feature = "mime-guess"))]
   let mimetype = quote! { None };
 
