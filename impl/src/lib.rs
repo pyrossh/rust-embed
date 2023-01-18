@@ -176,10 +176,8 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   };
   #[cfg(feature = "mime-guess")]
   let mimetype_tokens = {
-      let mt = file.metadata.mimetype();
-      quote! {
-        , #mt
-      }
+    let mt = file.metadata.mimetype();
+    quote! { , #mt }
   };
   #[cfg(not(feature = "mime-guess"))]
   let mimetype_tokens = TokenStream2::new();
