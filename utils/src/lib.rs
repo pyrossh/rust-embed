@@ -115,7 +115,7 @@ impl Metadata {
 
   /// The mime type of the file
   #[cfg(feature = "mime-guess")]
-  pub fn mimetype(&self) -> &Cow<str> {
+  pub fn mimetype(&self) -> &str {
     &self.mimetype
   }
 }
