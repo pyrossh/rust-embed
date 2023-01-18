@@ -93,17 +93,11 @@ pub struct Metadata {
 
 impl Metadata {
   #[doc(hidden)]
-  #[cfg(not(feature = "mime-guess"))]
-  pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>) -> Self {
-    Self { hash, last_modified }
-  }
-
-  #[doc(hidden)]
-  #[cfg(feature = "mime-guess")]
-  pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>, mimetype: &'static str) -> Self {
+  pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>, #[cfg(feature = "mime-guess")] mimetype: &'static str) -> Self {
     Self {
       hash,
       last_modified,
+      #[cfg(feature = "mime-guess")]
       mimetype: mimetype.into(),
     }
   }
