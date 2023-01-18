@@ -176,7 +176,7 @@ fn embed_file(rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
   };
   #[cfg(feature = "mime-guess")]
   let mimetype = {
-    let mt = file.metadata.mimetype().to_string();
+    let mt = file.metadata.mimetype();
     quote! { #mt }
   };
   #[cfg(not(feature = "mime-guess"))]
