@@ -30,4 +30,5 @@ optional = true
 debug-embed = []
 interpolate-folder-path = ["shellexpand"]
 compression = []
+mime-guess = ["rust-embed-utils/mime-guess"]
 include-exclude = ["rust-embed-utils/include-exclude"]

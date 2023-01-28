@@ -14,6 +14,7 @@ edition = "2018"
 [dependencies]
 walkdir = "2.3.1"
 sha2 = "0.10.5"
+mime_guess = { version = "2.0.4", optional = true }
 
 [dependencies.globset]
 version = "0.4.8"
@@ -21,4 +22,5 @@ optional = true
 
 [features]
 debug-embed = []
+mime-guess = ["mime_guess"]
 include-exclude = ["globset"]

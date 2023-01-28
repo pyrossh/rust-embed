@@ -33,6 +33,8 @@ jobs:
           cargo test --test lib
           cargo test --test lib --features "debug-embed"
           cargo test --test lib --features "compression" --release
+          cargo test --test mime_guess --features "mime-guess"
+          cargo test --test mime_guess --features "mime-guess" --release
           cargo test --test interpolated_path --features "interpolate-folder-path"
           cargo test --test interpolated_path --features "interpolate-folder-path" --release
           cargo build --example basic
