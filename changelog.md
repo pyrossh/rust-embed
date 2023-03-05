@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [6.6.0] - 2023-03-05
+
+- sort_by_file_name() requires walkdir v2.3.2 [#206](https://github.com/pyrossh/rust-embed/issues/206)
+- Add `mime-guess` feature to statically store mimetype [#192](https://github.com/pyrossh/rust-embed/issues/192)
+
 ## [6.4.2] - 2022-10-20
 
 - Fail the proc macro if include/exclude are used without the feature [#187](https://github.com/pyrossh/rust-embed/issues/187)
