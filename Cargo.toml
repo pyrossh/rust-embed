@@ -62,7 +62,7 @@ path = "tests/mime_guess.rs"
 required-features = ["mime-guess"]
 
 [dependencies]
-walkdir = "2.3.1"
+walkdir = "2.3.2"
 rust-embed-impl = { version = "6.3.1", path = "impl"}
 rust-embed-utils = { version = "7.3.0", path = "utils"}
 
