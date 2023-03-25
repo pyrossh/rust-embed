@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [6.6.1] - 2023-03-25
+
+- Fix mime-guess feature not working properly [#209](https://github.com/pyrossh/rust-embed/issues/209)
+
 ## [6.6.0] - 2023-03-05
 
 - sort_by_file_name() requires walkdir v2.3.2 [#206](https://github.com/pyrossh/rust-embed/issues/206)
