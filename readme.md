@@ -189,6 +189,3 @@ The power is yours!
 
 [`include-flate`]: https://crates.io/crates/include-flate
 [`globset`]: https://crates.io/crates/globset
-
-## Analytics
-![Alt](https://repobeats.axiom.co/api/embed/1758f5fddfab626c9ba40913f49da10132249f36.svg "Repobeats analytics image")
