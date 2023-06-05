@@ -7,7 +7,7 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use std::{env, path::Path};
-use syn::{Data, DeriveInput, Fields, Lit, Meta, MetaNameValue};
+use syn::{Data, DeriveInput, Expr, ExprLit, Fields, Lit, Meta, MetaNameValue};
 
 fn embedded(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String]) -> TokenStream2 {
   extern crate rust_embed_utils;
@@ -210,10 +210,12 @@ fn find_attribute_values(ast: &syn::DeriveInput, attr_name: &str) -> Vec<String>
   ast
     .attrs
     .iter()
-    .filter(|value| value.path.is_ident(attr_name))
-    .filter_map(|attr| attr.parse_meta().ok())
-    .filter_map(|meta| match meta {
-      Meta::NameValue(MetaNameValue { lit: Lit::Str(val), .. }) => Some(val.value()),
+    .filter(|value| value.path().is_ident(attr_name))
+    .filter_map(|attr| match &attr.meta {
+      Meta::NameValue(MetaNameValue {
+        value: Expr::Lit(ExprLit { lit: Lit::Str(val), .. }),
+        ..
+      }) => Some(val.value()),
       _ => None,
     })
     .collect()
