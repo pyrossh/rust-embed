@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [6.7.0] - 2023-06-09
+
+- Update `syn` to v2.0 [#209](https://github.com/pyrossh/rust-embed/issues/211)
+
 ## [6.6.1] - 2023-03-25
 
 - Fix mime-guess feature not working properly [#209](https://github.com/pyrossh/rust-embed/issues/209)
