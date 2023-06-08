@@ -9,7 +9,7 @@ Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
 ## [6.7.0] - 2023-06-09
 
-- Update `syn` to v2.0 [#209](https://github.com/pyrossh/rust-embed/issues/211)
+- Update `syn` to v2.0 [#211](https://github.com/pyrossh/rust-embed/issues/211)
 
 ## [6.6.1] - 2023-03-25
 
