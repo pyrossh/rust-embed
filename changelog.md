@@ -6,10 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
+## [6.8.1] - 2023-06-30
+
+- Fix failing compilation under compression feature [#182](https://github.com/pyrossh/rust-embed/issues/182). Thanks to [osiewicz](https://github.com/osiewicz)  
 
 ## [6.8.0] - 2023-06-30
 
-- Update `include-flate` to v0.2 [#211](https://github.com/pyrossh/rust-embed/issues/182)
+- Update `include-flate` to v0.2 [#182](https://github.com/pyrossh/rust-embed/issues/182)
 
 ## [6.7.0] - 2023-06-09
 
