@@ -1,5 +1,4 @@
 use axum::{
-  body::{boxed, Full},
   http::{header, StatusCode, Uri},
   response::{Html, IntoResponse, Response},
   routing::{get, Router},
@@ -61,11 +60,10 @@ where
 
     match Asset::get(path.as_str()) {
       Some(content) => {
-        let body = boxed(Full::from(content.data));
         let mime = mime_guess::from_path(path).first_or_octet_stream();
-        Response::builder().header(header::CONTENT_TYPE, mime.as_ref()).body(body).unwrap()
+        ([(header::CONTENT_TYPE, mime.as_ref())], content.data).into_response()
       }
-      None => Response::builder().status(StatusCode::NOT_FOUND).body(boxed(Full::from("404"))).unwrap(),
+      None => (StatusCode::NOT_FOUND, "404 Not Found").into_response(),
     }
   }
 }
