@@ -1,6 +1,6 @@
 use axum::{
   http::{header, StatusCode, Uri},
-  response::{IntoResponse, Response, Html},
+  response::{Html, IntoResponse, Response},
   routing::Router,
 };
 use rust_embed::RustEmbed;
@@ -46,9 +46,7 @@ async fn static_handler(uri: Uri) -> impl IntoResponse {
 
 async fn index_html() -> Response {
   match Assets::get(INDEX_HTML) {
-    Some(content) => {
-      Html(content.data).into_response()
-    }
+    Some(content) => Html(content.data).into_response(),
     None => not_found().await,
   }
 }
