@@ -97,11 +97,11 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
   };
 
   let declare_includes = quote! {
-    const includes: &[&str] = &[#(#includes),*];
+    const INCLUDES: &[&str] = &[#(#includes),*];
   };
 
   let declare_excludes = quote! {
-    const excludes: &[&str] = &[#(#excludes),*];
+    const EXCLUDES: &[&str] = &[#(#excludes),*];
   };
 
   let canonical_folder_path = Path::new(&folder_path).canonicalize().expect("folder path must resolve to an absolute path");
@@ -127,7 +127,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
                   return None;
               }
 
-              if rust_embed::utils::is_path_included(&rel_file_path, includes, excludes) {
+              if rust_embed::utils::is_path_included(&rel_file_path, INCLUDES, EXCLUDES) {
                 rust_embed::utils::read_file_from_fs(&canonical_file_path).ok()
               } else {
                 None
@@ -141,7 +141,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
               #declare_includes
               #declare_excludes
 
-              rust_embed::utils::get_files(String::from(#folder_path), includes, excludes)
+              rust_embed::utils::get_files(String::from(#folder_path), INCLUDES, EXCLUDES)
                   .map(|e| #map_iter)
           }
       }
