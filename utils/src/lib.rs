@@ -100,7 +100,7 @@ impl Metadata {
       hash,
       last_modified,
       #[cfg(feature = "mime-guess")]
-      mimetype: mimetype.into(),
+      mimetype: Cow::Borrowed(mimetype),
     }
   }
 

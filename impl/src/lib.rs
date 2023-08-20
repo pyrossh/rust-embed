@@ -56,6 +56,16 @@ fn embedded(
         (#path, #bytes),
     }
   });
+  let value_type = if cfg!(feature = "compression") {
+    quote! { fn() -> rust_embed::EmbeddedFile }
+  } else {
+    quote! { rust_embed::EmbeddedFile }
+  };
+  let get_value = if cfg!(feature = "compression") {
+    quote! {|idx| (ENTRIES[idx].1)()}
+  } else {
+    quote! {|idx| ENTRIES[idx].1.clone()}
+  };
   quote! {
       #not_debug_attr
       impl #ident {
@@ -63,10 +73,10 @@ fn embedded(
           pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
             #handle_prefix
             let key = file_path.replace("\\", "/");
-            const ENTRIES: &'static [(&'static str, rust_embed::EmbeddedFile)] = &[
+            const ENTRIES: &'static [(&'static str, #value_type)] = &[
                 #(#match_values)*];
             let position = ENTRIES.binary_search_by_key(&key.as_str(), |entry| entry.0);
-            position.ok().map(|index| ENTRIES[index].1.clone())
+            position.ok().map(#get_value)
 
           }
 
@@ -209,21 +219,24 @@ fn embed_file(folder_path: Option<&str>, rel_path: &str, full_canonical_path: &s
     let full_relative_path = PathBuf::from_iter([folder_path.expect("folder_path must be provided under `compression` feature"), rel_path]);
     let full_relative_path = full_relative_path.to_string_lossy();
     quote! {
-      rust_embed::flate!(static FILE: [u8] from #full_relative_path);
-      const BYTES: &'static [u8] = FILE;
+      rust_embed::flate!(static BYTES: [u8] from #full_relative_path);
     }
   } else {
     quote! {
       const BYTES: &'static [u8] = include_bytes!(#full_canonical_path);
     }
   };
-
+  let closure_args = if cfg!(feature = "compression") {
+    quote! { || }
+  } else {
+    quote! {}
+  };
   quote! {
-       {
+       #closure_args {
         #embedding_code
 
         rust_embed::EmbeddedFile {
-            data: std::borrow::Cow::Borrowed(BYTES),
+            data: std::borrow::Cow::Borrowed(&BYTES),
             metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified #mimetype_tokens)
         }
       }
