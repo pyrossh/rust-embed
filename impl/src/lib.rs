@@ -7,6 +7,7 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use std::{
+  collections::BTreeMap,
   env,
   iter::FromIterator,
   path::{Path, PathBuf},
@@ -18,13 +19,13 @@ fn embedded(
 ) -> TokenStream2 {
   extern crate rust_embed_utils;
 
-  let mut match_values = Vec::<TokenStream2>::new();
+  let mut match_values = BTreeMap::new();
   let mut list_values = Vec::<String>::new();
 
   let includes: Vec<&str> = includes.iter().map(AsRef::as_ref).collect();
   let excludes: Vec<&str> = excludes.iter().map(AsRef::as_ref).collect();
   for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(absolute_folder_path.clone(), &includes, &excludes) {
-    match_values.push(embed_file(relative_folder_path.clone(), &rel_path, &full_canonical_path));
+    match_values.insert(rel_path.clone(), embed_file(relative_folder_path.clone(), &rel_path, &full_canonical_path));
 
     list_values.push(if let Some(prefix) = prefix {
       format!("{}{}", prefix, rel_path)
@@ -50,17 +51,23 @@ fn embedded(
   } else {
     TokenStream2::new()
   };
-
+  let match_values = match_values.into_iter().map(|(path, bytes)| {
+    quote! {
+        (#path, #bytes),
+    }
+  });
   quote! {
       #not_debug_attr
       impl #ident {
           /// Get an embedded file and its metadata.
           pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
             #handle_prefix
-            match file_path.replace("\\", "/").as_str() {
-                #(#match_values)*
-                _ => None,
-            }
+            let key = file_path.replace("\\", "/");
+            const ENTRIES: &'static [(&'static str, rust_embed::EmbeddedFile)] = &[
+                #(#match_values)*];
+            let position = ENTRIES.binary_search_by_key(&key.as_str(), |entry| entry.0);
+            position.ok().map(|index| ENTRIES[index].1.clone())
+
           }
 
           fn names() -> std::slice::Iter<'static, &'static str> {
@@ -203,22 +210,22 @@ fn embed_file(folder_path: Option<&str>, rel_path: &str, full_canonical_path: &s
     let full_relative_path = full_relative_path.to_string_lossy();
     quote! {
       rust_embed::flate!(static FILE: [u8] from #full_relative_path);
-      let bytes = &FILE[..];
+      const BYTES: &'static [u8] = FILE;
     }
   } else {
     quote! {
-      let bytes = &include_bytes!(#full_canonical_path)[..];
+      const BYTES: &'static [u8] = include_bytes!(#full_canonical_path);
     }
   };
 
   quote! {
-      #rel_path => {
-          #embedding_code
+       {
+        #embedding_code
 
-          Some(rust_embed::EmbeddedFile {
-              data: std::borrow::Cow::from(bytes),
-              metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified #mimetype_tokens)
-          })
+        rust_embed::EmbeddedFile {
+            data: std::borrow::Cow::Borrowed(BYTES),
+            metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified #mimetype_tokens)
+        }
       }
   }
 }
