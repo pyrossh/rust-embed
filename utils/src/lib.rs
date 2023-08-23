@@ -78,12 +78,14 @@ pub fn get_files<'patterns>(folder_path: String, includes: &'patterns [&str], ex
 }
 
 /// A file embedded into the binary
+#[derive(Clone)]
 pub struct EmbeddedFile {
   pub data: Cow<'static, [u8]>,
   pub metadata: Metadata,
 }
 
 /// Metadata about an embedded file
+#[derive(Clone)]
 pub struct Metadata {
   hash: [u8; 32],
   last_modified: Option<u64>,
@@ -93,12 +95,12 @@ pub struct Metadata {
 
 impl Metadata {
   #[doc(hidden)]
-  pub fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>, #[cfg(feature = "mime-guess")] mimetype: &'static str) -> Self {
+  pub const fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>, #[cfg(feature = "mime-guess")] mimetype: &'static str) -> Self {
     Self {
       hash,
       last_modified,
       #[cfg(feature = "mime-guess")]
-      mimetype: mimetype.into(),
+      mimetype: Cow::Borrowed(mimetype),
     }
   }
 
