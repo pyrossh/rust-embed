@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
+
+## [8.0.0] - 2023-08-23
+
+- Store file contents statically and use binary search for lookup. [#217](https://github.com/pyrossh/rust-embed/pull/217/files). Thanks to [osiewicz](https://github.com/osiewicz)  
+
+
 ## [6.8.1] - 2023-06-30
 
 - Fix failing compilation under compression feature [#182](https://github.com/pyrossh/rust-embed/issues/182). Thanks to [osiewicz](https://github.com/osiewicz)  

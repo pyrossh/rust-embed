@@ -1,6 +1,6 @@
 [package]
 name = "rust-embed-utils"
-version = "7.8.1"
+version = "8.0.0"
 description = "Utilities for rust-embed"
 readme = "readme.md"
 documentation = "https://docs.rs/rust-embed"
