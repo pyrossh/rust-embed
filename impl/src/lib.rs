@@ -81,8 +81,8 @@ fn embedded(
           }
 
           fn names() -> std::slice::Iter<'static, &'static str> {
-              const items: [&str; #array_len] = [#(#list_values),*];
-              items.iter()
+              const ITEMS: [&str; #array_len] = [#(#list_values),*];
+              ITEMS.iter()
           }
 
           /// Iterates over the file paths in the folder.
