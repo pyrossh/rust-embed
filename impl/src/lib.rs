@@ -12,11 +12,11 @@ use std::{
   iter::FromIterator,
   path::{Path, PathBuf},
 };
-use syn::{Data, DeriveInput, Expr, ExprLit, Fields, Lit, Meta, MetaNameValue};
+use syn::{parse_macro_input, Data, DeriveInput, Expr, ExprLit, Fields, Lit, Meta, MetaNameValue};
 
 fn embedded(
   ident: &syn::Ident, relative_folder_path: Option<&str>, absolute_folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String],
-) -> TokenStream2 {
+) -> syn::Result<TokenStream2> {
   extern crate rust_embed_utils;
 
   let mut match_values = BTreeMap::new();
@@ -25,7 +25,10 @@ fn embedded(
   let includes: Vec<&str> = includes.iter().map(AsRef::as_ref).collect();
   let excludes: Vec<&str> = excludes.iter().map(AsRef::as_ref).collect();
   for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(absolute_folder_path.clone(), &includes, &excludes) {
-    match_values.insert(rel_path.clone(), embed_file(relative_folder_path.clone(), &rel_path, &full_canonical_path));
+    match_values.insert(
+      rel_path.clone(),
+      embed_file(relative_folder_path.clone(), ident, &rel_path, &full_canonical_path)?,
+    );
 
     list_values.push(if let Some(prefix) = prefix {
       format!("{}{}", prefix, rel_path)
@@ -66,7 +69,7 @@ fn embedded(
   } else {
     quote! {|idx| ENTRIES[idx].1.clone()}
   };
-  quote! {
+  Ok(quote! {
       #not_debug_attr
       impl #ident {
           /// Get an embedded file and its metadata.
@@ -100,7 +103,7 @@ fn embedded(
           rust_embed::Filenames::Embedded(#ident::names())
         }
       }
-  }
+  })
 }
 
 fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String]) -> TokenStream2 {
@@ -178,7 +181,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
 
 fn generate_assets(
   ident: &syn::Ident, relative_folder_path: Option<&str>, absolute_folder_path: String, prefix: Option<String>, includes: Vec<String>, excludes: Vec<String>,
-) -> TokenStream2 {
+) -> syn::Result<TokenStream2> {
   let embedded_impl = embedded(
     ident,
     relative_folder_path,
@@ -190,16 +193,16 @@ fn generate_assets(
   if cfg!(feature = "debug-embed") {
     return embedded_impl;
   }
-
+  let embedded_impl = embedded_impl?;
   let dynamic_impl = dynamic(ident, absolute_folder_path, prefix.as_deref(), &includes, &excludes);
 
-  quote! {
+  Ok(quote! {
       #embedded_impl
       #dynamic_impl
-  }
+  })
 }
 
-fn embed_file(folder_path: Option<&str>, rel_path: &str, full_canonical_path: &str) -> TokenStream2 {
+fn embed_file(folder_path: Option<&str>, ident: &syn::Ident, rel_path: &str, full_canonical_path: &str) -> syn::Result<TokenStream2> {
   let file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect("File should be readable");
   let hash = file.metadata.sha256_hash();
   let last_modified = match file.metadata.last_modified() {
@@ -215,8 +218,9 @@ fn embed_file(folder_path: Option<&str>, rel_path: &str, full_canonical_path: &s
   let mimetype_tokens = TokenStream2::new();
 
   let embedding_code = if cfg!(feature = "compression") {
+    let folder_path = folder_path.ok_or(syn::Error::new(ident.span(), "`folder` must be provided under `compression` feature."))?;
     // Print some debugging information
-    let full_relative_path = PathBuf::from_iter([folder_path.expect("folder_path must be provided under `compression` feature"), rel_path]);
+    let full_relative_path = PathBuf::from_iter([folder_path, rel_path]);
     let full_relative_path = full_relative_path.to_string_lossy();
     quote! {
       rust_embed::flate!(static BYTES: [u8] from #full_relative_path);
@@ -231,7 +235,7 @@ fn embed_file(folder_path: Option<&str>, rel_path: &str, full_canonical_path: &s
   } else {
     quote! {}
   };
-  quote! {
+  Ok(quote! {
        #closure_args {
         #embedding_code
 
@@ -240,7 +244,7 @@ fn embed_file(folder_path: Option<&str>, rel_path: &str, full_canonical_path: &s
             metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified #mimetype_tokens)
         }
       }
-  }
+  })
 }
 
 /// Find all pairs of the `name = "value"` attribute from the derive input
@@ -259,18 +263,21 @@ fn find_attribute_values(ast: &syn::DeriveInput, attr_name: &str) -> Vec<String>
     .collect()
 }
 
-fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
+fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
   match ast.data {
     Data::Struct(ref data) => match data.fields {
       Fields::Unit => {}
-      _ => panic!("RustEmbed can only be derived for unit structs"),
+      _ => return Err(syn::Error::new_spanned(ast, "RustEmbed can only be derived for unit structs")),
     },
-    _ => panic!("RustEmbed can only be derived for unit structs"),
+    _ => return Err(syn::Error::new_spanned(ast, "RustEmbed can only be derived for unit structs")),
   };
 
   let mut folder_paths = find_attribute_values(ast, "folder");
   if folder_paths.len() != 1 {
-    panic!("#[derive(RustEmbed)] must contain one attribute like this #[folder = \"examples/public/\"]");
+    return Err(syn::Error::new_spanned(
+      ast,
+      "#[derive(RustEmbed)] must contain one attribute like this #[folder = \"examples/public/\"]",
+    ));
   }
   let folder_path = folder_paths.remove(0);
 
@@ -280,11 +287,16 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
 
   #[cfg(not(feature = "include-exclude"))]
   if !includes.is_empty() || !excludes.is_empty() {
-    panic!("Please turn on the `include-exclude` feature to use the `include` and `exclude` attributes")
+    return Err(syn::Error::new_spanned(
+      ast,
+      "Please turn on the `include-exclude` feature to use the `include` and `exclude` attributes",
+    ));
   }
 
   #[cfg(feature = "interpolate-folder-path")]
-  let folder_path = shellexpand::full(&folder_path).unwrap().to_string();
+  let folder_path = shellexpand::full(&folder_path)
+    .map_err(|v| syn::Error::new_spanned(ast, v.to_string()))?
+    .to_string();
 
   // Base relative paths on the Cargo.toml location
   let (relative_path, absolute_folder_path) = if Path::new(&folder_path).is_relative() {
@@ -296,7 +308,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
     (Some(folder_path.clone()), absolute_path)
   } else {
     if cfg!(feature = "compression") {
-      panic!("`folder` must be a relative path under `compression` feature.")
+      return Err(syn::Error::new_spanned(ast, "`folder` must be a relative path under `compression` feature."));
     }
     (None, folder_path)
   };
@@ -315,7 +327,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
                   when the `interpolate-folder-path` feature is enabled.";
     }
 
-    panic!("{}", message);
+    return Err(syn::Error::new_spanned(ast, message));
   };
 
   generate_assets(&ast.ident, relative_path.as_deref(), absolute_folder_path, prefix, includes, excludes)
@@ -323,7 +335,9 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> TokenStream2 {
 
 #[proc_macro_derive(RustEmbed, attributes(folder, prefix, include, exclude))]
 pub fn derive_input_object(input: TokenStream) -> TokenStream {
-  let ast: DeriveInput = syn::parse(input).unwrap();
-  let gen = impl_rust_embed(&ast);
-  gen.into()
+  let ast = parse_macro_input!(input as DeriveInput);
+  match impl_rust_embed(&ast) {
+    Ok(ok) => ok.into(),
+    Err(e) => e.to_compile_error().into(),
+  }
 }
