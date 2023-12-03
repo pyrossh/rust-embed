@@ -89,16 +89,20 @@ pub struct EmbeddedFile {
 pub struct Metadata {
   hash: [u8; 32],
   last_modified: Option<u64>,
+  created: Option<u64>,
   #[cfg(feature = "mime-guess")]
   mimetype: Cow<'static, str>,
 }
 
 impl Metadata {
   #[doc(hidden)]
-  pub const fn __rust_embed_new(hash: [u8; 32], last_modified: Option<u64>, #[cfg(feature = "mime-guess")] mimetype: &'static str) -> Self {
+  pub const fn __rust_embed_new(
+    hash: [u8; 32], last_modified: Option<u64>, created: Option<u64>, #[cfg(feature = "mime-guess")] mimetype: &'static str,
+  ) -> Self {
     Self {
       hash,
       last_modified,
+      created,
       #[cfg(feature = "mime-guess")]
       mimetype: Cow::Borrowed(mimetype),
     }
@@ -113,6 +117,12 @@ impl Metadata {
   /// platform/file-system does not support this, None is returned.
   pub fn last_modified(&self) -> Option<u64> {
     self.last_modified
+  }
+
+  /// The created data in seconds since the UNIX epoch. If the underlying
+  /// platform/file-system does not support this, None is returned.
+  pub fn created(&self) -> Option<u64> {
+    self.created
   }
 
   /// The mime type of the file
@@ -135,8 +145,15 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
     Err(_) => None,
   };
 
-  let last_modified = fs::metadata(file_path)?.modified().ok().map(|last_modified| {
+  let metadata = fs::metadata(file_path)?;
+  let last_modified = metadata.modified().ok().map(|last_modified| {
     last_modified
+      .duration_since(SystemTime::UNIX_EPOCH)
+      .expect("Time before the UNIX epoch is unsupported")
+      .as_secs()
+  });
+  let created = metadata.created().ok().map(|created| {
+    created
       .duration_since(SystemTime::UNIX_EPOCH)
       .expect("Time before the UNIX epoch is unsupported")
       .as_secs()
@@ -150,6 +167,7 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
     metadata: Metadata {
       hash,
       last_modified: source_date_epoch.or(last_modified),
+      created: source_date_epoch.or(created),
       #[cfg(feature = "mime-guess")]
       mimetype: mimetype.into(),
     },

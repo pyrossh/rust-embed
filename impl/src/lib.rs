@@ -209,6 +209,10 @@ fn embed_file(folder_path: Option<&str>, ident: &syn::Ident, rel_path: &str, ful
     Some(last_modified) => quote! { Some(#last_modified) },
     None => quote! { None },
   };
+  let created = match file.metadata.created() {
+    Some(created) => quote! { Some(#created) },
+    None => quote! { None },
+  };
   #[cfg(feature = "mime-guess")]
   let mimetype_tokens = {
     let mt = file.metadata.mimetype();
@@ -241,7 +245,7 @@ fn embed_file(folder_path: Option<&str>, ident: &syn::Ident, rel_path: &str, ful
 
         rust_embed::EmbeddedFile {
             data: std::borrow::Cow::Borrowed(&BYTES),
-            metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified #mimetype_tokens)
+            metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified, #created #mimetype_tokens)
         }
       }
   })
