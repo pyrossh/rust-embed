@@ -55,6 +55,7 @@ pub struct EmbeddedFile {
 pub struct Metadata {
   hash: [u8; 32],
   last_modified: Option<u64>,
+  created: Option<u64>,
 }
 ```
 
