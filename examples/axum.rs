@@ -18,7 +18,8 @@ async fn main() {
   // Start listening on the given address.
   let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
   println!("listening on {}", addr);
-  axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
+  let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+  axum::serve(listener, app.into_make_service()).await.unwrap();
 }
 
 // We use static route matchers ("/" and "/index.html") to serve our home
