@@ -73,7 +73,7 @@ fn embedded(
       #not_debug_attr
       impl #ident {
           /// Get an embedded file and its metadata.
-          pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
+          pub fn get(file_path: &str) -> ::std::option::Option<rust_embed::EmbeddedFile> {
             #handle_prefix
             let key = file_path.replace("\\", "/");
             const ENTRIES: &'static [(&'static str, #value_type)] = &[
@@ -83,20 +83,20 @@ fn embedded(
 
           }
 
-          fn names() -> std::slice::Iter<'static, &'static str> {
+          fn names() -> ::std::slice::Iter<'static, &'static str> {
               const ITEMS: [&str; #array_len] = [#(#list_values),*];
               ITEMS.iter()
           }
 
           /// Iterates over the file paths in the folder.
-          pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
-              Self::names().map(|x| std::borrow::Cow::from(*x))
+          pub fn iter() -> impl ::std::iter::Iterator<Item = ::std::borrow::Cow<'static, str>> {
+              Self::names().map(|x| ::std::borrow::Cow::from(*x))
           }
       }
 
       #not_debug_attr
       impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
+        fn get(file_path: &str) -> ::std::option::Option<rust_embed::EmbeddedFile> {
           #ident::get(file_path)
         }
         fn iter() -> rust_embed::Filenames {
@@ -107,13 +107,13 @@ fn embedded(
 }
 
 fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String]) -> TokenStream2 {
-  let (handle_prefix, map_iter) = if let Some(prefix) = prefix {
+  let (handle_prefix, map_iter) = if let ::std::option::Option::Some(prefix) = prefix {
     (
       quote! { let file_path = file_path.strip_prefix(#prefix)?; },
-      quote! { std::borrow::Cow::Owned(format!("{}{}", #prefix, e.rel_path)) },
+      quote! { ::std::borrow::Cow::Owned(format!("{}{}", #prefix, e.rel_path)) },
     )
   } else {
-    (TokenStream2::new(), quote! { std::borrow::Cow::from(e.rel_path) })
+    (TokenStream2::new(), quote! { ::std::borrow::Cow::from(e.rel_path) })
   };
 
   let declare_includes = quote! {
@@ -131,49 +131,49 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
       #[cfg(debug_assertions)]
       impl #ident {
           /// Get an embedded file and its metadata.
-          pub fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
+          pub fn get(file_path: &str) -> ::std::option::Option<rust_embed::EmbeddedFile> {
               #handle_prefix
 
               #declare_includes
               #declare_excludes
 
               let rel_file_path = file_path.replace("\\", "/");
-              let file_path = std::path::Path::new(#folder_path).join(&rel_file_path);
+              let file_path = ::std::path::Path::new(#folder_path).join(&rel_file_path);
 
               // Make sure the path requested does not escape the folder path
               let canonical_file_path = file_path.canonicalize().ok()?;
               if !canonical_file_path.starts_with(#canonical_folder_path) {
                   // Tried to request a path that is not in the embedded folder
-                  return None;
+                  return ::std::option::Option::None;
               }
 
               if rust_embed::utils::is_path_included(&rel_file_path, INCLUDES, EXCLUDES) {
                 rust_embed::utils::read_file_from_fs(&canonical_file_path).ok()
               } else {
-                None
+                ::std::option::Option::None
               }
           }
 
           /// Iterates over the file paths in the folder.
-          pub fn iter() -> impl Iterator<Item = std::borrow::Cow<'static, str>> {
-              use std::path::Path;
+          pub fn iter() -> impl ::std::iter::Iterator<Item = ::std::borrow::Cow<'static, str>> {
+              use ::std::path::Path;
 
               #declare_includes
               #declare_excludes
 
-              rust_embed::utils::get_files(String::from(#folder_path), INCLUDES, EXCLUDES)
+              rust_embed::utils::get_files(::std::string::String::from(#folder_path), INCLUDES, EXCLUDES)
                   .map(|e| #map_iter)
           }
       }
 
       #[cfg(debug_assertions)]
       impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> Option<rust_embed::EmbeddedFile> {
+        fn get(file_path: &str) -> ::std::option::Option<rust_embed::EmbeddedFile> {
           #ident::get(file_path)
         }
         fn iter() -> rust_embed::Filenames {
           // the return type of iter() is unnamable, so we have to box it
-          rust_embed::Filenames::Dynamic(Box::new(#ident::iter()))
+          rust_embed::Filenames::Dynamic(::std::boxed::Box::new(#ident::iter()))
         }
       }
   }
@@ -206,12 +206,12 @@ fn embed_file(folder_path: Option<&str>, ident: &syn::Ident, rel_path: &str, ful
   let file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect("File should be readable");
   let hash = file.metadata.sha256_hash();
   let last_modified = match file.metadata.last_modified() {
-    Some(last_modified) => quote! { Some(#last_modified) },
-    None => quote! { None },
+    Some(last_modified) => quote! { ::std::option::Option::Some(#last_modified) },
+    None => quote! { ::std::option::Option::None },
   };
   let created = match file.metadata.created() {
-    Some(created) => quote! { Some(#created) },
-    None => quote! { None },
+    Some(created) => quote! { ::std::option::Option::Some(#created) },
+    None => quote! { ::std::option::Option::None },
   };
   #[cfg(feature = "mime-guess")]
   let mimetype_tokens = {
@@ -244,7 +244,7 @@ fn embed_file(folder_path: Option<&str>, ident: &syn::Ident, rel_path: &str, ful
         #embedding_code
 
         rust_embed::EmbeddedFile {
-            data: std::borrow::Cow::Borrowed(&BYTES),
+            data: ::std::borrow::Cow::Borrowed(&BYTES),
             metadata: rust_embed::Metadata::__rust_embed_new([#(#hash),*], #last_modified, #created #mimetype_tokens)
         }
       }
