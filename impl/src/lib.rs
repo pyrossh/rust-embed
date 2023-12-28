@@ -25,10 +25,7 @@ fn embedded(
   let includes: Vec<&str> = includes.iter().map(AsRef::as_ref).collect();
   let excludes: Vec<&str> = excludes.iter().map(AsRef::as_ref).collect();
   for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(absolute_folder_path.clone(), &includes, &excludes) {
-    match_values.insert(
-      rel_path.clone(),
-      embed_file(relative_folder_path.clone(), ident, &rel_path, &full_canonical_path)?,
-    );
+    match_values.insert(rel_path.clone(), embed_file(relative_folder_path, ident, &rel_path, &full_canonical_path)?);
 
     list_values.push(if let Some(prefix) = prefix {
       format!("{}{}", prefix, rel_path)
