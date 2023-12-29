@@ -141,7 +141,7 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
   let hash: [u8; 32] = hasher.finalize().into();
 
   let source_date_epoch = match std::env::var("SOURCE_DATE_EPOCH") {
-    Ok(value) => value.parse::<u64>().map_or(None, |v| Some(v)),
+    Ok(value) => value.parse::<u64>().ok(),
     Err(_) => None,
   };
 
