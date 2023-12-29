@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [8.2.0] - 2023-12-29
+
+- Fix naming collisions in macros [#230](https://github.com/pyrossh/rust-embed/pull/230/files). Thanks to [hwittenborn](https://github.com/hwittenborn)
+
 ## [8.1.0] - 2023-12-08
 
 - Add created to file metadata. [#225](https://github.com/pyrossh/rust-embed/pull/225/files). Thanks to [ngalaiko](https://github.com/ngalaiko)
