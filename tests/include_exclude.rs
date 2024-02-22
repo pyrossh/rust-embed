@@ -52,3 +52,15 @@ fn exclude_has_higher_priority() {
   assert!(ExcludePriorityAssets::get("images/llama.png").is_some(), "llama.png should exist");
   assert_eq!(ExcludePriorityAssets::iter().count(), 2);
 }
+
+#[derive(RustEmbed)]
+#[folder = "examples/public/symlinks"]
+#[include = "main.js"]
+struct IncludeSymlink;
+
+#[test]
+fn include_symlink() {
+  assert_eq!(IncludeSymlink::iter().count(), 1);
+  assert_eq!(IncludeSymlink::iter().next(), Some(std::borrow::Cow::Borrowed("main.js")));
+  assert!(IncludeSymlink::get("main.js").is_some())
+}
