@@ -9,7 +9,8 @@ fn get_works() {
   assert!(AllAssets::get("index.html").is_some(), "index.html should exist");
   assert!(AllAssets::get("gg.html").is_none(), "gg.html should not exist");
   assert!(AllAssets::get("images/llama.png").is_some(), "llama.png should exist");
-  assert_eq!(AllAssets::iter().count(), 6);
+  assert!(AllAssets::get("symlinks/main.js").is_some(), "main.js should exist");
+  assert_eq!(AllAssets::iter().count(), 7);
 }
 
 #[derive(RustEmbed)]
@@ -36,8 +37,9 @@ struct ExcludeSomeAssets;
 fn excluding_some_assets_works() {
   assert!(ExcludeSomeAssets::get("index.html").is_none(), "index.html should not exist");
   assert!(ExcludeSomeAssets::get("main.js").is_some(), "main.js should exist");
+  assert!(ExcludeSomeAssets::get("symlinks/main.js").is_some(), "main.js symlink should exist");
   assert!(ExcludeSomeAssets::get("images/llama.png").is_none(), "llama.png should not exist");
-  assert_eq!(ExcludeSomeAssets::iter().count(), 2);
+  assert_eq!(ExcludeSomeAssets::iter().count(), 3);
 }
 
 #[derive(RustEmbed)]
