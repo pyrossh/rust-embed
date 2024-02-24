@@ -144,7 +144,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
 
                   // Should be allowed only if it was a symlink
                   // TODO: Currently it allows "path_traversal_attack" for the symlink files
-                  // For it to be working properly we need to get absolute path first 
+                  // For it to be working properly we need to get absolute path first
                   // and check that instead if it starts with `canonical_folder_path`
                   // https://doc.rust-lang.org/std/path/fn.absolute.html (currently nightly)
                   let metadata = ::std::fs::metadata(file_path.as_path()).ok()?;
