@@ -9,7 +9,7 @@ Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
 ## [8.3.0] - 2024-02-26
 
-- Fix symbolic links in debug builds [#230](https://github.com/pyrossh/rust-embed/pull/235/files). Thanks to [Buckram123](https://github.com/Buckram123)
+- Fix symbolic links in debug builds [#235](https://github.com/pyrossh/rust-embed/pull/235/files). Thanks to [Buckram123](https://github.com/Buckram123)
 
 ## [8.2.0] - 2023-12-29
 
