@@ -16,6 +16,7 @@ use syn::{parse_macro_input, Data, DeriveInput, Expr, ExprLit, Fields, Lit, Meta
 
 fn embedded(
   ident: &syn::Ident, relative_folder_path: Option<&str>, absolute_folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String],
+  metadata_only: bool,
 ) -> syn::Result<TokenStream2> {
   extern crate rust_embed_utils;
 
@@ -25,7 +26,10 @@ fn embedded(
   let includes: Vec<&str> = includes.iter().map(AsRef::as_ref).collect();
   let excludes: Vec<&str> = excludes.iter().map(AsRef::as_ref).collect();
   for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(absolute_folder_path.clone(), &includes, &excludes) {
-    match_values.insert(rel_path.clone(), embed_file(relative_folder_path, ident, &rel_path, &full_canonical_path)?);
+    match_values.insert(
+      rel_path.clone(),
+      embed_file(relative_folder_path, ident, &rel_path, &full_canonical_path, metadata_only)?,
+    );
 
     list_values.push(if let Some(prefix) = prefix {
       format!("{}{}", prefix, rel_path)
@@ -187,6 +191,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
 
 fn generate_assets(
   ident: &syn::Ident, relative_folder_path: Option<&str>, absolute_folder_path: String, prefix: Option<String>, includes: Vec<String>, excludes: Vec<String>,
+  metadata_only: bool,
 ) -> syn::Result<TokenStream2> {
   let embedded_impl = embedded(
     ident,
@@ -195,6 +200,7 @@ fn generate_assets(
     prefix.as_deref(),
     &includes,
     &excludes,
+    metadata_only,
   );
   if cfg!(feature = "debug-embed") {
     return embedded_impl;
@@ -208,7 +214,7 @@ fn generate_assets(
   })
 }
 
-fn embed_file(folder_path: Option<&str>, ident: &syn::Ident, rel_path: &str, full_canonical_path: &str) -> syn::Result<TokenStream2> {
+fn embed_file(folder_path: Option<&str>, ident: &syn::Ident, rel_path: &str, full_canonical_path: &str, metadata_only: bool) -> syn::Result<TokenStream2> {
   let file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect("File should be readable");
   let hash = file.metadata.sha256_hash();
   let last_modified = match file.metadata.last_modified() {
@@ -227,7 +233,11 @@ fn embed_file(folder_path: Option<&str>, ident: &syn::Ident, rel_path: &str, ful
   #[cfg(not(feature = "mime-guess"))]
   let mimetype_tokens = TokenStream2::new();
 
-  let embedding_code = if cfg!(feature = "compression") {
+  let embedding_code = if metadata_only {
+    quote! {
+        const BYTES: &'static [u8] = &[];
+    }
+  } else if cfg!(feature = "compression") {
     let folder_path = folder_path.ok_or(syn::Error::new(ident.span(), "`folder` must be provided under `compression` feature."))?;
     // Print some debugging information
     let full_relative_path = PathBuf::from_iter([folder_path, rel_path]);
@@ -273,6 +283,20 @@ fn find_attribute_values(ast: &syn::DeriveInput, attr_name: &str) -> Vec<String>
     .collect()
 }
 
+fn find_bool_attribute(ast: &syn::DeriveInput, attr_name: &str) -> Option<bool> {
+  ast
+    .attrs
+    .iter()
+    .find(|value| value.path().is_ident(attr_name))
+    .and_then(|attr| match &attr.meta {
+      Meta::NameValue(MetaNameValue {
+        value: Expr::Lit(ExprLit { lit: Lit::Bool(val), .. }),
+        ..
+      }) => Some(val.value()),
+      _ => None,
+    })
+}
+
 fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
   match ast.data {
     Data::Struct(ref data) => match data.fields {
@@ -294,6 +318,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
   let prefix = find_attribute_values(ast, "prefix").into_iter().next();
   let includes = find_attribute_values(ast, "include");
   let excludes = find_attribute_values(ast, "exclude");
+  let metadata_only = find_bool_attribute(ast, "metadata_only").unwrap_or(false);
 
   #[cfg(not(feature = "include-exclude"))]
   if !includes.is_empty() || !excludes.is_empty() {
@@ -340,10 +365,18 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
     return Err(syn::Error::new_spanned(ast, message));
   };
 
-  generate_assets(&ast.ident, relative_path.as_deref(), absolute_folder_path, prefix, includes, excludes)
+  generate_assets(
+    &ast.ident,
+    relative_path.as_deref(),
+    absolute_folder_path,
+    prefix,
+    includes,
+    excludes,
+    metadata_only,
+  )
 }
 
-#[proc_macro_derive(RustEmbed, attributes(folder, prefix, include, exclude))]
+#[proc_macro_derive(RustEmbed, attributes(folder, prefix, include, exclude, metadata_only))]
 pub fn derive_input_object(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   match impl_rust_embed(&ast) {
