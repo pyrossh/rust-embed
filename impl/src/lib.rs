@@ -107,7 +107,7 @@ fn embedded(
   })
 }
 
-fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String]) -> TokenStream2 {
+fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String], metadata_only: bool) -> TokenStream2 {
   let (handle_prefix, map_iter) = if let ::std::option::Option::Some(prefix) = prefix {
     (
       quote! { let file_path = file_path.strip_prefix(#prefix)?; },
@@ -124,6 +124,10 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
   let declare_excludes = quote! {
     const EXCLUDES: &[&str] = &[#(#excludes),*];
   };
+
+  let strip_contents = metadata_only.then_some(quote! {
+      .map(|mut file| { file.data = ::std::default::Default::default(); file })
+  });
 
   let canonical_folder_path = Path::new(&folder_path).canonicalize().expect("folder path must resolve to an absolute path");
   let canonical_folder_path = canonical_folder_path.to_str().expect("absolute folder path must be valid unicode");
@@ -158,7 +162,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
               }
 
               if rust_embed::utils::is_path_included(&rel_file_path, INCLUDES, EXCLUDES) {
-                rust_embed::utils::read_file_from_fs(&canonical_file_path).ok()
+                rust_embed::utils::read_file_from_fs(&canonical_file_path).ok() #strip_contents
               } else {
                 ::std::option::Option::None
               }
@@ -206,7 +210,7 @@ fn generate_assets(
     return embedded_impl;
   }
   let embedded_impl = embedded_impl?;
-  let dynamic_impl = dynamic(ident, absolute_folder_path, prefix.as_deref(), &includes, &excludes);
+  let dynamic_impl = dynamic(ident, absolute_folder_path, prefix.as_deref(), &includes, &excludes, metadata_only);
 
   Ok(quote! {
       #embedded_impl
