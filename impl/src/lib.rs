@@ -147,7 +147,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
                   // and check that instead if it starts with `canonical_folder_path`
                   // https://doc.rust-lang.org/std/path/fn.absolute.html (currently nightly)
                   // Should be allowed only if it was a symlink
-                  let metadata = ::std::fs::symlink_metadata(file_path.as_path()).ok()?;
+                  let metadata = ::std::fs::symlink_metadata(&file_path).ok()?;
                   if !metadata.is_symlink() {
                     return ::std::option::Option::None;
                   }
