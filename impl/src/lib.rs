@@ -16,6 +16,7 @@ use syn::{parse_macro_input, Data, DeriveInput, Expr, ExprLit, Fields, Lit, Meta
 
 fn embedded(
   ident: &syn::Ident, relative_folder_path: Option<&str>, absolute_folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String],
+  crate_path: &syn::Path,
 ) -> syn::Result<TokenStream2> {
   extern crate rust_embed_utils;
 
@@ -57,9 +58,9 @@ fn embedded(
     }
   });
   let value_type = if cfg!(feature = "compression") {
-    quote! { fn() -> rust_embed::EmbeddedFile }
+    quote! { fn() -> #crate_path::EmbeddedFile }
   } else {
-    quote! { rust_embed::EmbeddedFile }
+    quote! { #crate_path::EmbeddedFile }
   };
   let get_value = if cfg!(feature = "compression") {
     quote! {|idx| (ENTRIES[idx].1)()}
@@ -70,7 +71,7 @@ fn embedded(
       #not_debug_attr
       impl #ident {
           /// Get an embedded file and its metadata.
-          pub fn get(file_path: &str) -> ::std::option::Option<rust_embed::EmbeddedFile> {
+          pub fn get(file_path: &str) -> ::std::option::Option<#crate_path::EmbeddedFile> {
             #handle_prefix
             let key = file_path.replace("\\", "/");
             const ENTRIES: &'static [(&'static str, #value_type)] = &[
@@ -92,18 +93,18 @@ fn embedded(
       }
 
       #not_debug_attr
-      impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> ::std::option::Option<rust_embed::EmbeddedFile> {
+      impl #crate_path::RustEmbed for #ident {
+        fn get(file_path: &str) -> ::std::option::Option<#crate_path::EmbeddedFile> {
           #ident::get(file_path)
         }
-        fn iter() -> rust_embed::Filenames {
-          rust_embed::Filenames::Embedded(#ident::names())
+        fn iter() -> #crate_path::Filenames {
+          #crate_path::Filenames::Embedded(#ident::names())
         }
       }
   })
 }
 
-fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String]) -> TokenStream2 {
+fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includes: &[String], excludes: &[String], crate_path: &syn::Path) -> TokenStream2 {
   let (handle_prefix, map_iter) = if let ::std::option::Option::Some(prefix) = prefix {
     (
       quote! { let file_path = file_path.strip_prefix(#prefix)?; },
@@ -128,7 +129,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
       #[cfg(debug_assertions)]
       impl #ident {
           /// Get an embedded file and its metadata.
-          pub fn get(file_path: &str) -> ::std::option::Option<rust_embed::EmbeddedFile> {
+          pub fn get(file_path: &str) -> ::std::option::Option<#crate_path::EmbeddedFile> {
               #handle_prefix
 
               #declare_includes
@@ -153,8 +154,8 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
                   }
               }
 
-              if rust_embed::utils::is_path_included(&rel_file_path, INCLUDES, EXCLUDES) {
-                rust_embed::utils::read_file_from_fs(&canonical_file_path).ok()
+              if #crate_path::utils::is_path_included(&rel_file_path, INCLUDES, EXCLUDES) {
+                #crate_path::utils::read_file_from_fs(&canonical_file_path).ok()
               } else {
                 ::std::option::Option::None
               }
@@ -167,19 +168,19 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
               #declare_includes
               #declare_excludes
 
-              rust_embed::utils::get_files(::std::string::String::from(#folder_path), INCLUDES, EXCLUDES)
+              #crate_path::utils::get_files(::std::string::String::from(#folder_path), INCLUDES, EXCLUDES)
                   .map(|e| #map_iter)
           }
       }
 
       #[cfg(debug_assertions)]
-      impl rust_embed::RustEmbed for #ident {
-        fn get(file_path: &str) -> ::std::option::Option<rust_embed::EmbeddedFile> {
+      impl #crate_path::RustEmbed for #ident {
+        fn get(file_path: &str) -> ::std::option::Option<#crate_path::EmbeddedFile> {
           #ident::get(file_path)
         }
-        fn iter() -> rust_embed::Filenames {
+        fn iter() -> #crate_path::Filenames {
           // the return type of iter() is unnamable, so we have to box it
-          rust_embed::Filenames::Dynamic(::std::boxed::Box::new(#ident::iter()))
+          #crate_path::Filenames::Dynamic(::std::boxed::Box::new(#ident::iter()))
         }
       }
   }
@@ -187,6 +188,7 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
 
 fn generate_assets(
   ident: &syn::Ident, relative_folder_path: Option<&str>, absolute_folder_path: String, prefix: Option<String>, includes: Vec<String>, excludes: Vec<String>,
+  crate_path: &syn::Path,
 ) -> syn::Result<TokenStream2> {
   let embedded_impl = embedded(
     ident,
@@ -195,12 +197,13 @@ fn generate_assets(
     prefix.as_deref(),
     &includes,
     &excludes,
+    crate_path,
   );
   if cfg!(feature = "debug-embed") {
     return embedded_impl;
   }
   let embedded_impl = embedded_impl?;
-  let dynamic_impl = dynamic(ident, absolute_folder_path, prefix.as_deref(), &includes, &excludes);
+  let dynamic_impl = dynamic(ident, absolute_folder_path, prefix.as_deref(), &includes, &excludes, crate_path);
 
   Ok(quote! {
       #embedded_impl
@@ -282,6 +285,11 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
     _ => return Err(syn::Error::new_spanned(ast, "RustEmbed can only be derived for unit structs")),
   };
 
+  let crate_path: syn::Path = find_attribute_values(ast, "crate_path")
+    .last()
+    .map(|v| syn::parse_str(&v).unwrap())
+    .unwrap_or_else(|| syn::parse_str("rust_embed").unwrap());
+
   let mut folder_paths = find_attribute_values(ast, "folder");
   if folder_paths.len() != 1 {
     return Err(syn::Error::new_spanned(
@@ -340,10 +348,18 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
     return Err(syn::Error::new_spanned(ast, message));
   };
 
-  generate_assets(&ast.ident, relative_path.as_deref(), absolute_folder_path, prefix, includes, excludes)
+  generate_assets(
+    &ast.ident,
+    relative_path.as_deref(),
+    absolute_folder_path,
+    prefix,
+    includes,
+    excludes,
+    &crate_path,
+  )
 }
 
-#[proc_macro_derive(RustEmbed, attributes(folder, prefix, include, exclude))]
+#[proc_macro_derive(RustEmbed, attributes(folder, prefix, include, exclude, crate_path))]
 pub fn derive_input_object(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   match impl_rust_embed(&ast) {
