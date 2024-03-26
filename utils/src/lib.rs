@@ -146,18 +146,17 @@ pub fn read_file_from_fs(file_path: &Path) -> io::Result<EmbeddedFile> {
   };
 
   let metadata = fs::metadata(file_path)?;
-  let last_modified = metadata.modified().ok().map(|last_modified| {
-    last_modified
-      .duration_since(SystemTime::UNIX_EPOCH)
-      .expect("Time before the UNIX epoch is unsupported")
-      .as_secs()
-  });
-  let created = metadata.created().ok().map(|created| {
-    created
-      .duration_since(SystemTime::UNIX_EPOCH)
-      .expect("Time before the UNIX epoch is unsupported")
-      .as_secs()
-  });
+  let last_modified = metadata
+    .modified()
+    .ok()
+    .and_then(|modified| modified.duration_since(SystemTime::UNIX_EPOCH).ok())
+    .map(|secs| secs.as_secs());
+
+  let created = metadata
+    .created()
+    .ok()
+    .and_then(|created| created.duration_since(SystemTime::UNIX_EPOCH).ok())
+    .map(|secs| secs.as_secs());
 
   #[cfg(feature = "mime-guess")]
   let mimetype = mime_guess::from_path(file_path).first_or_octet_stream().to_string();
