@@ -75,11 +75,17 @@ If the feature `debug-embed` is enabled or the binary compiled in release mode a
 
 Otherwise the files are listed from the file system on each call.
 
-## The `prefix` attribute
+## Attributes
+### `prefix`
 
 You can add `#[prefix = "my_prefix/"]` to the `RustEmbed` struct to add a prefix
 to all of the file paths. This prefix will be required on `get` calls, and will
 be included in the file paths returned by `iter`.
+
+### `metadata_only`
+
+You can add `#[metadata_only = true]` to the `RustEmbed` struct to exclude file contents from the
+binary. Only file paths and metadata will be embedded.
 
 ## Features
 
