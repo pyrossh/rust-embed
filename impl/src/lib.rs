@@ -125,6 +125,8 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
     const EXCLUDES: &[&str] = &[#(#excludes),*];
   };
 
+  // In metadata_only mode, we still need to read file contents to generate the file hash, but
+  // then we drop the file data.
   let strip_contents = metadata_only.then_some(quote! {
       .map(|mut file| { file.data = ::std::default::Default::default(); file })
   });
