@@ -6,6 +6,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
+use rust_embed_utils::PathMatcher;
 use std::{
   collections::BTreeMap,
   env,
@@ -25,7 +26,8 @@ fn embedded(
 
   let includes: Vec<&str> = includes.iter().map(AsRef::as_ref).collect();
   let excludes: Vec<&str> = excludes.iter().map(AsRef::as_ref).collect();
-  for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(absolute_folder_path.clone(), &includes, &excludes) {
+  let matcher = PathMatcher::new(&includes, &excludes);
+  for rust_embed_utils::FileEntry { rel_path, full_canonical_path } in rust_embed_utils::get_files(absolute_folder_path.clone(), matcher) {
     match_values.insert(
       rel_path.clone(),
       embed_file(relative_folder_path, ident, &rel_path, &full_canonical_path, metadata_only)?,
@@ -125,8 +127,8 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
     const EXCLUDES: &[&str] = &[#(#excludes),*];
   };
 
-  // In metadata_only mode, we still need to read file contents to generate the file hash, but
-  // then we drop the file data.
+  // In metadata_only mode, we still need to read file contents to generate the
+  // file hash, but then we drop the file data.
   let strip_contents = metadata_only.then_some(quote! {
       .map(|mut file| { file.data = ::std::default::Default::default(); file })
   });
@@ -137,12 +139,17 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
   quote! {
       #[cfg(debug_assertions)]
       impl #ident {
+
+
+        fn matcher() -> ::rust_embed::utils::PathMatcher {
+            #declare_includes
+            #declare_excludes
+            static PATH_MATCHER: ::std::sync::OnceLock<::rust_embed::utils::PathMatcher> = ::std::sync::OnceLock::new();
+            PATH_MATCHER.get_or_init(|| rust_embed::utils::PathMatcher::new(INCLUDES, EXCLUDES)).clone()
+        }
           /// Get an embedded file and its metadata.
           pub fn get(file_path: &str) -> ::std::option::Option<rust_embed::EmbeddedFile> {
               #handle_prefix
-
-              #declare_includes
-              #declare_excludes
 
               let rel_file_path = file_path.replace("\\", "/");
               let file_path = ::std::path::Path::new(#folder_path).join(&rel_file_path);
@@ -162,8 +169,8 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
                     return ::std::option::Option::None;
                   }
               }
-
-              if rust_embed::utils::is_path_included(&rel_file_path, INCLUDES, EXCLUDES) {
+              let path_matcher = Self::matcher();
+              if path_matcher.is_path_included(&rel_file_path) {
                 rust_embed::utils::read_file_from_fs(&canonical_file_path).ok() #strip_contents
               } else {
                 ::std::option::Option::None
@@ -174,10 +181,8 @@ fn dynamic(ident: &syn::Ident, folder_path: String, prefix: Option<&str>, includ
           pub fn iter() -> impl ::std::iter::Iterator<Item = ::std::borrow::Cow<'static, str>> {
               use ::std::path::Path;
 
-              #declare_includes
-              #declare_excludes
 
-              rust_embed::utils::get_files(::std::string::String::from(#folder_path), INCLUDES, EXCLUDES)
+              rust_embed::utils::get_files(::std::string::String::from(#folder_path), Self::matcher())
                   .map(|e| #map_iter)
           }
       }
