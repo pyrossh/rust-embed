@@ -10,7 +10,7 @@ keywords = ["http", "rocket", "static", "web", "server"]
 categories = ["web-programming", "filesystem"]
 authors = ["pyros2097 <pyros2097@gmail.com>"]
 edition = "2018"
-rust-version = "1.60.0"
+rust-version = "1.70.0"
 
 [[example]]
 name = "warp"
