@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [8.4.0] - 2024-05-11
+
+- Re-export RustEmbed as Embed [#245](https://github.com/pyrossh/rust-embed/pull/245/files). Thanks to [pyrossh](https://github.com/pyrossh)
+- Do not build glob matchers repeatedly when include-exclude feature is enabled [#244](https://github.com/pyrossh/rust-embed/pull/244/files). Thanks to [osiewicz](https://github.com/osiewicz)
+- Add `metadata_only` attribute [#241](https://github.com/pyrossh/rust-embed/pull/241/files). Thanks to [ddfisher](https://github.com/ddfisher)
+- Replace `expect` with a safer alternative that returns `None` instead [#240](https://github.com/pyrossh/rust-embed/pull/240/files). Thanks to [costinsin](https://github.com/costinsin)
+- Eliminate unnecessary `to_path` call [#239](https://github.com/pyrossh/rust-embed/pull/239/files). Thanks to [smoelius](https://github.com/smoelius)
+
 ## [8.3.0] - 2024-02-26
 
 - Fix symbolic links in debug builds [#235](https://github.com/pyrossh/rust-embed/pull/235/files). Thanks to [Buckram123](https://github.com/Buckram123)
