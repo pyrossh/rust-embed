@@ -3,12 +3,12 @@ use axum::{
   response::{Html, IntoResponse, Response},
   routing::Router,
 };
-use rust_embed::RustEmbed;
+use rust_embed::Embed;
 use std::net::SocketAddr;
 
 static INDEX_HTML: &str = "index.html";
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/axum-spa/assets/"]
 struct Assets;
 

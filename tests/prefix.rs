@@ -1,6 +1,6 @@
-use rust_embed::RustEmbed;
+use rust_embed::Embed;
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 #[prefix = "prefix/"]
 struct Asset;

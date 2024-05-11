@@ -1,8 +1,8 @@
-use rust_embed::{EmbeddedFile, RustEmbed};
+use rust_embed::{Embed, EmbeddedFile};
 use sha2::Digest;
 use std::{fs, time::SystemTime};
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 struct Asset;
 

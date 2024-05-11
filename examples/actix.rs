@@ -1,8 +1,8 @@
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use mime_guess::from_path;
-use rust_embed::RustEmbed;
+use rust_embed::Embed;
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 struct Asset;
 

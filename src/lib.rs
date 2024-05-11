@@ -21,9 +21,9 @@ pub extern crate rust_embed_utils as utils;
 ///
 /// This trait is meant to be derived like so:
 /// ```
-/// use rust_embed::RustEmbed;
+/// use rust_embed::Embed;
 ///
-/// #[derive(RustEmbed)]
+/// #[derive(Embed)]
 /// #[folder = "examples/public/"]
 /// struct Asset;
 ///
@@ -49,6 +49,8 @@ pub trait RustEmbed {
   /// Otherwise, the files are listed from the file system on each call.
   fn iter() -> Filenames;
 }
+
+pub use RustEmbed as Embed;
 
 /// An iterator over filenames.
 ///

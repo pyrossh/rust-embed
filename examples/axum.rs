@@ -3,7 +3,7 @@ use axum::{
   response::{Html, IntoResponse, Response},
   routing::{get, Router},
 };
-use rust_embed::RustEmbed;
+use rust_embed::Embed;
 use std::net::SocketAddr;
 
 #[tokio::main]
@@ -46,7 +46,7 @@ async fn not_found() -> Html<&'static str> {
   Html("<h1>404</h1><p>Not Found</p>")
 }
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 struct Asset;
 

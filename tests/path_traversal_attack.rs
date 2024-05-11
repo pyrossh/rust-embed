@@ -1,6 +1,6 @@
-use rust_embed::RustEmbed;
+use rust_embed::Embed;
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 struct Assets;
 
@@ -12,7 +12,7 @@ fn path_traversal_attack_fails() {
   assert!(Assets::get("../basic.rs").is_none());
 }
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/axum-spa/"]
 struct AxumAssets;
 
