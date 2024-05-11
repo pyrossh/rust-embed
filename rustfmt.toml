@@ -1,9 +1,5 @@
-unstable_features = false
-wrap_comments = true
-normalize_comments = true
 merge_derives = true
 fn_params_layout = "Compressed"
 max_width = 160
 tab_spaces = 2
-indent_style = "Block"
 reorder_imports = true
