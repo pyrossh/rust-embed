@@ -14,7 +14,7 @@ async fn main() -> Result<(), std::io::Error> {
   Ok(())
 }
 
-#[derive(rust_embed::RustEmbed)]
+#[derive(rust_embed::Embed)]
 #[folder = "examples/public/"]
 struct Asset;
 pub(crate) struct StaticEmbed;

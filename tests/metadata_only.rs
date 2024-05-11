@@ -1,6 +1,6 @@
-use rust_embed::{EmbeddedFile, RustEmbed};
+use rust_embed::{Embed, EmbeddedFile};
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 #[metadata_only = true]
 struct Asset;

@@ -3,13 +3,13 @@ extern crate rocket;
 
 use rocket::http::ContentType;
 use rocket::response::content::RawHtml;
-use rust_embed::RustEmbed;
+use rust_embed::Embed;
 
 use std::borrow::Cow;
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 struct Asset;
 

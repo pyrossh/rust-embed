@@ -1,7 +1,7 @@
-use rust_embed::RustEmbed;
+use rust_embed::Embed;
 use warp::{http::header::HeaderValue, path::Tail, reply::Response, Filter, Rejection, Reply};
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 struct Asset;
 

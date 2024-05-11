@@ -21,7 +21,7 @@ The path resolution works as follows:
 - In `release` or when `debug-embed` feature is enabled, the folder path is resolved relative to where `Cargo.toml` is.
 
 ```rust
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 struct Asset;
 ```
@@ -98,7 +98,7 @@ Always embed the files in the binary, even in debug mode.
 Allow environment variables to be used in the `folder` path. Example:
 
 ```rust
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "$CARGO_MANIFEST_DIR/foo"]
 struct Asset;
 ```
@@ -116,7 +116,9 @@ Matching is done on relative file paths, via [`globset`].
 Example:
 
 ```rust
-#[derive(RustEmbed)]
+use rust_embed::Embed;
+
+#[derive(Embed)]
 #[folder = "examples/public/"]
 #[include = "*.html"]
 #[include = "images/*"]
@@ -127,9 +129,9 @@ struct Asset;
 ## Usage
 
 ```rust
-use rust_embed::RustEmbed;
+use rust_embed::Embed;
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 #[prefix = "prefix/"]
 struct Asset;

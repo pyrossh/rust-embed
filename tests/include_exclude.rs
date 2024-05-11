@@ -1,6 +1,6 @@
-use rust_embed::RustEmbed;
+use rust_embed::Embed;
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 struct AllAssets;
 
@@ -13,7 +13,7 @@ fn get_works() {
   assert_eq!(AllAssets::iter().count(), 7);
 }
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 #[include = "*.html"]
 #[include = "images/*"]
@@ -27,7 +27,7 @@ fn including_some_assets_works() {
   assert_eq!(IncludeSomeAssets::iter().count(), 4);
 }
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 #[exclude = "*.html"]
 #[exclude = "images/*"]
@@ -42,7 +42,7 @@ fn excluding_some_assets_works() {
   assert_eq!(ExcludeSomeAssets::iter().count(), 3);
 }
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/"]
 #[include = "images/*"]
 #[exclude = "*.txt"]
@@ -55,7 +55,7 @@ fn exclude_has_higher_priority() {
   assert_eq!(ExcludePriorityAssets::iter().count(), 2);
 }
 
-#[derive(RustEmbed)]
+#[derive(Embed)]
 #[folder = "examples/public/symlinks"]
 #[include = "main.js"]
 struct IncludeSymlink;
