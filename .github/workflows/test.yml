@@ -37,6 +37,8 @@ jobs:
           cargo test --test mime_guess --features "mime-guess" --release
           cargo test --test interpolated_path --features "interpolate-folder-path"
           cargo test --test interpolated_path --features "interpolate-folder-path" --release
+          cargo test --test custom_crate_path
+          cargo test --test custom_crate_path --release
           cargo build --example basic
           cargo build --example rocket --features rocket
           cargo build --example actix --features actix
