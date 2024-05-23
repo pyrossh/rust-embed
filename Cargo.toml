@@ -67,7 +67,7 @@ walkdir = "2.3.2"
 rust-embed-impl = { version = "8.4.0", path = "impl"}
 rust-embed-utils = { version = "8.4.0", path = "utils"}
 
-include-flate = { version = "0.2", optional = true, features = ["stable"] }
+include-flate = { version = "0.3", optional = true }
 actix-web = { version = "4", optional = true }
 mime_guess = { version = "2", optional = true }
 hex = { version = "0.4.3", optional = true }
