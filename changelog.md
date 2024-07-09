@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [8.5.0] - 2024-07-09
+
+- Re-export RustEmbed as Embed [#246](https://github.com/pyrossh/rust-embed/pull/246). Thanks to [krant](https://github.com/krant)
+- Allow users to specify a custom path to the rust_embed crate in generated code[#232](https://github.com/pyrossh/rust-embed/pull/232). Thanks to [Wulf](https://github.com/Wulf)
+- Increase minimum rust-version to v1.7.0.0
+
 ## [8.4.0] - 2024-05-11
 
 - Re-export RustEmbed as Embed [#245](https://github.com/pyrossh/rust-embed/pull/245/files). Thanks to [pyrossh](https://github.com/pyrossh)
