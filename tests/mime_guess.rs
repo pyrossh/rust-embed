@@ -19,7 +19,7 @@ fn css_mime_is_correct() {
 #[test]
 fn js_mime_is_correct() {
   let js_file: EmbeddedFile = Asset::get("main.js").expect("main.js exists");
-  assert_eq!(js_file.metadata.mimetype(), "application/javascript");
+  assert_eq!(js_file.metadata.mimetype(), "text/javascript");
 }
 
 #[test]
