@@ -18,7 +18,7 @@ pub fn get_files(folder_path: String, matcher: PathMatcher) -> impl Iterator<Ite
     .follow_links(true)
     .sort_by_file_name()
     .into_iter()
-    .filter_map(|e| e.ok())
+    .filter_map(std::result::Result::ok)
     .filter(|e| e.file_type().is_file())
     .filter_map(move |e| {
       let rel_path = path_to_str(e.path().strip_prefix(&folder_path).unwrap());
