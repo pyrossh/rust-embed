@@ -14,10 +14,21 @@ pub struct FileEntry {
 
 #[cfg_attr(all(debug_assertions, not(feature = "debug-embed")), allow(unused))]
 pub fn get_files(folder_path: String, matcher: PathMatcher) -> impl Iterator<Item = FileEntry> {
+  let temp_folder_path = folder_path.clone();
+
   walkdir::WalkDir::new(&folder_path)
     .follow_links(true)
     .sort_by_file_name()
     .into_iter()
+    .filter_entry(move |e| {
+      let rel_path = path_to_str(e.path().strip_prefix(&temp_folder_path).unwrap());
+      if e.file_type().is_dir() {
+        // dir must be explicitly excluded
+        !matcher.is_path_excluded(&rel_path)
+      } else {
+        matcher.is_path_included(&rel_path)
+      }
+    })
     .filter_map(|e| e.ok())
     .filter(|e| e.file_type().is_file())
     .filter_map(move |e| {
@@ -29,11 +40,7 @@ pub fn get_files(folder_path: String, matcher: PathMatcher) -> impl Iterator<Ite
       } else {
         rel_path
       };
-      if matcher.is_path_included(&rel_path) {
-        Some(FileEntry { rel_path, full_canonical_path })
-      } else {
-        None
-      }
+      Some(FileEntry { rel_path, full_canonical_path })
     })
 }
 
@@ -172,6 +179,9 @@ impl PathMatcher {
   pub fn is_path_included(&self, path: &str) -> bool {
     !self.exclude_matcher.is_match(path) && (self.include_matcher.is_empty() || self.include_matcher.is_match(path))
   }
+  pub fn is_path_excluded(&self, path: &str) -> bool {
+    self.exclude_matcher.is_match(path)
+  }
 }
 
 #[cfg(not(feature = "include-exclude"))]
@@ -181,5 +191,8 @@ impl PathMatcher {
   }
   pub fn is_path_included(&self, _path: &str) -> bool {
     true
+  }
+  pub fn is_path_excluded(&self, _path: &str) -> bool {
+    false
   }
 }
