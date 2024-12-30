@@ -17,8 +17,9 @@ async fn main() {
   let app = Router::new().fallback(static_handler);
 
   let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+  let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
   println!("listening on {}", addr);
-  axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
+  axum::serve(listener, app.into_make_service()).await.unwrap();
 }
 
 async fn static_handler(uri: Uri) -> impl IntoResponse {
