@@ -324,8 +324,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
 
   let crate_path: syn::Path = find_attribute_values(ast, "crate_path")
     .last()
-    .map(|v| syn::parse_str(v).unwrap())
-    .unwrap_or_else(|| syn::parse_str("rust_embed").unwrap());
+    .map_or_else(|| syn::parse_str("rust_embed").unwrap(), |v| syn::parse_str(v).unwrap());
 
   let mut folder_paths = find_attribute_values(ast, "folder");
   if folder_paths.len() != 1 {
