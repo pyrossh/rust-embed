@@ -121,7 +121,7 @@ This will pull the `foo` directory relative to your `Cargo.toml` file.
 Compress each file when embedding into the binary. Compression is done via [`include-flate`].
 
 ### `include-exclude`
-Filter files to be embedded with multiple `#[include = "*.txt"]` and `#[exclude = "*.jpg"]` attributes.
+Filter files to be embedded with multiple `#[include = "*.txt"]` and `#[exclude = "*.jpg"]` attributes. 
 Matching is done on relative file paths, via [`globset`].
 `exclude` attributes have higher priority than `include` attributes.
 Example:
