@@ -10,6 +10,7 @@ use rust_embed_utils::PathMatcher;
 use std::{
   collections::BTreeMap,
   env,
+  io::ErrorKind,
   iter::FromIterator,
   path::{Path, PathBuf},
 };
@@ -135,7 +136,14 @@ fn dynamic(
       .map(|mut file| { file.data = ::std::default::Default::default(); file })
   });
 
-  let canonical_folder_path = Path::new(&folder_path).canonicalize().expect("folder path must resolve to an absolute path");
+  let non_canonical_folder_path = Path::new(&folder_path);
+  let canonical_folder_path = non_canonical_folder_path
+    .canonicalize()
+    .or_else(|err| match err {
+      err if err.kind() == ErrorKind::NotFound => Ok(non_canonical_folder_path.to_owned()),
+      err => Err(err),
+    })
+    .expect("folder path must resolve to an absolute path");
   let canonical_folder_path = canonical_folder_path.to_str().expect("absolute folder path must be valid unicode");
 
   quote! {
@@ -339,6 +347,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
   let includes = find_attribute_values(ast, "include");
   let excludes = find_attribute_values(ast, "exclude");
   let metadata_only = find_bool_attribute(ast, "metadata_only").unwrap_or(false);
+  let allow_missing = find_bool_attribute(ast, "allow_missing").unwrap_or(false);
 
   #[cfg(not(feature = "include-exclude"))]
   if !includes.is_empty() || !excludes.is_empty() {
@@ -368,9 +377,9 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
     (None, folder_path)
   };
 
-  if !Path::new(&absolute_folder_path).exists() {
+  if !Path::new(&absolute_folder_path).exists() && !allow_missing {
     let mut message = format!(
-      "#[derive(RustEmbed)] folder '{}' does not exist. cwd: '{}'",
+      "#[derive(RustEmbed)] folder '{}' does not exist. To allow the folder to be missing, add #[allow_missing]. cwd: '{}'",
       absolute_folder_path,
       std::env::current_dir().unwrap().to_str().unwrap()
     );
@@ -397,7 +406,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
   )
 }
 
-#[proc_macro_derive(RustEmbed, attributes(folder, prefix, include, exclude, metadata_only, crate_path))]
+#[proc_macro_derive(RustEmbed, attributes(folder, prefix, include, exclude, allow_missing, metadata_only, crate_path))]
 pub fn derive_input_object(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   match impl_rust_embed(&ast) {

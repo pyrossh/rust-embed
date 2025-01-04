@@ -93,6 +93,11 @@ be included in the file paths returned by `iter`.
 You can add `#[metadata_only = true]` to the `RustEmbed` struct to exclude file contents from the
 binary. Only file paths and metadata will be embedded.
 
+### `allow_missing`
+
+You can add `#[allow_missing = true]` to the `RustEmbed` struct to allow the embedded folder to be missing.
+In that case, RustEmbed will be empty.
+
 ## Features
 
 ### `debug-embed`
@@ -116,7 +121,7 @@ This will pull the `foo` directory relative to your `Cargo.toml` file.
 Compress each file when embedding into the binary. Compression is done via [`include-flate`].
 
 ### `include-exclude`
-Filter files to be embedded with multiple `#[include = "*.txt"]` and `#[exclude = "*.jpg"]` attributes. 
+Filter files to be embedded with multiple `#[include = "*.txt"]` and `#[exclude = "*.jpg"]` attributes.
 Matching is done on relative file paths, via [`globset`].
 `exclude` attributes have higher priority than `include` attributes.
 Example:
