@@ -379,7 +379,7 @@ fn impl_rust_embed(ast: &syn::DeriveInput) -> syn::Result<TokenStream2> {
 
   if !Path::new(&absolute_folder_path).exists() && !allow_missing {
     let mut message = format!(
-      "#[derive(RustEmbed)] folder '{}' does not exist. To allow the folder to be missing, add #[allow_missing]. cwd: '{}'",
+      "#[derive(RustEmbed)] folder '{}' does not exist. cwd: '{}'",
       absolute_folder_path,
       std::env::current_dir().unwrap().to_str().unwrap()
     );
