@@ -93,6 +93,11 @@ be included in the file paths returned by `iter`.
 You can add `#[metadata_only = true]` to the `RustEmbed` struct to exclude file contents from the
 binary. Only file paths and metadata will be embedded.
 
+### `allow_missing`
+
+You can add `#[allow_missing = true]` to the `RustEmbed` struct to allow the embedded folder to be missing.
+In that case, RustEmbed will be empty.
+
 ## Features
 
 ### `debug-embed`
