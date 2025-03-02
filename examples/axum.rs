@@ -12,7 +12,7 @@ async fn main() {
   let app = Router::new()
     .route("/", get(index_handler))
     .route("/index.html", get(index_handler))
-    .route("/dist/*file", get(static_handler))
+    .route("/dist/{*file}", get(static_handler))
     .fallback_service(get(not_found));
 
   // Start listening on the given address.
