@@ -137,6 +137,9 @@ use rust_embed::Embed;
 struct Asset;
 ```
 
+### `deterministic-timestamps`
+Overwrite embedded files' timestamps with `0` to preserve deterministic builds with `debug-embed` or release mode
+
 ## Usage
 
 ```rust

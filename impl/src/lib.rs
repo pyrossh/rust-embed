@@ -241,13 +241,18 @@ fn embed_file(
 ) -> syn::Result<TokenStream2> {
   let file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect("File should be readable");
   let hash = file.metadata.sha256_hash();
-  let last_modified = match file.metadata.last_modified() {
-    Some(last_modified) => quote! { ::std::option::Option::Some(#last_modified) },
-    None => quote! { ::std::option::Option::None },
-  };
-  let created = match file.metadata.created() {
-    Some(created) => quote! { ::std::option::Option::Some(#created) },
-    None => quote! { ::std::option::Option::None },
+  let (last_modified, created) = if cfg!(feature = "deterministic-timestamps") {
+    (quote! { ::std::option::Option::Some(0u64) }, quote! { ::std::option::Option::Some(0u64) })
+  } else {
+    let last_modified = match file.metadata.last_modified() {
+      Some(last_modified) => quote! { ::std::option::Option::Some(#last_modified) },
+      None => quote! { ::std::option::Option::None },
+    };
+    let created = match file.metadata.created() {
+      Some(created) => quote! { ::std::option::Option::Some(#created) },
+      None => quote! { ::std::option::Option::None },
+    };
+    (last_modified, created)
   };
   #[cfg(feature = "mime-guess")]
   let mimetype_tokens = {
