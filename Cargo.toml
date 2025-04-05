@@ -92,6 +92,7 @@ warp-ex = ["warp", "tokio", "mime_guess"]
 axum-ex = ["axum", "tokio", "mime_guess"]
 poem-ex = ["poem", "tokio", "mime_guess", "hex"]
 salvo-ex = ["salvo", "tokio", "mime_guess", "hex"]
+deterministic-timestamps = ["rust-embed-impl/deterministic-timestamps"]
 
 
 [badges]
