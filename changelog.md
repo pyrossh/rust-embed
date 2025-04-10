@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Thanks to [Mark Drobnak](https://github.com/AzureMarker) for the changelog.
 
+## [8.7.0] - 2025-04-10
+
+ - add deterministic timestamps flag for deterministic builds [#259](https://github.com/pyrossh/rust-embed/pull/259). Thanks to [daywalker90](https://github.com/daywalker90)
+
+
 ## [8.6.0] - 2025-02-25
 
 - Update include-flate to 0.3 [#246](https://github.com/pyrossh/rust-embed/pull/246). Thanks to [krant](https://github.com/krant)
